@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
 import { swagger } from '@elysiajs/swagger'
-import { openApiConfig } from './config/openapi'
+import { open_api_config } from './config/openapi'
 
 const REDOC_HTML = `<!DOCTYPE html>
 <html>
@@ -17,7 +17,7 @@ const REDOC_HTML = `<!DOCTYPE html>
 </html>`
 
 export const app = new Elysia()
-  .use(swagger(openApiConfig))
+    .use(swagger(open_api_config))
   .get('/', () => 'Hello Elysia')
   .get('/docs', () => new Response(REDOC_HTML, { headers: { 'Content-Type': 'text/html' } }))
 

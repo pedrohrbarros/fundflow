@@ -1,4 +1,4 @@
-export const openApiConfig = {
+export const open_api_config = {
   path: '/openapi' as const,
   documentation: {
     info: {
