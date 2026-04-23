@@ -3,7 +3,8 @@
   "version": "1.0.50",
   "scripts": {
     "test": "bun test",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "migrate": "bash scripts/migrate.sh"
   },
   "dependencies": {
     "@elysiajs/swagger": "^1.3.1",
@@ -15,7 +16,8 @@
   },
   "devDependencies": {
     "bun-types": "latest",
-    "prisma": "^7.8.0"
+    "prisma": "^7.8.0",
+    "supabase": "^2.95.0"
   },
   "module": "src/index.js"
 }

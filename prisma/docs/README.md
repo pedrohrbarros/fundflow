@@ -26,74 +26,80 @@ model User {
 
 ## Running a Migration Against Supabase
 
-Supabase exposes two connection types:
+Migrations use both **Prisma** (schema definition + client generation) and the **Supabase CLI** (applying SQL to the database). A single `bun run migrate` command handles both automatically.
 
-| Type | Port | Use for |
-|------|------|---------|
-| **Transaction pooler** (default `DATABASE_URL`) | 6543 | App queries at runtime |
-| **Direct connection** (`DIRECT_URL`) | 5432 | Prisma migrations |
+### One-time setup per machine
 
-Prisma reads `DATABASE_URL` for runtime queries and `DIRECT_URL` for migrations. Both must be set in `.env`.
+**Log in to Supabase:**
 
-### Step-by-step
-
-**1. Get your connection strings**
-
-Open [Supabase dashboard](https://supabase.com/dashboard) → your project → **Settings** → **Database** → **Connection string**.
-
-Copy:
-- **Transaction** tab → paste as `DATABASE_URL` in `.env`
-- **Direct** tab → paste as `DIRECT_URL` in `.env`
-
-Your `.env` should contain:
-```env
-DATABASE_URL="postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres"
-DIRECT_URL="postgresql://postgres.[ref]:[password]@db.[ref].supabase.co:5432/postgres"
+```bash
+bunx supabase login
 ```
 
-**2. Add a new model to `prisma/schema.prisma`**
+**Link to the Supabase project:**
 
-Edit the schema, then validate:
+```bash
+bunx supabase link --project-ref vucwsoyaqjufmkmozoqk
+```
+
+---
+
+### Running a migration
+
+**1. Update `prisma/schema.prisma`** with your new model or field changes.
+
+**2. Validate the schema:**
 
 ```bash
 bunx prisma validate
 ```
 
-**3. Create and apply the migration**
+**3. Run the combined migrate command:**
 
 ```bash
-bunx prisma migrate dev --name <descriptive-name>
+bun run migrate <descriptive-name>
 ```
 
-This will:
-- Connect via `DIRECT_URL`
-- Generate a timestamped SQL file under `prisma/migrations/`
-- Apply it to your Supabase database
-- Regenerate the Prisma client under `src/prisma/`
+This single command does everything in sequence:
 
-**4. Verify**
+| Step | What happens |
+|------|-------------|
+| `prisma migrate dev --name <name>` | Generates SQL, applies it to the DB, updates Prisma's migration log |
+| `supabase migration new <name>` | Creates a matching timestamped file in `supabase/migrations/` |
+| Copies SQL with `IF NOT EXISTS` guards | Makes the Supabase migration safe to re-run if needed |
+| `supabase db push` | Registers the migration in Supabase's tracking table |
+
+**4. Run the tests to confirm the schema is live:**
 
 ```bash
-bunx prisma studio
+bun test
 ```
 
-Opens a browser UI where you can inspect your tables and rows.
-
-**5. Commit the migration**
+**5. Commit:**
 
 ```bash
-git add prisma/migrations src/prisma
+git add prisma/schema.prisma prisma/migrations src/prisma supabase/migrations
 git commit -m "feat(db): <describe the migration>"
 ```
 
-> Never edit files inside `prisma/migrations/` or `src/prisma/` manually — they are generated artifacts.
+> Never edit files inside `src/prisma/` or `prisma/migrations/` manually — they are generated artifacts.
 
-### Deploying to production
+---
 
-For CI/CD or production environments (where you want to apply without prompts):
+### Migration history
 
-```bash
-bunx prisma migrate deploy
+#### `add_user` — 2026-04-23
+
+Added the `users` table to store Clerk user IDs synced via the `user.created` webhook.
+
+**File:** `supabase/migrations/20260423183504_add_user.sql`
+
+```sql
+CREATE TABLE IF NOT EXISTS "users" (
+    "id" BIGSERIAL NOT NULL,
+    "external_id" TEXT NOT NULL,
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "users_external_id_key" ON "users"("external_id");
 ```
-
-This applies all pending migrations without creating new ones. Use this in your deploy pipeline.
