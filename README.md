@@ -79,9 +79,40 @@ app.get('/protected', handler, { beforeHandle: requireAuth })
 
 ### Running Tests
 
+Run the full test suite:
+
 ```bash
 bun test
 ```
+
+Run a specific test file:
+
+```bash
+bun test src/tests/middleware/auth.test.ts
+bun test src/tests/api/index.test.ts
+bun test src/tests/docs/openapi.test.ts
+bun test src/tests/db/client.test.ts
+bun test src/tests/db/user.test.ts
+```
+
+Run tests matching a pattern:
+
+```bash
+bun test --watch          # re-run on file changes
+bun test --bail           # stop after first failure
+```
+
+**Database tests** (`src/tests/db/`) connect to your real Supabase database. Make sure `DATABASE_URL` is set in `.env` before running them.
+
+#### Test files
+
+| File | What it covers |
+|------|---------------|
+| `src/tests/api/index.test.ts` | OpenAPI JSON spec + ReDoc HTML endpoint |
+| `src/tests/docs/openapi.test.ts` | OpenAPI config metadata and security schemes |
+| `src/tests/middleware/auth.test.ts` | Bearer token middleware (valid, invalid, missing) |
+| `src/tests/db/client.test.ts` | Prisma client singleton shape |
+| `src/tests/db/user.test.ts` | User model: create and clean up a record |
 
 ### Project Structure
 
@@ -89,18 +120,27 @@ bun test
 src/
 ├── index.ts                  # App entry point
 ├── config/
+│   ├── db.ts                 # Prisma client singleton
 │   ├── openapi.ts            # OpenAPI metadata and security schemes
 │   └── redis.ts              # Redis client
 ├── middleware/
 │   └── auth.ts               # Bearer token authentication middleware
+├── routes/
+│   └── webhooks/
+│       └── clerk.ts          # Clerk webhook handlers
 └── tests/
     ├── api/
     │   └── index.test.ts     # Integration tests for API endpoints
     ├── db/
-    │   └── client.test.ts    # Prisma client tests
+    │   ├── client.test.ts    # Prisma client singleton tests
+    │   └── user.test.ts      # User model integration tests
+    ├── docs/
+    │   └── openapi.test.ts   # OpenAPI config tests
     └── middleware/
         └── auth.test.ts      # Unit tests for auth middleware
 
 prisma/
-└── schema.prisma             # Prisma schema (PostgreSQL / Supabase)
+├── schema.prisma             # Prisma schema (PostgreSQL / Supabase)
+└── docs/
+    └── README.md             # Schema reference + migration guide
 ```

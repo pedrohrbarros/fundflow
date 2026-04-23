@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'bun:test'
-import { db } from '../../db/index'
+import { db } from '../../config/db'
 
 describe('Prisma client singleton', () => {
   it('exports a defined db instance', () => {
