@@ -77,6 +77,34 @@ app.get('/protected', handler, { beforeHandle: requireAuth })
 
 ## Development
 
+### Code Formatting
+
+This project uses [Prettier](https://prettier.io/) for code formatting. Formatting runs automatically on every commit via [Husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) — only staged files are formatted.
+
+**Config:** `.prettierrc`
+
+| Option          | Value     |
+|-----------------|-----------|
+| `semi`          | `false`   |
+| `singleQuote`   | `true`    |
+| `tabWidth`      | `2`       |
+| `trailingComma` | `es5`     |
+| `printWidth`    | `100`     |
+
+To format all files manually:
+
+```bash
+bunx prettier --write .
+```
+
+To check for formatting issues without writing:
+
+```bash
+bunx prettier --check .
+```
+
+Git hooks are installed automatically on `bun install` via the `prepare` script.
+
 ### Running Tests
 
 Run the full test suite:
