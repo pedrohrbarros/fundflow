@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia'
 import { swagger } from '@elysiajs/swagger'
 import { open_api_config } from './config/openapi'
+import { withBearerAuth } from './middleware/auth'
 import { webhooks } from './routes/v1/webhooks'
 
 const REDOC_HTML = `<!DOCTYPE html>
@@ -19,7 +20,7 @@ const REDOC_HTML = `<!DOCTYPE html>
 
 export const app = new Elysia()
   .use(swagger(open_api_config))
-  .group('/v1', (app) => app.use(webhooks))
+  .group('/v1', (app) => withBearerAuth(app).use(webhooks))
   .get('/', () => 'Hello Elysia')
   .get('/docs', () => new Response(REDOC_HTML, { headers: { 'Content-Type': 'text/html' } }))
 

@@ -1,7 +1,6 @@
 import { Elysia } from 'elysia'
-import { clerkUserCreatedListenerWebhook } from './webhooks/clerk/user-created'
+import { clerkRegisterWebhook } from './webhooks/clerk/register'
 
-export const webhooks = new Elysia().post(
-  '/webhooks/clerk/user-created/listener',
-  clerkUserCreatedListenerWebhook
-)
+export const webhooks = new Elysia()
+  .onParse(({ request }) => request.text())
+  .post('/webhooks/clerk/register', clerkRegisterWebhook)

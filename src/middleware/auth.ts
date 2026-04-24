@@ -1,14 +1,11 @@
-import type { Context } from 'elysia'
+import { Elysia } from 'elysia'
 
-export function requireAuth({ headers, set }: Pick<Context, 'headers' | 'set'>) {
-  const auth = headers['authorization']
-  if (!auth?.startsWith('Bearer ')) {
-    set.status = 401
-    return 'Unauthorized'
-  }
-  const token = auth.slice(7)
-  if (token !== process.env.API_KEY) {
-    set.status = 401
-    return 'Unauthorized'
-  }
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const withBearerAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
+  app.onBeforeHandle(({ request, set }) => {
+    const authorizationHeader = request.headers.get('authorization')
+    if (!authorizationHeader || authorizationHeader !== `Bearer ${process.env.API_TOKEN}`) {
+      set.status = 401
+      return { error: 'Unauthorized' }
+    }
+  })
