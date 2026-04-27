@@ -24,10 +24,10 @@ Each route group has two parts:
 
 ### Naming
 
-| What | Pattern | Example |
-|------|---------|---------|
-| Plugin file | `<resource>.ts` | `webhooks.ts` |
-| Handler file | `<provider>/<event>.ts` | `clerk/user-created.ts` |
+| What           | Pattern                                | Example                           |
+| -------------- | -------------------------------------- | --------------------------------- |
+| Plugin file    | `<resource>.ts`                        | `webhooks.ts`                     |
+| Handler file   | `<provider>/<event>.ts`                | `clerk/user-created.ts`           |
 | Handler export | `<provider><Event>Handler` (camelCase) | `clerkUserCreatedListenerWebhook` |
 
 ### Route paths
@@ -50,6 +50,6 @@ Example: `POST /webhooks/clerk/user-created/listener`
 
 ### Webhooks
 
-| Method | Path | Description |
-|--------|------|-------------|
+| Method | Path                                       | Description                                             |
+| ------ | ------------------------------------------ | ------------------------------------------------------- |
 | `POST` | `/v1/webhooks/clerk/user-created/listener` | Creates a user record from a Clerk `user.created` event |

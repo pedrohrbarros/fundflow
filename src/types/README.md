@@ -29,9 +29,9 @@ import type { ClerkUserCreatedPayload } from '../../types/webhooks/clerk'
 
 ### Naming
 
-| What | Pattern | Example |
-|------|---------|---------|
-| Payload type | `<Provider><Event>Payload` | `ClerkUserCreatedPayload` |
+| What          | Pattern                     | Example                    |
+| ------------- | --------------------------- | -------------------------- |
+| Payload type  | `<Provider><Event>Payload`  | `ClerkUserCreatedPayload`  |
 | Response type | `<Provider><Event>Response` | `ClerkUserCreatedResponse` |
 
 ### Adding new types
@@ -44,6 +44,6 @@ import type { ClerkUserCreatedPayload } from '../../types/webhooks/clerk'
 
 ### `webhooks/clerk`
 
-| Type | Description |
-|------|-------------|
+| Type                      | Description                                            |
+| ------------------------- | ------------------------------------------------------ |
 | `ClerkUserCreatedPayload` | Shape of the `user.created` webhook body sent by Clerk |

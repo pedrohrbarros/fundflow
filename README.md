@@ -33,8 +33,8 @@ DATABASE_URL=postgresql://user:password@host:5432/dbname
 REDIS_URL=redis://localhost:6379
 ```
 
-| Variable       | Required | Description                                     |
-|----------------|----------|-------------------------------------------------|
+| Variable       | Required | Description                                    |
+| -------------- | -------- | ---------------------------------------------- |
 | `API_KEY`      | Yes      | Bearer token used to authenticate API requests |
 | `DATABASE_URL` | Yes      | PostgreSQL connection string (Supabase)        |
 | `REDIS_URL`    | Yes      | Redis connection string                        |
@@ -53,11 +53,11 @@ Interactive documentation is available at `http://localhost:3000/docs` (ReDoc UI
 
 ### Endpoints
 
-| Method | Path            | Auth | Description                       |
-|--------|-----------------|------|-----------------------------------|
-| `GET`  | `/`             | No   | Health check                      |
+| Method | Path            | Auth | Description                      |
+| ------ | --------------- | ---- | -------------------------------- |
+| `GET`  | `/`             | No   | Health check                     |
 | `GET`  | `/openapi/json` | No   | OpenAPI 3.0 specification (JSON) |
-| `GET`  | `/docs`         | No   | Interactive API documentation     |
+| `GET`  | `/docs`         | No   | Interactive API documentation    |
 
 ### Authentication
 
@@ -83,13 +83,13 @@ This project uses [Prettier](https://prettier.io/) for code formatting. Formatti
 
 **Config:** `.prettierrc`
 
-| Option          | Value     |
-|-----------------|-----------|
-| `semi`          | `false`   |
-| `singleQuote`   | `true`    |
-| `tabWidth`      | `2`       |
-| `trailingComma` | `es5`     |
-| `printWidth`    | `100`     |
+| Option          | Value   |
+| --------------- | ------- |
+| `semi`          | `false` |
+| `singleQuote`   | `true`  |
+| `tabWidth`      | `2`     |
+| `trailingComma` | `es5`   |
+| `printWidth`    | `100`   |
 
 To format all files manually:
 
@@ -134,13 +134,13 @@ bun test --bail           # stop after first failure
 
 #### Test files
 
-| File | What it covers |
-|------|---------------|
-| `src/tests/api/index.test.ts` | OpenAPI JSON spec + ReDoc HTML endpoint |
-| `src/tests/docs/openapi.test.ts` | OpenAPI config metadata and security schemes |
+| File                                | What it covers                                    |
+| ----------------------------------- | ------------------------------------------------- |
+| `src/tests/api/index.test.ts`       | OpenAPI JSON spec + ReDoc HTML endpoint           |
+| `src/tests/docs/openapi.test.ts`    | OpenAPI config metadata and security schemes      |
 | `src/tests/middleware/auth.test.ts` | Bearer token middleware (valid, invalid, missing) |
-| `src/tests/db/client.test.ts` | Prisma client singleton shape |
-| `src/tests/db/user.test.ts` | User model: create and clean up a record |
+| `src/tests/db/client.test.ts`       | Prisma client singleton shape                     |
+| `src/tests/db/user.test.ts`         | User model: create and clean up a record          |
 
 ### Project Structure
 

@@ -6,10 +6,10 @@
 
 Represents a registered user. Created when Clerk fires a `user.created` webhook.
 
-| Column | Type | Constraints | Description |
-|--------|------|-------------|-------------|
-| `id` | `BigInt` | PK, auto-increment | Internal surrogate key |
-| `external_id` | `String` | UNIQUE, NOT NULL | Clerk user ID (`data.id` from the webhook payload) |
+| Column        | Type     | Constraints        | Description                                        |
+| ------------- | -------- | ------------------ | -------------------------------------------------- |
+| `id`          | `BigInt` | PK, auto-increment | Internal surrogate key                             |
+| `external_id` | `String` | UNIQUE, NOT NULL   | Clerk user ID (`data.id` from the webhook payload) |
 
 **Table name:** `users` (mapped via `@@map("users")`)
 
@@ -62,12 +62,12 @@ bun run migrate <descriptive-name>
 
 This single command does everything in sequence:
 
-| Step | What happens |
-|------|-------------|
-| `prisma migrate dev --name <name>` | Generates SQL, applies it to the DB, updates Prisma's migration log |
-| `supabase migration new <name>` | Creates a matching timestamped file in `supabase/migrations/` |
-| Copies SQL with `IF NOT EXISTS` guards | Makes the Supabase migration safe to re-run if needed |
-| `supabase db push` | Registers the migration in Supabase's tracking table |
+| Step                                   | What happens                                                        |
+| -------------------------------------- | ------------------------------------------------------------------- |
+| `prisma migrate dev --name <name>`     | Generates SQL, applies it to the DB, updates Prisma's migration log |
+| `supabase migration new <name>`        | Creates a matching timestamped file in `supabase/migrations/`       |
+| Copies SQL with `IF NOT EXISTS` guards | Makes the Supabase migration safe to re-run if needed               |
+| `supabase db push`                     | Registers the migration in Supabase's tracking table                |
 
 **4. Run the tests to confirm the schema is live:**
 
