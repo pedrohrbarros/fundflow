@@ -53,11 +53,19 @@ Interactive documentation is available at `http://localhost:3000/docs` (ReDoc UI
 
 ### Endpoints
 
-| Method | Path            | Auth | Description                      |
-| ------ | --------------- | ---- | -------------------------------- |
-| `GET`  | `/`             | No   | Health check                     |
-| `GET`  | `/openapi/json` | No   | OpenAPI 3.0 specification (JSON) |
-| `GET`  | `/docs`         | No   | Interactive API documentation    |
+| Method | Path            | Auth | Rate limit | Description                      |
+| ------ | --------------- | ---- | ---------- | -------------------------------- |
+| `GET`  | `/`             | No   | —          | Health check                     |
+| `GET`  | `/openapi/json` | No   | —          | OpenAPI 3.0 specification (JSON) |
+| `GET`  | `/docs`         | No   | —          | Interactive API documentation    |
+
+### Webhooks
+
+| Method | Path                        | Auth | Rate limit    | IP allowlist       | Description              |
+| ------ | --------------------------- | ---- | ------------- | ------------------ | ------------------------ |
+| `POST` | `/v1/webhooks/clerk/register` | Svix | 50 req/min  | Clerk IPs only     | Clerk `user.created` event → creates user record |
+
+The rate limit (50 req/min) applies to all `/v1/webhooks/*` routes. Requests from IPs outside Clerk's published ranges are rejected with `403` before reaching the handler. The full allowlist is in `src/constants/api/webhooks/rules/clerk.ts`.
 
 ### Authentication
 

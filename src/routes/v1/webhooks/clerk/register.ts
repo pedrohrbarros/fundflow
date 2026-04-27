@@ -2,6 +2,7 @@ import type { Context } from 'elysia'
 import { db } from '../../../../config/db'
 import { verifySvixSignature } from '../../../../helpers/webhooks/auth/svix'
 import { handleError } from '../../../../middleware/error'
+import type { ClerkUserCreatedEvent } from '../../../../types/webhooks/clerk'
 
 export const clerkRegisterWebhook = async ({ request, body, set }: Context) => {
   const raw_body = body as string
@@ -20,9 +21,9 @@ export const clerkRegisterWebhook = async ({ request, body, set }: Context) => {
     return handleError(set, 400, 'Webhook verification failed', { reason: verification.reason })
   }
 
-  let event: { type: string; data: { id?: string } }
+  let event: ClerkUserCreatedEvent
   try {
-    event = JSON.parse(raw_body)
+    event = JSON.parse(raw_body) as ClerkUserCreatedEvent
   } catch (error) {
     return handleError(set, 400, 'Invalid JSON body', { error })
   }
