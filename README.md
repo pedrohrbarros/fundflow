@@ -61,9 +61,9 @@ Interactive documentation is available at `http://localhost:3000/docs` (ReDoc UI
 
 ### Webhooks
 
-| Method | Path                        | Auth | Rate limit    | IP allowlist       | Description              |
-| ------ | --------------------------- | ---- | ------------- | ------------------ | ------------------------ |
-| `POST` | `/v1/webhooks/clerk/register` | Svix | 50 req/min  | Clerk IPs only     | Clerk `user.created` event → creates user record |
+| Method | Path                          | Auth | Rate limit | IP allowlist   | Description                                      |
+| ------ | ----------------------------- | ---- | ---------- | -------------- | ------------------------------------------------ |
+| `POST` | `/v1/webhooks/clerk/register` | Svix | 50 req/min | Clerk IPs only | Clerk `user.created` event → creates user record |
 
 The rate limit (50 req/min) applies to all `/v1/webhooks/*` routes. Requests from IPs outside Clerk's published ranges are rejected with `403` before reaching the handler. The full allowlist is in `src/constants/api/webhooks/rules/clerk.ts`.
 

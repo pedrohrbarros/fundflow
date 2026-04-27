@@ -23,6 +23,30 @@ export const webhooks = new Elysia()
       }
     },
     detail: {
+      security: [{ bearerAuth: [] }],
+      parameters: [
+        {
+          name: 'svix-id',
+          in: 'header',
+          required: true,
+          schema: { type: 'string' },
+          description: 'Unique message identifier for the webhook payload',
+        },
+        {
+          name: 'svix-timestamp',
+          in: 'header',
+          required: true,
+          schema: { type: 'string' },
+          description: 'Unix timestamp (seconds) when the webhook was sent',
+        },
+        {
+          name: 'svix-signature',
+          in: 'header',
+          required: true,
+          schema: { type: 'string' },
+          description: 'Space-delimited list of signatures (e.g. v1,<base64>)',
+        },
+      ],
       requestBody: {
         required: true,
         content: {
