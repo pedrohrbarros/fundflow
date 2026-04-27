@@ -83,21 +83,21 @@ Structured logging via [pino](https://github.com/pinojs/pino). In development, o
 
 Controlled by the `LOG_LEVEL` environment variable (default: `info`).
 
-| Level   | Used for                                      |
-| ------- | --------------------------------------------- |
-| `error` | Unhandled request errors                      |
-| `warn`  | DB warnings                                   |
+| Level   | Used for                                          |
+| ------- | ------------------------------------------------- |
+| `error` | Unhandled request errors                          |
+| `warn`  | DB warnings                                       |
 | `info`  | Request lifecycle (incoming + completed), DB info |
-| `debug` | DB queries (SQL + duration, params redacted)  |
+| `debug` | DB queries (SQL + duration, params redacted)      |
 
 ### Loggers
 
-| Export             | Context field  | Where used                                  |
-| ------------------ | -------------- | ------------------------------------------- |
-| `logger`           | —              | App startup (`src/index.ts`)                |
-| `endpoint_logger`  | `endpoint`     | `onRequest`, `onAfterResponse`, `onError`   |
-| `db_logger`        | `db`           | Prisma query/info/warn/error events         |
-| `migration_logger` | `migration`    | Available for TypeScript migration scripts  |
+| Export             | Context field | Where used                                 |
+| ------------------ | ------------- | ------------------------------------------ |
+| `logger`           | —             | App startup (`src/index.ts`)               |
+| `endpoint_logger`  | `endpoint`    | `onRequest`, `onAfterResponse`, `onError`  |
+| `db_logger`        | `db`          | Prisma query/info/warn/error events        |
+| `migration_logger` | `migration`   | Available for TypeScript migration scripts |
 
 ### DB query logging
 
@@ -109,10 +109,10 @@ LOG_LEVEL=debug bun run dev
 
 ### Environment variables
 
-| Variable    | Required | Description                                  |
-| ----------- | -------- | -------------------------------------------- |
-| `LOG_LEVEL` | No       | Minimum log level (default: `info`)          |
-| `NODE_ENV`  | No       | Set to `production` for JSON-only output     |
+| Variable    | Required | Description                              |
+| ----------- | -------- | ---------------------------------------- |
+| `LOG_LEVEL` | No       | Minimum log level (default: `info`)      |
+| `NODE_ENV`  | No       | Set to `production` for JSON-only output |
 
 ## Development
 
