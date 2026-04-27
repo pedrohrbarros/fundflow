@@ -1,6 +1,9 @@
 import { Elysia } from 'elysia'
 import { swagger } from '@elysiajs/swagger'
 import { open_api_config } from './config/openapi'
+import { withBearerAuth } from './middleware/auth'
+import { webhooks } from './routes/v1/webhooks'
+import { endpoint_logger, logger } from './config/logging'
 
 const REDOC_HTML = `<!DOCTYPE html>
 <html>
@@ -17,11 +20,33 @@ const REDOC_HTML = `<!DOCTYPE html>
 </html>`
 
 export const app = new Elysia()
-    .use(swagger(open_api_config))
-  .get('/', () => 'Hello Elysia')
+  .derive(() => ({ requestStart: Date.now() }))
+  .onRequest(({ request }) => {
+    endpoint_logger.info({ method: request.method, url: request.url }, 'Incoming request')
+  })
+  .onAfterResponse(({ request, set, requestStart }) => {
+    endpoint_logger.info(
+      {
+        method: request.method,
+        url: request.url,
+        status: set.status,
+        duration: Date.now() - requestStart,
+      },
+      'Request completed'
+    )
+  })
+  .onError(({ error, request, set }) => {
+    endpoint_logger.error(
+      { method: request.method, url: request.url, status: set.status, error: String(error) },
+      'Request error'
+    )
+  })
+  .use(swagger(open_api_config))
+  .group('/v1', (app) => withBearerAuth(app).use(webhooks))
+  .get('/', () => 'Fundflow API')
   .get('/docs', () => new Response(REDOC_HTML, { headers: { 'Content-Type': 'text/html' } }))
 
 if (import.meta.main) {
   app.listen(3000)
-  console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`)
+  logger.info(`Fundflow is running at ${app.server?.hostname}:${app.server?.port}`)
 }

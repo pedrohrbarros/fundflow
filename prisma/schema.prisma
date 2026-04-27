@@ -1,8 +1,15 @@
 generator client {
   provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  output   = "../src/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id          BigInt @id @default(autoincrement())
+  external_id String @unique
+
+  @@map("users")
 }

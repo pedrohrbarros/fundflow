@@ -4,16 +4,16 @@ export const open_api_config = {
     info: {
       title: 'Fundflow',
       description: 'Fundflow API documentation',
-      version: '1.0.0'
+      version: '1.0.0',
     },
     components: {
       securitySchemes: {
         bearerAuth: {
           type: 'http' as const,
           scheme: 'bearer',
-          description: 'Bearer token authentication (JWT or similar)'
-        }
-      }
-    }
-  }
+          description: 'Bearer token authentication (JWT or similar)',
+        },
+      },
+    },
+  },
 }
