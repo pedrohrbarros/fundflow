@@ -75,6 +75,45 @@ import { requireAuth } from './middleware/auth'
 app.get('/protected', handler, { beforeHandle: requireAuth })
 ```
 
+## Logging
+
+Structured logging via [pino](https://github.com/pinojs/pino). In development, output is pretty-printed with color; in production, it is newline-delimited JSON.
+
+### Log levels
+
+Controlled by the `LOG_LEVEL` environment variable (default: `info`).
+
+| Level   | Used for                                      |
+| ------- | --------------------------------------------- |
+| `error` | Unhandled request errors                      |
+| `warn`  | DB warnings                                   |
+| `info`  | Request lifecycle (incoming + completed), DB info |
+| `debug` | DB queries (SQL + duration, params redacted)  |
+
+### Loggers
+
+| Export             | Context field  | Where used                                  |
+| ------------------ | -------------- | ------------------------------------------- |
+| `logger`           | —              | App startup (`src/index.ts`)                |
+| `endpoint_logger`  | `endpoint`     | `onRequest`, `onAfterResponse`, `onError`   |
+| `db_logger`        | `db`           | Prisma query/info/warn/error events         |
+| `migration_logger` | `migration`    | Available for TypeScript migration scripts  |
+
+### DB query logging
+
+DB queries are logged at `debug` level only. `e.params` (bound values) is intentionally excluded to avoid logging PII. To see queries locally:
+
+```bash
+LOG_LEVEL=debug bun run dev
+```
+
+### Environment variables
+
+| Variable    | Required | Description                                  |
+| ----------- | -------- | -------------------------------------------- |
+| `LOG_LEVEL` | No       | Minimum log level (default: `info`)          |
+| `NODE_ENV`  | No       | Set to `production` for JSON-only output     |
+
 ## Development
 
 ### Code Formatting
@@ -149,6 +188,7 @@ src/
 ├── index.ts                  # App entry point
 ├── config/
 │   ├── db.ts                 # Prisma client singleton
+│   ├── logging.ts            # pino loggers (endpoint_logger, db_logger, migration_logger)
 │   ├── openapi.ts            # OpenAPI metadata and security schemes
 │   └── redis.ts              # Redis client
 ├── middleware/
