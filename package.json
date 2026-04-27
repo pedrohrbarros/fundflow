@@ -5,7 +5,8 @@
     "test": "bun test",
     "dev": "bun run --watch src/index.ts",
     "migrate": "bash scripts/migrate.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "@clerk/backend": "^3.3.0",
