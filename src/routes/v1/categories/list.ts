@@ -1,14 +1,9 @@
 import type { Context } from 'elysia'
-import { db } from '../../../../config/db'
+import { categoriesService } from '../../../../services/categories'
 import { handleError } from '../../../../middleware/error'
 
 export const listCategories = async ({ set }: Context) => {
-  let categories
-  try {
-    categories = await db.sourceOfIncomeCategory.findMany({ orderBy: { id: 'asc' } })
-  } catch (err) {
-    return handleError(set, 500, 'Failed to fetch categories', { err })
-  }
-
-  return { categories: categories.map((c) => ({ id: c.id.toString(), name: c.name })) }
+  const result = await categoriesService.list()
+  if (!result.ok) return handleError(set, result.status, result.message, result.meta)
+  return { categories: result.data }
 }
