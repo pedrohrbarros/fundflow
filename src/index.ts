@@ -4,6 +4,7 @@ import { open_api_config } from './config/openapi'
 import { withBearerAuth } from './middleware/auth'
 import { webhooks } from './routes/v1/webhooks'
 import { categories } from './routes/v1/categories'
+import { sources_of_income } from './routes/v1/sources_of_income'
 import { endpoint_logger, logger } from './config/logging'
 
 const REDOC_HTML = `<!DOCTYPE html>
@@ -43,7 +44,7 @@ export const app = new Elysia()
     )
   })
   .use(swagger(open_api_config))
-  .group('/v1', (app) => withBearerAuth(app).use(webhooks).use(categories))
+  .group('/v1', (app) => withBearerAuth(app).use(webhooks).use(categories).use(sources_of_income))
   .get('/', () => 'Fundflow API')
   .get('/docs', () => new Response(REDOC_HTML, { headers: { 'Content-Type': 'text/html' } }))
 
