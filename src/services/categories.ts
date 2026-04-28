@@ -4,7 +4,7 @@ import type { ServiceResult } from './types'
 
 type CategoryRecord = { id: string; name: string }
 
-export const categoriesService = {
+export const CategoriesService = {
   async create(name: string): Promise<ServiceResult<CategoryRecord>> {
     try {
       const category = await db.sourceOfIncomeCategory.create({ data: { name } })
@@ -22,7 +22,10 @@ export const categoriesService = {
   async list(): Promise<ServiceResult<CategoryRecord[]>> {
     try {
       const categories = await db.sourceOfIncomeCategory.findMany({ orderBy: { id: 'asc' } })
-      return { ok: true, data: categories.map((c) => ({ id: c.id.toString(), name: c.name })) }
+      return {
+        ok: true,
+        data: categories.map((category) => ({ id: category.id.toString(), name: category.name })),
+      }
     } catch (err: unknown) {
       return {
         ok: false,

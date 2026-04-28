@@ -2,7 +2,7 @@ import { db } from '../config/db'
 import type { ServiceResult } from './types'
 import type { SourceOfIncomeRecord } from '../types/sources_of_income'
 
-export const sourcesOfIncomeService = {
+export const SourcesOfIncomeService = {
   async create(
     name: string,
     category_id: bigint,

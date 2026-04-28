@@ -2,7 +2,7 @@
 import { db } from '../../config/db'
 import type { ServiceResult } from '../types'
 
-export const clerkWebhookService = {
+export const ClerkWebhookService = {
   async registerUser(
     external_id: string
   ): Promise<ServiceResult<{ id: string; external_id: string }>> {

@@ -2,7 +2,7 @@
 import type { Context } from 'elysia'
 import { verifySvixSignature } from '../../../../helpers/webhooks/auth/svix'
 import { handleError } from '../../../../middleware/error'
-import { clerkWebhookService } from '../../../../services/webhooks/clerk'
+import { ClerkWebhookService } from '../../../../services/webhooks/clerk'
 import type { ClerkUserCreatedEvent } from '../../../../types/webhooks/clerk'
 
 export const clerkRegisterWebhook = async ({ request, body, set }: Context) => {
@@ -34,7 +34,7 @@ export const clerkRegisterWebhook = async ({ request, body, set }: Context) => {
   if (!external_id)
     return handleError(set, 400, 'Missing user id in webhook payload', { event_type: event.type })
 
-  const result = await clerkWebhookService.registerUser(external_id)
+  const result = await ClerkWebhookService.registerUser(external_id)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
 
   set.status = 201
