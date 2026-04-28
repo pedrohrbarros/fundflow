@@ -43,11 +43,15 @@ describe('UserSourceOfIncome model', () => {
       data: { user_id: userId, source_of_income_id: sourceId },
     })
 
-    expect(
-      db.userSourceOfIncome.create({
+    let threw = false
+    try {
+      await db.userSourceOfIncome.create({
         data: { user_id: userId, source_of_income_id: sourceId },
       })
-    ).rejects.toThrow()
+    } catch {
+      threw = true
+    }
+    expect(threw).toBe(true)
   })
 
   it('fetches a user with their sources of income', async () => {
