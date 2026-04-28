@@ -1,6 +1,6 @@
 import type { Context } from 'elysia'
-import { CategoriesService } from '../../../../services/categories'
-import { handleError } from '../../../../middleware/error'
+import { CategoriesService } from '../../../services/categories'
+import { handleError } from '../../../middleware/error'
 
 export const deleteCategory = async ({ params, set }: Context) => {
   const id = BigInt((params as { id: string }).id)
