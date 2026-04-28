@@ -49,6 +49,9 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  SourceOfIncomeCategory: 'SourceOfIncomeCategory',
+  SourceOfIncome: 'SourceOfIncome',
+  UserSourceOfIncome: 'UserSourceOfIncome',
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -73,6 +76,32 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+export const SourceOfIncomeCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+} as const
+
+export type SourceOfIncomeCategoryScalarFieldEnum =
+  (typeof SourceOfIncomeCategoryScalarFieldEnum)[keyof typeof SourceOfIncomeCategoryScalarFieldEnum]
+
+export const SourceOfIncomeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  category_id: 'category_id',
+  income: 'income',
+} as const
+
+export type SourceOfIncomeScalarFieldEnum =
+  (typeof SourceOfIncomeScalarFieldEnum)[keyof typeof SourceOfIncomeScalarFieldEnum]
+
+export const UserSourceOfIncomeScalarFieldEnum = {
+  user_id: 'user_id',
+  source_of_income_id: 'source_of_income_id',
+} as const
+
+export type UserSourceOfIncomeScalarFieldEnum =
+  (typeof UserSourceOfIncomeScalarFieldEnum)[keyof typeof UserSourceOfIncomeScalarFieldEnum]
 
 export const SortOrder = {
   asc: 'asc',

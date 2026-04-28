@@ -188,11 +188,13 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.BigIntFilter<'User'> | bigint | number
   external_id?: Prisma.StringFilter<'User'> | string
+  sources_of_income?: Prisma.UserSourceOfIncomeListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   external_id?: Prisma.SortOrder
+  sources_of_income?: Prisma.UserSourceOfIncomeOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<
@@ -202,6 +204,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
     AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
     OR?: Prisma.UserWhereInput[]
     NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
+    sources_of_income?: Prisma.UserSourceOfIncomeListRelationFilter
   },
   'id' | 'external_id'
 >
@@ -227,21 +230,25 @@ export type UserScalarWhereWithAggregatesInput = {
 export type UserCreateInput = {
   id?: bigint | number
   external_id: string
+  sources_of_income?: Prisma.UserSourceOfIncomeCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: bigint | number
   external_id: string
+  sources_of_income?: Prisma.UserSourceOfIncomeUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  sources_of_income?: Prisma.UserSourceOfIncomeUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  sources_of_income?: Prisma.UserSourceOfIncomeUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -282,6 +289,11 @@ export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
+export type UserScalarRelationFilter = {
+  is?: Prisma.UserWhereInput
+  isNot?: Prisma.UserWhereInput
+}
+
 export type BigIntFieldUpdateOperationsInput = {
   set?: bigint | number
   increment?: bigint | number
@@ -294,12 +306,123 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
+export type UserCreateNestedOneWithoutSources_of_incomeInput = {
+  create?: Prisma.XOR<
+    Prisma.UserCreateWithoutSources_of_incomeInput,
+    Prisma.UserUncheckedCreateWithoutSources_of_incomeInput
+  >
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSources_of_incomeInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSources_of_incomeNestedInput = {
+  create?: Prisma.XOR<
+    Prisma.UserCreateWithoutSources_of_incomeInput,
+    Prisma.UserUncheckedCreateWithoutSources_of_incomeInput
+  >
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSources_of_incomeInput
+  upsert?: Prisma.UserUpsertWithoutSources_of_incomeInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<
+    Prisma.XOR<
+      Prisma.UserUpdateToOneWithWhereWithoutSources_of_incomeInput,
+      Prisma.UserUpdateWithoutSources_of_incomeInput
+    >,
+    Prisma.UserUncheckedUpdateWithoutSources_of_incomeInput
+  >
+}
+
+export type UserCreateWithoutSources_of_incomeInput = {
+  id?: bigint | number
+  external_id: string
+}
+
+export type UserUncheckedCreateWithoutSources_of_incomeInput = {
+  id?: bigint | number
+  external_id: string
+}
+
+export type UserCreateOrConnectWithoutSources_of_incomeInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<
+    Prisma.UserCreateWithoutSources_of_incomeInput,
+    Prisma.UserUncheckedCreateWithoutSources_of_incomeInput
+  >
+}
+
+export type UserUpsertWithoutSources_of_incomeInput = {
+  update: Prisma.XOR<
+    Prisma.UserUpdateWithoutSources_of_incomeInput,
+    Prisma.UserUncheckedUpdateWithoutSources_of_incomeInput
+  >
+  create: Prisma.XOR<
+    Prisma.UserCreateWithoutSources_of_incomeInput,
+    Prisma.UserUncheckedCreateWithoutSources_of_incomeInput
+  >
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSources_of_incomeInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<
+    Prisma.UserUpdateWithoutSources_of_incomeInput,
+    Prisma.UserUncheckedUpdateWithoutSources_of_incomeInput
+  >
+}
+
+export type UserUpdateWithoutSources_of_incomeInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  external_id?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type UserUncheckedUpdateWithoutSources_of_incomeInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  external_id?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+/**
+ * Count Type UserCountOutputType
+ */
+
+export type UserCountOutputType = {
+  sources_of_income: number
+}
+
+export type UserCountOutputTypeSelect<
+  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  sources_of_income?: boolean | UserCountOutputTypeCountSources_of_incomeArgs
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeDefaultArgs<
+  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  /**
+   * Select specific fields to fetch from the UserCountOutputType
+   */
+  select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSources_of_incomeArgs<
+  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  where?: Prisma.UserSourceOfIncomeWhereInput
+}
+
 export type UserSelect<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetSelect<
   {
     id?: boolean
     external_id?: boolean
+    sources_of_income?: boolean | Prisma.User$sources_of_incomeArgs<ExtArgs>
+    _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['user']
 >
@@ -332,12 +455,26 @@ export type UserSelectScalar = {
 export type UserOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetOmit<'id' | 'external_id', ExtArgs['result']['user']>
+export type UserInclude<
+  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  sources_of_income?: boolean | Prisma.User$sources_of_incomeArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type UserIncludeCreateManyAndReturn<
+  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {}
+export type UserIncludeUpdateManyAndReturn<
+  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {}
 
 export type $UserPayload<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   name: 'User'
-  objects: {}
+  objects: {
+    sources_of_income: Prisma.$UserSourceOfIncomePayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
       id: bigint
@@ -852,6 +989,17 @@ export interface Prisma__UserClient<
   GlobalOmitOptions = {},
 > extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: 'PrismaPromise'
+  sources_of_income<T extends Prisma.User$sources_of_incomeArgs<ExtArgs> = {}>(
+    args?: Prisma.Subset<T, Prisma.User$sources_of_incomeArgs<ExtArgs>>
+  ): Prisma.PrismaPromise<
+    | runtime.Types.Result.GetResult<
+        Prisma.$UserSourceOfIncomePayload<ExtArgs>,
+        T,
+        'findMany',
+        GlobalOmitOptions
+      >
+    | Null
+  >
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -903,6 +1051,10 @@ export type UserFindUniqueArgs<
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where: Prisma.UserWhereUniqueInput
@@ -923,6 +1075,10 @@ export type UserFindUniqueOrThrowArgs<
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where: Prisma.UserWhereUniqueInput
@@ -942,6 +1098,10 @@ export type UserFindFirstArgs<
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * Filter, which User to fetch.
    */
@@ -993,6 +1153,10 @@ export type UserFindFirstOrThrowArgs<
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where?: Prisma.UserWhereInput
@@ -1043,6 +1207,10 @@ export type UserFindManyArgs<
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which Users to fetch.
    */
   where?: Prisma.UserWhereInput
@@ -1092,6 +1260,10 @@ export type UserCreateArgs<
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * The data needed to create a User.
    */
@@ -1146,6 +1318,10 @@ export type UserUpdateArgs<
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * The data needed to update a User.
    */
@@ -1219,6 +1395,10 @@ export type UserUpsertArgs<
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * The filter to search for the User to update in case it exists.
    */
   where: Prisma.UserWhereUniqueInput
@@ -1247,6 +1427,10 @@ export type UserDeleteArgs<
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter which User to delete.
    */
   where: Prisma.UserWhereUniqueInput
@@ -1269,6 +1453,34 @@ export type UserDeleteManyArgs<
 }
 
 /**
+ * User.sources_of_income
+ */
+export type User$sources_of_incomeArgs<
+  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
+> = {
+  /**
+   * Select specific fields to fetch from the UserSourceOfIncome
+   */
+  select?: Prisma.UserSourceOfIncomeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserSourceOfIncome
+   */
+  omit?: Prisma.UserSourceOfIncomeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserSourceOfIncomeInclude<ExtArgs> | null
+  where?: Prisma.UserSourceOfIncomeWhereInput
+  orderBy?:
+    | Prisma.UserSourceOfIncomeOrderByWithRelationInput
+    | Prisma.UserSourceOfIncomeOrderByWithRelationInput[]
+  cursor?: Prisma.UserSourceOfIncomeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserSourceOfIncomeScalarFieldEnum | Prisma.UserSourceOfIncomeScalarFieldEnum[]
+}
+
+/**
  * User without action
  */
 export type UserDefaultArgs<
@@ -1282,4 +1494,8 @@ export type UserDefaultArgs<
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
 }

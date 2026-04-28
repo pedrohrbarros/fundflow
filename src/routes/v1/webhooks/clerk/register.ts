@@ -1,7 +1,8 @@
+// src/routes/v1/webhooks/clerk/register.ts
 import type { Context } from 'elysia'
-import { db } from '../../../../config/db'
 import { verifySvixSignature } from '../../../../helpers/webhooks/auth/svix'
 import { handleError } from '../../../../middleware/error'
+import { ClerkWebhookService } from '../../../../services/webhooks/clerk'
 import type { ClerkUserCreatedEvent } from '../../../../types/webhooks/clerk'
 
 export const clerkRegisterWebhook = async ({ request, body, set }: Context) => {
@@ -17,9 +18,8 @@ export const clerkRegisterWebhook = async ({ request, body, set }: Context) => {
     process.env.CLERK_WEBHOOK_SIGNING_SECRET ?? ''
   )
 
-  if (!verification.success) {
+  if (!verification.success)
     return handleError(set, 400, 'Webhook verification failed', { reason: verification.reason })
-  }
 
   let event: ClerkUserCreatedEvent
   try {
@@ -28,24 +28,15 @@ export const clerkRegisterWebhook = async ({ request, body, set }: Context) => {
     return handleError(set, 400, 'Invalid JSON body', { error })
   }
 
-  if (event.type !== 'user.created') {
-    return { message: 'Event ignored' }
-  }
+  if (event.type !== 'user.created') return { message: 'Event ignored' }
 
   const external_id = event.data.id
-  if (!external_id) {
+  if (!external_id)
     return handleError(set, 400, 'Missing user id in webhook payload', { event_type: event.type })
-  }
 
-  let user
-  try {
-    user = await db.user.create({
-      data: { external_id },
-    })
-  } catch (err) {
-    return handleError(set, 500, 'Failed to create user', { err, external_id })
-  }
+  const result = await ClerkWebhookService.registerUser(external_id)
+  if (!result.ok) return handleError(set, result.status, result.message, result.meta)
 
   set.status = 201
-  return { id: user.id.toString(), external_id: user.external_id }
+  return result.data
 }
