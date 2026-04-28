@@ -8,4 +8,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
+export type * from './models/SourceOfIncomeCategory'
+export type * from './models/SourceOfIncome'
+export type * from './models/UserSourceOfIncome'
 export type * from './commonInputTypes'
