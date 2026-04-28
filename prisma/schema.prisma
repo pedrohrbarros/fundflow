@@ -8,8 +8,38 @@ datasource db {
 }
 
 model User {
-  id          BigInt @id @default(autoincrement())
-  external_id String @unique
+  id                BigInt               @id @default(autoincrement())
+  external_id       String               @unique
+  sources_of_income UserSourceOfIncome[]
 
   @@map("users")
+}
+
+model SourceOfIncomeCategory {
+  id                BigInt           @id @default(autoincrement())
+  name              String
+  sources_of_income SourceOfIncome[]
+
+  @@map("source_of_income_categories")
+}
+
+model SourceOfIncome {
+  id          BigInt                 @id @default(autoincrement())
+  name        String
+  category_id BigInt
+  income      Float                  @default(0)
+  category    SourceOfIncomeCategory @relation(fields: [category_id], references: [id])
+  users       UserSourceOfIncome[]
+
+  @@map("sources_of_income")
+}
+
+model UserSourceOfIncome {
+  user_id             BigInt
+  source_of_income_id BigInt
+  user                User           @relation(fields: [user_id], references: [id])
+  source_of_income    SourceOfIncome @relation(fields: [source_of_income_id], references: [id])
+
+  @@id([user_id, source_of_income_id])
+  @@map("user_sources_of_income")
 }
