@@ -11,6 +11,7 @@ model User {
   id                BigInt               @id @default(autoincrement())
   external_id       String               @unique
   sources_of_income UserSourceOfIncome[]
+  payment_methods   PaymentMethod[]
 
   @@map("users")
 }
@@ -42,4 +43,15 @@ model UserSourceOfIncome {
 
   @@id([user_id, source_of_income_id])
   @@map("user_sources_of_income")
+}
+
+model PaymentMethod {
+  id       BigInt  @id @default(autoincrement())
+  name     String
+  bank     String?
+  receiver String?
+  user_id  BigInt
+  user     User    @relation(fields: [user_id], references: [id])
+
+  @@map("payment_methods")
 }

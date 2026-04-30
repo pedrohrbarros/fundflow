@@ -1,4 +1,3 @@
-// src/services/categories.ts
 import { db } from '../config/db'
 import type { ServiceResult } from './types'
 

@@ -52,6 +52,7 @@ export const ModelName = {
   SourceOfIncomeCategory: 'SourceOfIncomeCategory',
   SourceOfIncome: 'SourceOfIncome',
   UserSourceOfIncome: 'UserSourceOfIncome',
+  PaymentMethod: 'PaymentMethod',
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -103,6 +104,17 @@ export const UserSourceOfIncomeScalarFieldEnum = {
 export type UserSourceOfIncomeScalarFieldEnum =
   (typeof UserSourceOfIncomeScalarFieldEnum)[keyof typeof UserSourceOfIncomeScalarFieldEnum]
 
+export const PaymentMethodScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  bank: 'bank',
+  receiver: 'receiver',
+  user_id: 'user_id',
+} as const
+
+export type PaymentMethodScalarFieldEnum =
+  (typeof PaymentMethodScalarFieldEnum)[keyof typeof PaymentMethodScalarFieldEnum]
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc',
@@ -116,3 +128,10 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last',
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]

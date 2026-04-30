@@ -36,3 +36,8 @@ export type SourceOfIncome = Prisma.SourceOfIncomeModel
  *
  */
 export type UserSourceOfIncome = Prisma.UserSourceOfIncomeModel
+/**
+ * Model PaymentMethod
+ *
+ */
+export type PaymentMethod = Prisma.PaymentMethodModel

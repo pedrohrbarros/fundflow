@@ -8,9 +8,27 @@ All routes are versioned under `/v1` and registered in `src/index.ts` via Elysia
 routes/
 └── v1/
     ├── webhooks.ts              # Elysia plugin that mounts all webhook routes
-    └── webhooks/
-        └── clerk/
-            └── user-created.ts  # Handler for Clerk user.created webhook
+    ├── webhooks/
+    │   └── clerk/
+    │       └── user-created.ts  # Handler for Clerk user.created webhook
+    ├── categories.ts            # Elysia plugin for categories routes
+    ├── categories/
+    │   ├── create.ts
+    │   ├── list.ts
+    │   ├── update.ts
+    │   └── delete.ts
+    ├── sources_of_income.ts     # Elysia plugin for sources of income routes
+    ├── sources_of_income/
+    │   ├── create.ts
+    │   ├── list.ts
+    │   ├── update.ts
+    │   └── delete.ts
+    ├── payment_methods.ts       # Elysia plugin for payment methods routes
+    └── payment_methods/
+        ├── create.ts
+        ├── list.ts
+        ├── update.ts
+        └── delete.ts
 ```
 
 ## Conventions
@@ -20,31 +38,46 @@ routes/
 Each route group has two parts:
 
 - **`<resource>.ts`** — the Elysia plugin that declares the route paths and wires handlers together.
-- **`<resource>/<provider>/<event>.ts`** — the handler function for a specific event, exported as a named `const`.
+- **`<resource>/<action>.ts`** — the handler function for a specific action, exported as a named `const`.
 
 ### Naming
 
-| What           | Pattern                                | Example                           |
-| -------------- | -------------------------------------- | --------------------------------- |
-| Plugin file    | `<resource>.ts`                        | `webhooks.ts`                     |
-| Handler file   | `<provider>/<event>.ts`                | `clerk/user-created.ts`           |
-| Handler export | `<provider><Event>Handler` (camelCase) | `clerkUserCreatedListenerWebhook` |
+| What           | Pattern                          | Example               |
+| -------------- | -------------------------------- | --------------------- |
+| Plugin file    | `<resource>.ts`                  | `payment_methods.ts`  |
+| Handler file   | `<action>.ts`                    | `create.ts`           |
+| Handler export | `<action><Resource>` (camelCase) | `createPaymentMethod` |
 
 ### Route paths
 
-Routes follow the shape:
+Standard resource routes follow the shape:
 
 ```
-/<resource>/<provider>/<event>/listener
+/<resource>
+/<resource>/:id
 ```
 
-Example: `POST /webhooks/clerk/user-created/listener`
+Webhook routes follow:
+
+```
+/webhooks/<provider>/<event>/listener
+```
+
+### Authentication
+
+| Strategy     | Middleware       | Used by                                          |
+| ------------ | ---------------- | ------------------------------------------------ |
+| Bearer token | `withBearerAuth` | `categories`, `sources_of_income`, `webhooks`    |
+| Clerk JWT    | `withClerkAuth`  | `payment_methods`                                |
+
+Clerk-authenticated handlers receive `clerk_user_id: string` in their context, injected by the `withClerkAuth` middleware.
 
 ### Adding a new endpoint
 
-1. Create the handler in `routes/v1/<resource>/<provider>/<event>.ts`.
+1. Create the handler in `routes/v1/<resource>/<action>.ts`.
 2. Import and register it in `routes/v1/<resource>.ts`.
-3. Add the corresponding request/response types under `src/types/<resource>/<provider>/`.
+3. Add the corresponding request/response types under `src/types/<resource>/`.
+4. Document the endpoint in this README.
 
 ## Current Endpoints
 
@@ -53,3 +86,30 @@ Example: `POST /webhooks/clerk/user-created/listener`
 | Method | Path                                       | Description                                             |
 | ------ | ------------------------------------------ | ------------------------------------------------------- |
 | `POST` | `/v1/webhooks/clerk/user-created/listener` | Creates a user record from a Clerk `user.created` event |
+
+### Categories
+
+| Method   | Path                  | Auth   | Description               |
+| -------- | --------------------- | ------ | ------------------------- |
+| `POST`   | `/v1/categories`      | Bearer | Create a new category     |
+| `GET`    | `/v1/categories`      | Bearer | List all categories       |
+| `PATCH`  | `/v1/categories/:id`  | Bearer | Update a category by id   |
+| `DELETE` | `/v1/categories/:id`  | Bearer | Delete a category by id   |
+
+### Sources of Income
+
+| Method   | Path                        | Auth   | Description                        |
+| -------- | --------------------------- | ------ | ---------------------------------- |
+| `POST`   | `/v1/sources_of_income`     | Bearer | Create a new source of income      |
+| `GET`    | `/v1/sources_of_income`     | Bearer | List all sources of income         |
+| `PATCH`  | `/v1/sources_of_income/:id` | Bearer | Update a source of income by id    |
+| `DELETE` | `/v1/sources_of_income/:id` | Bearer | Delete a source of income by id    |
+
+### Payment Methods
+
+| Method   | Path                       | Auth      | Description                                              |
+| -------- | -------------------------- | --------- | -------------------------------------------------------- |
+| `POST`   | `/v1/payment_methods`      | Clerk JWT | Create a payment method for the authenticated user       |
+| `GET`    | `/v1/payment_methods`      | Clerk JWT | List all payment methods for the authenticated user      |
+| `PATCH`  | `/v1/payment_methods/:id`  | Clerk JWT | Update a payment method owned by the authenticated user  |
+| `DELETE` | `/v1/payment_methods/:id`  | Clerk JWT | Delete a payment method owned by the authenticated user  |
