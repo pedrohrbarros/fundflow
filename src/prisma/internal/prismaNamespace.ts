@@ -379,6 +379,7 @@ export const ModelName = {
   SourceOfIncomeCategory: 'SourceOfIncomeCategory',
   SourceOfIncome: 'SourceOfIncome',
   UserSourceOfIncome: 'UserSourceOfIncome',
+  PaymentMethod: 'PaymentMethod',
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -398,7 +399,12 @@ export type TypeMap<
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: 'user' | 'sourceOfIncomeCategory' | 'sourceOfIncome' | 'userSourceOfIncome'
+    modelProps:
+      | 'user'
+      | 'sourceOfIncomeCategory'
+      | 'sourceOfIncome'
+      | 'userSourceOfIncome'
+      | 'paymentMethod'
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -704,6 +710,82 @@ export type TypeMap<
         }
       }
     }
+    PaymentMethod: {
+      payload: Prisma.$PaymentMethodPayload<ExtArgs>
+      fields: Prisma.PaymentMethodFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PaymentMethodFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PaymentMethodFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>
+        }
+        findFirst: {
+          args: Prisma.PaymentMethodFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PaymentMethodFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>
+        }
+        findMany: {
+          args: Prisma.PaymentMethodFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>[]
+        }
+        create: {
+          args: Prisma.PaymentMethodCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>
+        }
+        createMany: {
+          args: Prisma.PaymentMethodCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PaymentMethodCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>[]
+        }
+        delete: {
+          args: Prisma.PaymentMethodDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>
+        }
+        update: {
+          args: Prisma.PaymentMethodUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>
+        }
+        deleteMany: {
+          args: Prisma.PaymentMethodDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PaymentMethodUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PaymentMethodUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>[]
+        }
+        upsert: {
+          args: Prisma.PaymentMethodUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PaymentMethodPayload>
+        }
+        aggregate: {
+          args: Prisma.PaymentMethodAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePaymentMethod>
+        }
+        groupBy: {
+          args: Prisma.PaymentMethodGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PaymentMethodGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PaymentMethodCountArgs<ExtArgs>
+          result:
+            | runtime.Types.Utils.Optional<Prisma.PaymentMethodCountAggregateOutputType>
+            | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -776,6 +858,17 @@ export const UserSourceOfIncomeScalarFieldEnum = {
 export type UserSourceOfIncomeScalarFieldEnum =
   (typeof UserSourceOfIncomeScalarFieldEnum)[keyof typeof UserSourceOfIncomeScalarFieldEnum]
 
+export const PaymentMethodScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  bank: 'bank',
+  receiver: 'receiver',
+  user_id: 'user_id',
+} as const
+
+export type PaymentMethodScalarFieldEnum =
+  (typeof PaymentMethodScalarFieldEnum)[keyof typeof PaymentMethodScalarFieldEnum]
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc',
@@ -789,6 +882,13 @@ export const QueryMode = {
 } as const
 
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last',
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 /**
  * Field references
@@ -956,6 +1056,7 @@ export type GlobalOmitConfig = {
   sourceOfIncomeCategory?: Prisma.SourceOfIncomeCategoryOmit
   sourceOfIncome?: Prisma.SourceOfIncomeOmit
   userSourceOfIncome?: Prisma.UserSourceOfIncomeOmit
+  paymentMethod?: Prisma.PaymentMethodOmit
 }
 
 /* Types for Logging */
