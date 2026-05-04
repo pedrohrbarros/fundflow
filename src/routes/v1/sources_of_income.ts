@@ -8,7 +8,7 @@ import { SourceOfIncomeCreateBody, SourceOfIncomeUpdateBody } from '../../types/
 export const sources_of_income = new Elysia()
   .post('/sources_of_income', createSourceOfIncome, {
     detail: {
-      security: [{ bearerAuth: [] }],
+      security: [{ clerkAuth: [] }],
       requestBody: {
         required: true,
         content: {
@@ -20,13 +20,11 @@ export const sources_of_income = new Elysia()
     },
   })
   .get('/sources_of_income', listSourcesOfIncome, {
-    detail: {
-      security: [{ bearerAuth: [] }],
-    },
+    detail: { security: [{ clerkAuth: [] }] },
   })
   .patch('/sources_of_income/:id', updateSourceOfIncome, {
     detail: {
-      security: [{ bearerAuth: [] }],
+      security: [{ clerkAuth: [] }],
       requestBody: {
         required: true,
         content: {
@@ -38,7 +36,5 @@ export const sources_of_income = new Elysia()
     },
   })
   .delete('/sources_of_income/:id', deleteSourceOfIncome, {
-    detail: {
-      security: [{ bearerAuth: [] }],
-    },
+    detail: { security: [{ clerkAuth: [] }] },
   })

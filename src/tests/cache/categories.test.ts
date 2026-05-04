@@ -1,41 +1,60 @@
-import { describe, it, expect, beforeAll, afterEach, afterAll } from 'bun:test'
-import { app } from '../../index'
+import { describe, it, expect, mock, beforeAll, afterEach, afterAll } from 'bun:test'
+import { generateKeyPair, SignJWT } from 'jose'
 import { db } from '../../config/db'
 import { client } from '../../config/redis'
 
-const TS = Date.now()
-const AUTH_TOKEN = 'test-token-cache-cat'
-const CACHE_KEY = 'categories:list'
+const { privateKey: testPrivateKey, publicKey: testPublicKey } = await generateKeyPair('RS256')
 
-const req = (method: string, path: string, body?: unknown) =>
-  app.handle(
+mock.module('../../config/clerk', () => ({
+  getClerkPublicKey: async () => testPublicKey,
+}))
+
+process.env.CLERK_AUTHORIZED_PARTY = 'http://localhost:3000'
+
+const { app } = await import('../../index')
+
+const TEST_EXTERNAL_ID = `user_cache_cat_${Date.now()}`
+const CACHE_KEY = `categories:list:${TEST_EXTERNAL_ID}`
+const TS = Date.now()
+
+const makeToken = () =>
+  new SignJWT({ azp: process.env.CLERK_AUTHORIZED_PARTY })
+    .setProtectedHeader({ alg: 'RS256' })
+    .setSubject(TEST_EXTERNAL_ID)
+    .setIssuedAt()
+    .setExpirationTime('1h')
+    .sign(testPrivateKey)
+
+const req = async (method: string, path: string, body?: unknown) => {
+  const token = await makeToken()
+  return app.handle(
     new Request(`http://localhost${path}`, {
       method,
       headers: {
-        Authorization: `Bearer ${AUTH_TOKEN}`,
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     })
   )
+}
 
-beforeAll(() => {
-  process.env.API_TOKEN = AUTH_TOKEN
+beforeAll(async () => {
+  await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
 })
 
 afterEach(async () => {
   await client.del(CACHE_KEY)
-  await db.sourceOfIncomeCategory.deleteMany({
-    where: { name: { startsWith: `test-cache-cat-${TS}` } },
-  })
+  await db.sourceOfIncomeCategory.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
 })
 
 afterAll(async () => {
+  await db.user.deleteMany({ where: { external_id: TEST_EXTERNAL_ID } })
   await db.$disconnect()
 })
 
 describe('Categories cache', () => {
-  it('GET /v1/categories populates the cache', async () => {
+  it('GET /v1/categories populates the per-user cache', async () => {
     await req('GET', '/v1/categories')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()

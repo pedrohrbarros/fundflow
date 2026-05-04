@@ -7,6 +7,8 @@ export type PaymentMethodRecord = {
   bank: string | null
   receiver: string | null
   user_id: string
+  created_at: string
+  updated_at: string
 }
 
 export const PaymentMethodCreateBody = t.Object({

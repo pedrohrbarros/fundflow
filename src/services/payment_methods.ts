@@ -15,6 +15,9 @@ export const PaymentMethodsService = {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
+      const count = await db.paymentMethod.count({ where: { user_id: user.id } })
+      if (count >= 100)
+        return { ok: false, status: 400, message: 'Payment method limit reached (100 per user)' }
       const payment_method = await db.paymentMethod.create({
         data: { name, bank: bank ?? null, receiver: receiver ?? null, user_id: user.id },
       })
@@ -27,6 +30,8 @@ export const PaymentMethodsService = {
           bank: payment_method.bank,
           receiver: payment_method.receiver,
           user_id: payment_method.user_id.toString(),
+          created_at: payment_method.created_at.toISOString(),
+          updated_at: payment_method.updated_at.toISOString(),
         },
       }
     } catch (err: unknown) {
@@ -56,6 +61,8 @@ export const PaymentMethodsService = {
         bank: pm.bank,
         receiver: pm.receiver,
         user_id: pm.user_id.toString(),
+        created_at: pm.created_at.toISOString(),
+        updated_at: pm.updated_at.toISOString(),
       }))
       await cacheSet(key, data)
       return { ok: true, data }
@@ -93,6 +100,8 @@ export const PaymentMethodsService = {
           bank: payment_method.bank,
           receiver: payment_method.receiver,
           user_id: payment_method.user_id.toString(),
+          created_at: payment_method.created_at.toISOString(),
+          updated_at: payment_method.updated_at.toISOString(),
         },
       }
     } catch (err: unknown) {

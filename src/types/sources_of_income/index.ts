@@ -6,6 +6,8 @@ export type SourceOfIncomeRecord = {
   name: string
   category_id: string
   income: number
+  created_at: string
+  updated_at: string
 }
 
 export const SourceOfIncomeCreateBody = t.Object({

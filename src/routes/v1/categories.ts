@@ -8,7 +8,7 @@ import { CategoryCreateBody, CategoryUpdateBody } from '../../types/categories'
 export const categories = new Elysia()
   .post('/categories', createCategory, {
     detail: {
-      security: [{ bearerAuth: [] }],
+      security: [{ clerkAuth: [] }],
       requestBody: {
         required: true,
         content: {
@@ -20,13 +20,11 @@ export const categories = new Elysia()
     },
   })
   .get('/categories', listCategories, {
-    detail: {
-      security: [{ bearerAuth: [] }],
-    },
+    detail: { security: [{ clerkAuth: [] }] },
   })
   .patch('/categories/:id', updateCategory, {
     detail: {
-      security: [{ bearerAuth: [] }],
+      security: [{ clerkAuth: [] }],
       requestBody: {
         required: true,
         content: {
@@ -38,7 +36,5 @@ export const categories = new Elysia()
     },
   })
   .delete('/categories/:id', deleteCategory, {
-    detail: {
-      security: [{ bearerAuth: [] }],
-    },
+    detail: { security: [{ clerkAuth: [] }] },
   })

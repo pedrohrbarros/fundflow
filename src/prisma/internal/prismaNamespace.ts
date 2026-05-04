@@ -378,8 +378,9 @@ export const ModelName = {
   User: 'User',
   SourceOfIncomeCategory: 'SourceOfIncomeCategory',
   SourceOfIncome: 'SourceOfIncome',
-  UserSourceOfIncome: 'UserSourceOfIncome',
   PaymentMethod: 'PaymentMethod',
+  Expense: 'Expense',
+  ExpensePaymentMethod: 'ExpensePaymentMethod',
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -403,8 +404,9 @@ export type TypeMap<
       | 'user'
       | 'sourceOfIncomeCategory'
       | 'sourceOfIncome'
-      | 'userSourceOfIncome'
       | 'paymentMethod'
+      | 'expense'
+      | 'expensePaymentMethod'
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -634,82 +636,6 @@ export type TypeMap<
         }
       }
     }
-    UserSourceOfIncome: {
-      payload: Prisma.$UserSourceOfIncomePayload<ExtArgs>
-      fields: Prisma.UserSourceOfIncomeFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.UserSourceOfIncomeFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.UserSourceOfIncomeFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>
-        }
-        findFirst: {
-          args: Prisma.UserSourceOfIncomeFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.UserSourceOfIncomeFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>
-        }
-        findMany: {
-          args: Prisma.UserSourceOfIncomeFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>[]
-        }
-        create: {
-          args: Prisma.UserSourceOfIncomeCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>
-        }
-        createMany: {
-          args: Prisma.UserSourceOfIncomeCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.UserSourceOfIncomeCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>[]
-        }
-        delete: {
-          args: Prisma.UserSourceOfIncomeDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>
-        }
-        update: {
-          args: Prisma.UserSourceOfIncomeUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>
-        }
-        deleteMany: {
-          args: Prisma.UserSourceOfIncomeDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.UserSourceOfIncomeUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.UserSourceOfIncomeUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>[]
-        }
-        upsert: {
-          args: Prisma.UserSourceOfIncomeUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSourceOfIncomePayload>
-        }
-        aggregate: {
-          args: Prisma.UserSourceOfIncomeAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateUserSourceOfIncome>
-        }
-        groupBy: {
-          args: Prisma.UserSourceOfIncomeGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.UserSourceOfIncomeGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.UserSourceOfIncomeCountArgs<ExtArgs>
-          result:
-            | runtime.Types.Utils.Optional<Prisma.UserSourceOfIncomeCountAggregateOutputType>
-            | number
-        }
-      }
-    }
     PaymentMethod: {
       payload: Prisma.$PaymentMethodPayload<ExtArgs>
       fields: Prisma.PaymentMethodFieldRefs
@@ -786,6 +712,156 @@ export type TypeMap<
         }
       }
     }
+    Expense: {
+      payload: Prisma.$ExpensePayload<ExtArgs>
+      fields: Prisma.ExpenseFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ExpenseFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ExpenseFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>
+        }
+        findFirst: {
+          args: Prisma.ExpenseFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ExpenseFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>
+        }
+        findMany: {
+          args: Prisma.ExpenseFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>[]
+        }
+        create: {
+          args: Prisma.ExpenseCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>
+        }
+        createMany: {
+          args: Prisma.ExpenseCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ExpenseCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>[]
+        }
+        delete: {
+          args: Prisma.ExpenseDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>
+        }
+        update: {
+          args: Prisma.ExpenseUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>
+        }
+        deleteMany: {
+          args: Prisma.ExpenseDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ExpenseUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ExpenseUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>[]
+        }
+        upsert: {
+          args: Prisma.ExpenseUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePayload>
+        }
+        aggregate: {
+          args: Prisma.ExpenseAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExpense>
+        }
+        groupBy: {
+          args: Prisma.ExpenseGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExpenseGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ExpenseCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExpenseCountAggregateOutputType> | number
+        }
+      }
+    }
+    ExpensePaymentMethod: {
+      payload: Prisma.$ExpensePaymentMethodPayload<ExtArgs>
+      fields: Prisma.ExpensePaymentMethodFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ExpensePaymentMethodFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ExpensePaymentMethodFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>
+        }
+        findFirst: {
+          args: Prisma.ExpensePaymentMethodFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ExpensePaymentMethodFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>
+        }
+        findMany: {
+          args: Prisma.ExpensePaymentMethodFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>[]
+        }
+        create: {
+          args: Prisma.ExpensePaymentMethodCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>
+        }
+        createMany: {
+          args: Prisma.ExpensePaymentMethodCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ExpensePaymentMethodCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>[]
+        }
+        delete: {
+          args: Prisma.ExpensePaymentMethodDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>
+        }
+        update: {
+          args: Prisma.ExpensePaymentMethodUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>
+        }
+        deleteMany: {
+          args: Prisma.ExpensePaymentMethodDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ExpensePaymentMethodUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ExpensePaymentMethodUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>[]
+        }
+        upsert: {
+          args: Prisma.ExpensePaymentMethodUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ExpensePaymentMethodPayload>
+        }
+        aggregate: {
+          args: Prisma.ExpensePaymentMethodAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExpensePaymentMethod>
+        }
+        groupBy: {
+          args: Prisma.ExpensePaymentMethodGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ExpensePaymentMethodGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ExpensePaymentMethodCountArgs<ExtArgs>
+          result:
+            | runtime.Types.Utils.Optional<Prisma.ExpensePaymentMethodCountAggregateOutputType>
+            | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -828,6 +904,8 @@ export type TransactionIsolationLevel =
 export const UserScalarFieldEnum = {
   id: 'id',
   external_id: 'external_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -835,6 +913,9 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export const SourceOfIncomeCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  user_id: 'user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
 } as const
 
 export type SourceOfIncomeCategoryScalarFieldEnum =
@@ -845,18 +926,13 @@ export const SourceOfIncomeScalarFieldEnum = {
   name: 'name',
   category_id: 'category_id',
   income: 'income',
+  user_id: 'user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
 } as const
 
 export type SourceOfIncomeScalarFieldEnum =
   (typeof SourceOfIncomeScalarFieldEnum)[keyof typeof SourceOfIncomeScalarFieldEnum]
-
-export const UserSourceOfIncomeScalarFieldEnum = {
-  user_id: 'user_id',
-  source_of_income_id: 'source_of_income_id',
-} as const
-
-export type UserSourceOfIncomeScalarFieldEnum =
-  (typeof UserSourceOfIncomeScalarFieldEnum)[keyof typeof UserSourceOfIncomeScalarFieldEnum]
 
 export const PaymentMethodScalarFieldEnum = {
   id: 'id',
@@ -864,10 +940,37 @@ export const PaymentMethodScalarFieldEnum = {
   bank: 'bank',
   receiver: 'receiver',
   user_id: 'user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
 } as const
 
 export type PaymentMethodScalarFieldEnum =
   (typeof PaymentMethodScalarFieldEnum)[keyof typeof PaymentMethodScalarFieldEnum]
+
+export const ExpenseScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  amount: 'amount',
+  is_paid: 'is_paid',
+  is_saved: 'is_saved',
+  saving_location: 'saving_location',
+  user_id: 'user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at',
+} as const
+
+export type ExpenseScalarFieldEnum =
+  (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
+
+export const ExpensePaymentMethodScalarFieldEnum = {
+  expense_id: 'expense_id',
+  payment_method_id: 'payment_method_id',
+  partial_amount: 'partial_amount',
+  created_at: 'created_at',
+} as const
+
+export type ExpensePaymentMethodScalarFieldEnum =
+  (typeof ExpensePaymentMethodScalarFieldEnum)[keyof typeof ExpensePaymentMethodScalarFieldEnum]
 
 export const SortOrder = {
   asc: 'asc',
@@ -915,6 +1018,16 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
 export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
 
 /**
+ * Reference to a field of type 'DateTime'
+ */
+export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+
+/**
+ * Reference to a field of type 'DateTime[]'
+ */
+export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -923,6 +1036,11 @@ export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, '
  * Reference to a field of type 'Float[]'
  */
 export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
 
 /**
  * Reference to a field of type 'Int'
@@ -1055,8 +1173,9 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   sourceOfIncomeCategory?: Prisma.SourceOfIncomeCategoryOmit
   sourceOfIncome?: Prisma.SourceOfIncomeOmit
-  userSourceOfIncome?: Prisma.UserSourceOfIncomeOmit
   paymentMethod?: Prisma.PaymentMethodOmit
+  expense?: Prisma.ExpenseOmit
+  expensePaymentMethod?: Prisma.ExpensePaymentMethodOmit
 }
 
 /* Types for Logging */

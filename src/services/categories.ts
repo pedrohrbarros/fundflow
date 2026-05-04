@@ -2,16 +2,31 @@ import { db } from '../config/db'
 import { cacheGet, cacheSet, cacheDel } from '../middleware/cache'
 import type { ServiceResult } from './types'
 
-type CategoryRecord = { id: string; name: string }
+type CategoryRecord = { id: string; name: string; created_at: string; updated_at: string }
 
-const CACHE_KEY = 'categories:list'
+const cacheKey = (user_external_id: string) => `categories:list:${user_external_id}`
 
 export const CategoriesService = {
-  async create(name: string): Promise<ServiceResult<CategoryRecord>> {
+  async create(user_external_id: string, name: string): Promise<ServiceResult<CategoryRecord>> {
     try {
-      const category = await db.sourceOfIncomeCategory.create({ data: { name } })
-      await cacheDel(CACHE_KEY)
-      return { ok: true, data: { id: category.id.toString(), name: category.name } }
+      const user = await db.user.findUnique({ where: { external_id: user_external_id } })
+      if (!user) return { ok: false, status: 404, message: 'User not found' }
+      const count = await db.sourceOfIncomeCategory.count({ where: { user_id: user.id } })
+      if (count >= 100)
+        return { ok: false, status: 400, message: 'Category limit reached (100 per user)' }
+      const category = await db.sourceOfIncomeCategory.create({
+        data: { name, user_id: user.id },
+      })
+      await cacheDel(cacheKey(user_external_id))
+      return {
+        ok: true,
+        data: {
+          id: category.id.toString(),
+          name: category.name,
+          created_at: category.created_at.toISOString(),
+          updated_at: category.updated_at.toISOString(),
+        },
+      }
     } catch (err: unknown) {
       return {
         ok: false,
@@ -22,13 +37,24 @@ export const CategoriesService = {
     }
   },
 
-  async list(): Promise<ServiceResult<CategoryRecord[]>> {
-    const cached = await cacheGet<CategoryRecord[]>(CACHE_KEY)
+  async listForUser(user_external_id: string): Promise<ServiceResult<CategoryRecord[]>> {
+    const key = cacheKey(user_external_id)
+    const cached = await cacheGet<CategoryRecord[]>(key)
     if (cached) return { ok: true, data: cached }
     try {
-      const categories = await db.sourceOfIncomeCategory.findMany({ orderBy: { id: 'asc' } })
-      const data = categories.map((c) => ({ id: c.id.toString(), name: c.name }))
-      await cacheSet(CACHE_KEY, data)
+      const user = await db.user.findUnique({ where: { external_id: user_external_id } })
+      if (!user) return { ok: false, status: 404, message: 'User not found' }
+      const categories = await db.sourceOfIncomeCategory.findMany({
+        where: { user_id: user.id },
+        orderBy: { id: 'asc' },
+      })
+      const data = categories.map((c) => ({
+        id: c.id.toString(),
+        name: c.name,
+        created_at: c.created_at.toISOString(),
+        updated_at: c.updated_at.toISOString(),
+      }))
+      await cacheSet(key, data)
       return { ok: true, data }
     } catch (err: unknown) {
       return {
@@ -40,11 +66,28 @@ export const CategoriesService = {
     }
   },
 
-  async update(id: bigint, name: string): Promise<ServiceResult<CategoryRecord>> {
+  async update(
+    id: bigint,
+    user_external_id: string,
+    name: string
+  ): Promise<ServiceResult<CategoryRecord>> {
     try {
-      const category = await db.sourceOfIncomeCategory.update({ where: { id }, data: { name } })
-      await cacheDel(CACHE_KEY)
-      return { ok: true, data: { id: category.id.toString(), name: category.name } }
+      const user = await db.user.findUnique({ where: { external_id: user_external_id } })
+      if (!user) return { ok: false, status: 404, message: 'User not found' }
+      const category = await db.sourceOfIncomeCategory.update({
+        where: { id, user_id: user.id },
+        data: { name },
+      })
+      await cacheDel(cacheKey(user_external_id))
+      return {
+        ok: true,
+        data: {
+          id: category.id.toString(),
+          name: category.name,
+          created_at: category.created_at.toISOString(),
+          updated_at: category.updated_at.toISOString(),
+        },
+      }
     } catch (err: unknown) {
       if ((err as { code?: string })?.code === 'P2025')
         return {
@@ -62,10 +105,12 @@ export const CategoriesService = {
     }
   },
 
-  async remove(id: bigint): Promise<ServiceResult<{ message: string }>> {
+  async remove(id: bigint, user_external_id: string): Promise<ServiceResult<{ message: string }>> {
     try {
-      await db.sourceOfIncomeCategory.delete({ where: { id } })
-      await cacheDel(CACHE_KEY)
+      const user = await db.user.findUnique({ where: { external_id: user_external_id } })
+      if (!user) return { ok: false, status: 404, message: 'User not found' }
+      await db.sourceOfIncomeCategory.delete({ where: { id, user_id: user.id } })
+      await cacheDel(cacheKey(user_external_id))
       return { ok: true, data: { message: 'Category deleted' } }
     } catch (err: unknown) {
       if ((err as { code?: string })?.code === 'P2025')

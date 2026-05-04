@@ -1,8 +1,8 @@
-import { CategoriesService } from '../../../services/categories'
+import { ExpensesService } from '../../../services/expenses'
 import { handleError } from '../../../middleware/error'
-import type { CategoryCreateBodyType } from '../../../types/categories'
+import type { ExpenseCreateBodyType } from '../../../types/expenses'
 
-export const createCategory = async ({
+export const createExpense = async ({
   clerk_user_id,
   body,
   set,
@@ -11,8 +11,8 @@ export const createCategory = async ({
   body: unknown
   set: { status?: number | string }
 }) => {
-  const { name } = body as CategoryCreateBodyType
-  const result = await CategoriesService.create(clerk_user_id, name)
+  const input = body as ExpenseCreateBodyType
+  const result = await ExpensesService.create(clerk_user_id, input)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201
   return result.data
