@@ -79,6 +79,20 @@ Clerk-authenticated handlers receive `clerk_user_id: string` in their context, i
 3. Add the corresponding request/response types under `src/types/<resource>/`.
 4. Document the endpoint in this README.
 
+### Caching
+
+List endpoints on non-webhook resources are cached in Redis using read-through caching. The cache is invalidated immediately after any successful mutation (create, update, delete) on the same resource. A 5-minute TTL acts as a safety backstop.
+
+Cache helpers live in `src/middleware/cache.ts` (`cacheGet`, `cacheSet`, `cacheDel`). Caching logic is applied at the service layer — route handlers are unchanged.
+
+| Endpoint | Cache key |
+| -------- | --------- |
+| `GET /v1/categories` | `categories:list` |
+| `GET /v1/sources_of_income` | `sources_of_income:list` |
+| `GET /v1/payment_methods` | `payment_methods:list:{clerk_user_id}` |
+
+When adding a new cacheable resource, follow the pattern in `src/services/categories.ts` and document the cache key in this table.
+
 ## Current Endpoints
 
 ### Webhooks

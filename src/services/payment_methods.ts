@@ -1,6 +1,9 @@
 import { db } from '../config/db'
+import { cacheGet, cacheSet, cacheDel } from '../middleware/cache'
 import type { ServiceResult } from './types'
 import type { PaymentMethodRecord } from '../types/payment_methods'
+
+const pmCacheKey = (user_external_id: string) => `payment_methods:list:${user_external_id}`
 
 export const PaymentMethodsService = {
   async create(
@@ -15,6 +18,7 @@ export const PaymentMethodsService = {
       const payment_method = await db.paymentMethod.create({
         data: { name, bank: bank ?? null, receiver: receiver ?? null, user_id: user.id },
       })
+      await cacheDel(pmCacheKey(user_external_id))
       return {
         ok: true,
         data: {
@@ -36,6 +40,9 @@ export const PaymentMethodsService = {
   },
 
   async listForUser(user_external_id: string): Promise<ServiceResult<PaymentMethodRecord[]>> {
+    const key = pmCacheKey(user_external_id)
+    const cached = await cacheGet<PaymentMethodRecord[]>(key)
+    if (cached) return { ok: true, data: cached }
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
@@ -43,16 +50,15 @@ export const PaymentMethodsService = {
         where: { user_id: user.id },
         orderBy: { id: 'asc' },
       })
-      return {
-        ok: true,
-        data: payment_methods.map((payment_method) => ({
-          id: payment_method.id.toString(),
-          name: payment_method.name,
-          bank: payment_method.bank,
-          receiver: payment_method.receiver,
-          user_id: payment_method.user_id.toString(),
-        })),
-      }
+      const data = payment_methods.map((pm) => ({
+        id: pm.id.toString(),
+        name: pm.name,
+        bank: pm.bank,
+        receiver: pm.receiver,
+        user_id: pm.user_id.toString(),
+      }))
+      await cacheSet(key, data)
+      return { ok: true, data }
     } catch (err: unknown) {
       return {
         ok: false,
@@ -78,6 +84,7 @@ export const PaymentMethodsService = {
         where: { id, user_id: user.id },
         data,
       })
+      await cacheDel(pmCacheKey(user_external_id))
       return {
         ok: true,
         data: {
@@ -110,6 +117,7 @@ export const PaymentMethodsService = {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
       await db.paymentMethod.delete({ where: { id, user_id: user.id } })
+      await cacheDel(pmCacheKey(user_external_id))
       return { ok: true, data: { message: 'Payment method deleted' } }
     } catch (err: unknown) {
       if ((err as { code?: string })?.code === 'P2025')
