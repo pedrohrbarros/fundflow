@@ -1,6 +1,9 @@
 import { db } from '../config/db'
+import { cacheGet, cacheSet, cacheDel } from '../middleware/cache'
 import type { ServiceResult } from './types'
 import type { SourceOfIncomeRecord } from '../types/sources_of_income'
+
+const CACHE_KEY = 'sources_of_income:list'
 
 export const SourcesOfIncomeService = {
   async create(
@@ -12,6 +15,7 @@ export const SourcesOfIncomeService = {
       const source_of_income = await db.sourceOfIncome.create({
         data: { name, category_id, ...(income !== undefined ? { income } : {}) },
       })
+      await cacheDel(CACHE_KEY)
       return {
         ok: true,
         data: {
@@ -39,17 +43,18 @@ export const SourcesOfIncomeService = {
   },
 
   async list(): Promise<ServiceResult<SourceOfIncomeRecord[]>> {
+    const cached = await cacheGet<SourceOfIncomeRecord[]>(CACHE_KEY)
+    if (cached) return { ok: true, data: cached }
     try {
       const sources_of_income = await db.sourceOfIncome.findMany({ orderBy: { id: 'asc' } })
-      return {
-        ok: true,
-        data: sources_of_income.map((source_of_income) => ({
-          id: source_of_income.id.toString(),
-          name: source_of_income.name,
-          category_id: source_of_income.category_id.toString(),
-          income: source_of_income.income,
-        })),
-      }
+      const data = sources_of_income.map((s) => ({
+        id: s.id.toString(),
+        name: s.name,
+        category_id: s.category_id.toString(),
+        income: s.income,
+      }))
+      await cacheSet(CACHE_KEY, data)
+      return { ok: true, data }
     } catch (err: unknown) {
       return {
         ok: false,
@@ -69,6 +74,7 @@ export const SourcesOfIncomeService = {
 
     try {
       const source_of_income = await db.sourceOfIncome.update({ where: { id }, data })
+      await cacheDel(CACHE_KEY)
       return {
         ok: true,
         data: {
@@ -106,6 +112,7 @@ export const SourcesOfIncomeService = {
   async remove(id: bigint): Promise<ServiceResult<{ message: string }>> {
     try {
       await db.sourceOfIncome.delete({ where: { id } })
+      await cacheDel(CACHE_KEY)
       return { ok: true, data: { message: 'Source of income deleted' } }
     } catch (err: unknown) {
       if ((err as { code?: string })?.code === 'P2025')
