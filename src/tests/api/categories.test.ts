@@ -9,6 +9,7 @@ mock.module('../../config/clerk', () => ({
 }))
 
 process.env.CLERK_AUTHORIZED_PARTY = 'http://localhost:3000'
+process.env.API_TOKEN = 'test-api-token'
 
 const { app } = await import('../../index')
 
@@ -31,6 +32,7 @@ const req = async (method: string, path: string, body?: unknown) => {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
+        'X-Api-Key': process.env.API_TOKEN!,
       },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     })
