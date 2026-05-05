@@ -30,12 +30,14 @@ export type SourceOfIncomeAvgAggregateOutputType = {
   id: number | null
   category_id: number | null
   income: number | null
+  user_id: number | null
 }
 
 export type SourceOfIncomeSumAggregateOutputType = {
   id: bigint | null
   category_id: bigint | null
   income: number | null
+  user_id: bigint | null
 }
 
 export type SourceOfIncomeMinAggregateOutputType = {
@@ -43,6 +45,9 @@ export type SourceOfIncomeMinAggregateOutputType = {
   name: string | null
   category_id: bigint | null
   income: number | null
+  user_id: bigint | null
+  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type SourceOfIncomeMaxAggregateOutputType = {
@@ -50,6 +55,9 @@ export type SourceOfIncomeMaxAggregateOutputType = {
   name: string | null
   category_id: bigint | null
   income: number | null
+  user_id: bigint | null
+  created_at: Date | null
+  updated_at: Date | null
 }
 
 export type SourceOfIncomeCountAggregateOutputType = {
@@ -57,6 +65,9 @@ export type SourceOfIncomeCountAggregateOutputType = {
   name: number
   category_id: number
   income: number
+  user_id: number
+  created_at: number
+  updated_at: number
   _all: number
 }
 
@@ -64,12 +75,14 @@ export type SourceOfIncomeAvgAggregateInputType = {
   id?: true
   category_id?: true
   income?: true
+  user_id?: true
 }
 
 export type SourceOfIncomeSumAggregateInputType = {
   id?: true
   category_id?: true
   income?: true
+  user_id?: true
 }
 
 export type SourceOfIncomeMinAggregateInputType = {
@@ -77,6 +90,9 @@ export type SourceOfIncomeMinAggregateInputType = {
   name?: true
   category_id?: true
   income?: true
+  user_id?: true
+  created_at?: true
+  updated_at?: true
 }
 
 export type SourceOfIncomeMaxAggregateInputType = {
@@ -84,6 +100,9 @@ export type SourceOfIncomeMaxAggregateInputType = {
   name?: true
   category_id?: true
   income?: true
+  user_id?: true
+  created_at?: true
+  updated_at?: true
 }
 
 export type SourceOfIncomeCountAggregateInputType = {
@@ -91,6 +110,9 @@ export type SourceOfIncomeCountAggregateInputType = {
   name?: true
   category_id?: true
   income?: true
+  user_id?: true
+  created_at?: true
+  updated_at?: true
   _all?: true
 }
 
@@ -190,6 +212,9 @@ export type SourceOfIncomeGroupByOutputType = {
   name: string
   category_id: bigint
   income: number
+  user_id: bigint
+  created_at: Date
+  updated_at: Date
   _count: SourceOfIncomeCountAggregateOutputType | null
   _avg: SourceOfIncomeAvgAggregateOutputType | null
   _sum: SourceOfIncomeSumAggregateOutputType | null
@@ -218,11 +243,14 @@ export type SourceOfIncomeWhereInput = {
   name?: Prisma.StringFilter<'SourceOfIncome'> | string
   category_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
   income?: Prisma.FloatFilter<'SourceOfIncome'> | number
+  user_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
+  created_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
+  updated_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   category?: Prisma.XOR<
     Prisma.SourceOfIncomeCategoryScalarRelationFilter,
     Prisma.SourceOfIncomeCategoryWhereInput
   >
-  users?: Prisma.UserSourceOfIncomeListRelationFilter
 }
 
 export type SourceOfIncomeOrderByWithRelationInput = {
@@ -230,8 +258,11 @@ export type SourceOfIncomeOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
+  user_id?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
   category?: Prisma.SourceOfIncomeCategoryOrderByWithRelationInput
-  users?: Prisma.UserSourceOfIncomeOrderByRelationAggregateInput
 }
 
 export type SourceOfIncomeWhereUniqueInput = Prisma.AtLeast<
@@ -243,11 +274,14 @@ export type SourceOfIncomeWhereUniqueInput = Prisma.AtLeast<
     name?: Prisma.StringFilter<'SourceOfIncome'> | string
     category_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
     income?: Prisma.FloatFilter<'SourceOfIncome'> | number
+    user_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
+    created_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
+    updated_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
+    user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
     category?: Prisma.XOR<
       Prisma.SourceOfIncomeCategoryScalarRelationFilter,
       Prisma.SourceOfIncomeCategoryWhereInput
     >
-    users?: Prisma.UserSourceOfIncomeListRelationFilter
   },
   'id'
 >
@@ -257,6 +291,9 @@ export type SourceOfIncomeOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
+  user_id?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
   _count?: Prisma.SourceOfIncomeCountOrderByAggregateInput
   _avg?: Prisma.SourceOfIncomeAvgOrderByAggregateInput
   _max?: Prisma.SourceOfIncomeMaxOrderByAggregateInput
@@ -276,14 +313,19 @@ export type SourceOfIncomeScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<'SourceOfIncome'> | string
   category_id?: Prisma.BigIntWithAggregatesFilter<'SourceOfIncome'> | bigint | number
   income?: Prisma.FloatWithAggregatesFilter<'SourceOfIncome'> | number
+  user_id?: Prisma.BigIntWithAggregatesFilter<'SourceOfIncome'> | bigint | number
+  created_at?: Prisma.DateTimeWithAggregatesFilter<'SourceOfIncome'> | Date | string
+  updated_at?: Prisma.DateTimeWithAggregatesFilter<'SourceOfIncome'> | Date | string
 }
 
 export type SourceOfIncomeCreateInput = {
   id?: bigint | number
   name: string
   income?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutSources_of_incomeInput
   category: Prisma.SourceOfIncomeCategoryCreateNestedOneWithoutSources_of_incomeInput
-  users?: Prisma.UserSourceOfIncomeCreateNestedManyWithoutSource_of_incomeInput
 }
 
 export type SourceOfIncomeUncheckedCreateInput = {
@@ -291,15 +333,19 @@ export type SourceOfIncomeUncheckedCreateInput = {
   name: string
   category_id: bigint | number
   income?: number
-  users?: Prisma.UserSourceOfIncomeUncheckedCreateNestedManyWithoutSource_of_incomeInput
+  user_id: bigint | number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type SourceOfIncomeUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutSources_of_incomeNestedInput
   category?: Prisma.SourceOfIncomeCategoryUpdateOneRequiredWithoutSources_of_incomeNestedInput
-  users?: Prisma.UserSourceOfIncomeUpdateManyWithoutSource_of_incomeNestedInput
 }
 
 export type SourceOfIncomeUncheckedUpdateInput = {
@@ -307,7 +353,9 @@ export type SourceOfIncomeUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   category_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   income?: Prisma.FloatFieldUpdateOperationsInput | number
-  users?: Prisma.UserSourceOfIncomeUncheckedUpdateManyWithoutSource_of_incomeNestedInput
+  user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SourceOfIncomeCreateManyInput = {
@@ -315,12 +363,17 @@ export type SourceOfIncomeCreateManyInput = {
   name: string
   category_id: bigint | number
   income?: number
+  user_id: bigint | number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type SourceOfIncomeUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SourceOfIncomeUncheckedUpdateManyInput = {
@@ -328,6 +381,9 @@ export type SourceOfIncomeUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   category_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   income?: Prisma.FloatFieldUpdateOperationsInput | number
+  user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SourceOfIncomeListRelationFilter = {
@@ -345,12 +401,16 @@ export type SourceOfIncomeCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
+  user_id?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type SourceOfIncomeAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
+  user_id?: Prisma.SortOrder
 }
 
 export type SourceOfIncomeMaxOrderByAggregateInput = {
@@ -358,6 +418,9 @@ export type SourceOfIncomeMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
+  user_id?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type SourceOfIncomeMinOrderByAggregateInput = {
@@ -365,17 +428,102 @@ export type SourceOfIncomeMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
+  user_id?: Prisma.SortOrder
+  created_at?: Prisma.SortOrder
+  updated_at?: Prisma.SortOrder
 }
 
 export type SourceOfIncomeSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
+  user_id?: Prisma.SortOrder
 }
 
-export type SourceOfIncomeScalarRelationFilter = {
-  is?: Prisma.SourceOfIncomeWhereInput
-  isNot?: Prisma.SourceOfIncomeWhereInput
+export type SourceOfIncomeCreateNestedManyWithoutUserInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.SourceOfIncomeCreateWithoutUserInput,
+        Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput
+      >
+    | Prisma.SourceOfIncomeCreateWithoutUserInput[]
+    | Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput[]
+  connectOrCreate?:
+    | Prisma.SourceOfIncomeCreateOrConnectWithoutUserInput
+    | Prisma.SourceOfIncomeCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.SourceOfIncomeCreateManyUserInputEnvelope
+  connect?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+}
+
+export type SourceOfIncomeUncheckedCreateNestedManyWithoutUserInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.SourceOfIncomeCreateWithoutUserInput,
+        Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput
+      >
+    | Prisma.SourceOfIncomeCreateWithoutUserInput[]
+    | Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput[]
+  connectOrCreate?:
+    | Prisma.SourceOfIncomeCreateOrConnectWithoutUserInput
+    | Prisma.SourceOfIncomeCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.SourceOfIncomeCreateManyUserInputEnvelope
+  connect?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+}
+
+export type SourceOfIncomeUpdateManyWithoutUserNestedInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.SourceOfIncomeCreateWithoutUserInput,
+        Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput
+      >
+    | Prisma.SourceOfIncomeCreateWithoutUserInput[]
+    | Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput[]
+  connectOrCreate?:
+    | Prisma.SourceOfIncomeCreateOrConnectWithoutUserInput
+    | Prisma.SourceOfIncomeCreateOrConnectWithoutUserInput[]
+  upsert?:
+    | Prisma.SourceOfIncomeUpsertWithWhereUniqueWithoutUserInput
+    | Prisma.SourceOfIncomeUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.SourceOfIncomeCreateManyUserInputEnvelope
+  set?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+  disconnect?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+  delete?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+  connect?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+  update?:
+    | Prisma.SourceOfIncomeUpdateWithWhereUniqueWithoutUserInput
+    | Prisma.SourceOfIncomeUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?:
+    | Prisma.SourceOfIncomeUpdateManyWithWhereWithoutUserInput
+    | Prisma.SourceOfIncomeUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.SourceOfIncomeScalarWhereInput | Prisma.SourceOfIncomeScalarWhereInput[]
+}
+
+export type SourceOfIncomeUncheckedUpdateManyWithoutUserNestedInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.SourceOfIncomeCreateWithoutUserInput,
+        Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput
+      >
+    | Prisma.SourceOfIncomeCreateWithoutUserInput[]
+    | Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput[]
+  connectOrCreate?:
+    | Prisma.SourceOfIncomeCreateOrConnectWithoutUserInput
+    | Prisma.SourceOfIncomeCreateOrConnectWithoutUserInput[]
+  upsert?:
+    | Prisma.SourceOfIncomeUpsertWithWhereUniqueWithoutUserInput
+    | Prisma.SourceOfIncomeUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.SourceOfIncomeCreateManyUserInputEnvelope
+  set?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+  disconnect?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+  delete?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+  connect?: Prisma.SourceOfIncomeWhereUniqueInput | Prisma.SourceOfIncomeWhereUniqueInput[]
+  update?:
+    | Prisma.SourceOfIncomeUpdateWithWhereUniqueWithoutUserInput
+    | Prisma.SourceOfIncomeUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?:
+    | Prisma.SourceOfIncomeUpdateManyWithWhereWithoutUserInput
+    | Prisma.SourceOfIncomeUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.SourceOfIncomeScalarWhereInput | Prisma.SourceOfIncomeScalarWhereInput[]
 }
 
 export type SourceOfIncomeCreateNestedManyWithoutCategoryInput = {
@@ -472,44 +620,94 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type SourceOfIncomeCreateNestedOneWithoutUsersInput = {
-  create?: Prisma.XOR<
-    Prisma.SourceOfIncomeCreateWithoutUsersInput,
-    Prisma.SourceOfIncomeUncheckedCreateWithoutUsersInput
-  >
-  connectOrCreate?: Prisma.SourceOfIncomeCreateOrConnectWithoutUsersInput
-  connect?: Prisma.SourceOfIncomeWhereUniqueInput
+export type SourceOfIncomeCreateWithoutUserInput = {
+  id?: bigint | number
+  name: string
+  income?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+  category: Prisma.SourceOfIncomeCategoryCreateNestedOneWithoutSources_of_incomeInput
 }
 
-export type SourceOfIncomeUpdateOneRequiredWithoutUsersNestedInput = {
-  create?: Prisma.XOR<
-    Prisma.SourceOfIncomeCreateWithoutUsersInput,
-    Prisma.SourceOfIncomeUncheckedCreateWithoutUsersInput
+export type SourceOfIncomeUncheckedCreateWithoutUserInput = {
+  id?: bigint | number
+  name: string
+  category_id: bigint | number
+  income?: number
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type SourceOfIncomeCreateOrConnectWithoutUserInput = {
+  where: Prisma.SourceOfIncomeWhereUniqueInput
+  create: Prisma.XOR<
+    Prisma.SourceOfIncomeCreateWithoutUserInput,
+    Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput
   >
-  connectOrCreate?: Prisma.SourceOfIncomeCreateOrConnectWithoutUsersInput
-  upsert?: Prisma.SourceOfIncomeUpsertWithoutUsersInput
-  connect?: Prisma.SourceOfIncomeWhereUniqueInput
-  update?: Prisma.XOR<
-    Prisma.XOR<
-      Prisma.SourceOfIncomeUpdateToOneWithWhereWithoutUsersInput,
-      Prisma.SourceOfIncomeUpdateWithoutUsersInput
-    >,
-    Prisma.SourceOfIncomeUncheckedUpdateWithoutUsersInput
+}
+
+export type SourceOfIncomeCreateManyUserInputEnvelope = {
+  data: Prisma.SourceOfIncomeCreateManyUserInput | Prisma.SourceOfIncomeCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type SourceOfIncomeUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.SourceOfIncomeWhereUniqueInput
+  update: Prisma.XOR<
+    Prisma.SourceOfIncomeUpdateWithoutUserInput,
+    Prisma.SourceOfIncomeUncheckedUpdateWithoutUserInput
   >
+  create: Prisma.XOR<
+    Prisma.SourceOfIncomeCreateWithoutUserInput,
+    Prisma.SourceOfIncomeUncheckedCreateWithoutUserInput
+  >
+}
+
+export type SourceOfIncomeUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.SourceOfIncomeWhereUniqueInput
+  data: Prisma.XOR<
+    Prisma.SourceOfIncomeUpdateWithoutUserInput,
+    Prisma.SourceOfIncomeUncheckedUpdateWithoutUserInput
+  >
+}
+
+export type SourceOfIncomeUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.SourceOfIncomeScalarWhereInput
+  data: Prisma.XOR<
+    Prisma.SourceOfIncomeUpdateManyMutationInput,
+    Prisma.SourceOfIncomeUncheckedUpdateManyWithoutUserInput
+  >
+}
+
+export type SourceOfIncomeScalarWhereInput = {
+  AND?: Prisma.SourceOfIncomeScalarWhereInput | Prisma.SourceOfIncomeScalarWhereInput[]
+  OR?: Prisma.SourceOfIncomeScalarWhereInput[]
+  NOT?: Prisma.SourceOfIncomeScalarWhereInput | Prisma.SourceOfIncomeScalarWhereInput[]
+  id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
+  name?: Prisma.StringFilter<'SourceOfIncome'> | string
+  category_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
+  income?: Prisma.FloatFilter<'SourceOfIncome'> | number
+  user_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
+  created_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
+  updated_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
 }
 
 export type SourceOfIncomeCreateWithoutCategoryInput = {
   id?: bigint | number
   name: string
   income?: number
-  users?: Prisma.UserSourceOfIncomeCreateNestedManyWithoutSource_of_incomeInput
+  created_at?: Date | string
+  updated_at?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutSources_of_incomeInput
 }
 
 export type SourceOfIncomeUncheckedCreateWithoutCategoryInput = {
   id?: bigint | number
   name: string
   income?: number
-  users?: Prisma.UserSourceOfIncomeUncheckedCreateNestedManyWithoutSource_of_incomeInput
+  user_id: bigint | number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type SourceOfIncomeCreateOrConnectWithoutCategoryInput = {
@@ -555,131 +753,76 @@ export type SourceOfIncomeUpdateManyWithWhereWithoutCategoryInput = {
   >
 }
 
-export type SourceOfIncomeScalarWhereInput = {
-  AND?: Prisma.SourceOfIncomeScalarWhereInput | Prisma.SourceOfIncomeScalarWhereInput[]
-  OR?: Prisma.SourceOfIncomeScalarWhereInput[]
-  NOT?: Prisma.SourceOfIncomeScalarWhereInput | Prisma.SourceOfIncomeScalarWhereInput[]
-  id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
-  name?: Prisma.StringFilter<'SourceOfIncome'> | string
-  category_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
-  income?: Prisma.FloatFilter<'SourceOfIncome'> | number
-}
-
-export type SourceOfIncomeCreateWithoutUsersInput = {
-  id?: bigint | number
-  name: string
-  income?: number
-  category: Prisma.SourceOfIncomeCategoryCreateNestedOneWithoutSources_of_incomeInput
-}
-
-export type SourceOfIncomeUncheckedCreateWithoutUsersInput = {
+export type SourceOfIncomeCreateManyUserInput = {
   id?: bigint | number
   name: string
   category_id: bigint | number
   income?: number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
-export type SourceOfIncomeCreateOrConnectWithoutUsersInput = {
-  where: Prisma.SourceOfIncomeWhereUniqueInput
-  create: Prisma.XOR<
-    Prisma.SourceOfIncomeCreateWithoutUsersInput,
-    Prisma.SourceOfIncomeUncheckedCreateWithoutUsersInput
-  >
-}
-
-export type SourceOfIncomeUpsertWithoutUsersInput = {
-  update: Prisma.XOR<
-    Prisma.SourceOfIncomeUpdateWithoutUsersInput,
-    Prisma.SourceOfIncomeUncheckedUpdateWithoutUsersInput
-  >
-  create: Prisma.XOR<
-    Prisma.SourceOfIncomeCreateWithoutUsersInput,
-    Prisma.SourceOfIncomeUncheckedCreateWithoutUsersInput
-  >
-  where?: Prisma.SourceOfIncomeWhereInput
-}
-
-export type SourceOfIncomeUpdateToOneWithWhereWithoutUsersInput = {
-  where?: Prisma.SourceOfIncomeWhereInput
-  data: Prisma.XOR<
-    Prisma.SourceOfIncomeUpdateWithoutUsersInput,
-    Prisma.SourceOfIncomeUncheckedUpdateWithoutUsersInput
-  >
-}
-
-export type SourceOfIncomeUpdateWithoutUsersInput = {
+export type SourceOfIncomeUpdateWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.SourceOfIncomeCategoryUpdateOneRequiredWithoutSources_of_incomeNestedInput
 }
 
-export type SourceOfIncomeUncheckedUpdateWithoutUsersInput = {
+export type SourceOfIncomeUncheckedUpdateWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   category_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   income?: Prisma.FloatFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type SourceOfIncomeUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  income?: Prisma.FloatFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SourceOfIncomeCreateManyCategoryInput = {
   id?: bigint | number
   name: string
   income?: number
+  user_id: bigint | number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
 export type SourceOfIncomeUpdateWithoutCategoryInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
-  users?: Prisma.UserSourceOfIncomeUpdateManyWithoutSource_of_incomeNestedInput
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutSources_of_incomeNestedInput
 }
 
 export type SourceOfIncomeUncheckedUpdateWithoutCategoryInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
-  users?: Prisma.UserSourceOfIncomeUncheckedUpdateManyWithoutSource_of_incomeNestedInput
+  user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SourceOfIncomeUncheckedUpdateManyWithoutCategoryInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
-}
-
-/**
- * Count Type SourceOfIncomeCountOutputType
- */
-
-export type SourceOfIncomeCountOutputType = {
-  users: number
-}
-
-export type SourceOfIncomeCountOutputTypeSelect<
-  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-  users?: boolean | SourceOfIncomeCountOutputTypeCountUsersArgs
-}
-
-/**
- * SourceOfIncomeCountOutputType without action
- */
-export type SourceOfIncomeCountOutputTypeDefaultArgs<
-  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-  /**
-   * Select specific fields to fetch from the SourceOfIncomeCountOutputType
-   */
-  select?: Prisma.SourceOfIncomeCountOutputTypeSelect<ExtArgs> | null
-}
-
-/**
- * SourceOfIncomeCountOutputType without action
- */
-export type SourceOfIncomeCountOutputTypeCountUsersArgs<
-  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-  where?: Prisma.UserSourceOfIncomeWhereInput
+  user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type SourceOfIncomeSelect<
@@ -690,9 +833,11 @@ export type SourceOfIncomeSelect<
     name?: boolean
     category_id?: boolean
     income?: boolean
+    user_id?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
     category?: boolean | Prisma.SourceOfIncomeCategoryDefaultArgs<ExtArgs>
-    users?: boolean | Prisma.SourceOfIncome$usersArgs<ExtArgs>
-    _count?: boolean | Prisma.SourceOfIncomeCountOutputTypeDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['sourceOfIncome']
 >
@@ -705,6 +850,10 @@ export type SourceOfIncomeSelectCreateManyAndReturn<
     name?: boolean
     category_id?: boolean
     income?: boolean
+    user_id?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
     category?: boolean | Prisma.SourceOfIncomeCategoryDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['sourceOfIncome']
@@ -718,6 +867,10 @@ export type SourceOfIncomeSelectUpdateManyAndReturn<
     name?: boolean
     category_id?: boolean
     income?: boolean
+    user_id?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
     category?: boolean | Prisma.SourceOfIncomeCategoryDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['sourceOfIncome']
@@ -728,29 +881,33 @@ export type SourceOfIncomeSelectScalar = {
   name?: boolean
   category_id?: boolean
   income?: boolean
+  user_id?: boolean
+  created_at?: boolean
+  updated_at?: boolean
 }
 
 export type SourceOfIncomeOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'name' | 'category_id' | 'income',
+  'id' | 'name' | 'category_id' | 'income' | 'user_id' | 'created_at' | 'updated_at',
   ExtArgs['result']['sourceOfIncome']
 >
 export type SourceOfIncomeInclude<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.SourceOfIncomeCategoryDefaultArgs<ExtArgs>
-  users?: boolean | Prisma.SourceOfIncome$usersArgs<ExtArgs>
-  _count?: boolean | Prisma.SourceOfIncomeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SourceOfIncomeIncludeCreateManyAndReturn<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.SourceOfIncomeCategoryDefaultArgs<ExtArgs>
 }
 export type SourceOfIncomeIncludeUpdateManyAndReturn<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   category?: boolean | Prisma.SourceOfIncomeCategoryDefaultArgs<ExtArgs>
 }
 
@@ -759,8 +916,8 @@ export type $SourceOfIncomePayload<
 > = {
   name: 'SourceOfIncome'
   objects: {
+    user: Prisma.$UserPayload<ExtArgs>
     category: Prisma.$SourceOfIncomeCategoryPayload<ExtArgs>
-    users: Prisma.$UserSourceOfIncomePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
@@ -768,6 +925,9 @@ export type $SourceOfIncomePayload<
       name: string
       category_id: bigint
       income: number
+      user_id: bigint
+      created_at: Date
+      updated_at: Date
     },
     ExtArgs['result']['sourceOfIncome']
   >
@@ -1307,6 +1467,20 @@ export interface Prisma__SourceOfIncomeClient<
   GlobalOmitOptions = {},
 > extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: 'PrismaPromise'
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(
+    args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>
+  ): Prisma.Prisma__UserClient<
+    | runtime.Types.Result.GetResult<
+        Prisma.$UserPayload<ExtArgs>,
+        T,
+        'findUniqueOrThrow',
+        GlobalOmitOptions
+      >
+    | Null,
+    Null,
+    ExtArgs,
+    GlobalOmitOptions
+  >
   category<T extends Prisma.SourceOfIncomeCategoryDefaultArgs<ExtArgs> = {}>(
     args?: Prisma.Subset<T, Prisma.SourceOfIncomeCategoryDefaultArgs<ExtArgs>>
   ): Prisma.Prisma__SourceOfIncomeCategoryClient<
@@ -1320,17 +1494,6 @@ export interface Prisma__SourceOfIncomeClient<
     Null,
     ExtArgs,
     GlobalOmitOptions
-  >
-  users<T extends Prisma.SourceOfIncome$usersArgs<ExtArgs> = {}>(
-    args?: Prisma.Subset<T, Prisma.SourceOfIncome$usersArgs<ExtArgs>>
-  ): Prisma.PrismaPromise<
-    | runtime.Types.Result.GetResult<
-        Prisma.$UserSourceOfIncomePayload<ExtArgs>,
-        T,
-        'findMany',
-        GlobalOmitOptions
-      >
-    | Null
   >
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1367,6 +1530,9 @@ export interface SourceOfIncomeFieldRefs {
   readonly name: Prisma.FieldRef<'SourceOfIncome', 'String'>
   readonly category_id: Prisma.FieldRef<'SourceOfIncome', 'BigInt'>
   readonly income: Prisma.FieldRef<'SourceOfIncome', 'Float'>
+  readonly user_id: Prisma.FieldRef<'SourceOfIncome', 'BigInt'>
+  readonly created_at: Prisma.FieldRef<'SourceOfIncome', 'DateTime'>
+  readonly updated_at: Prisma.FieldRef<'SourceOfIncome', 'DateTime'>
 }
 
 // Custom InputTypes
@@ -1804,34 +1970,6 @@ export type SourceOfIncomeDeleteManyArgs<
    * Limit how many SourceOfIncomes to delete.
    */
   limit?: number
-}
-
-/**
- * SourceOfIncome.users
- */
-export type SourceOfIncome$usersArgs<
-  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-  /**
-   * Select specific fields to fetch from the UserSourceOfIncome
-   */
-  select?: Prisma.UserSourceOfIncomeSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the UserSourceOfIncome
-   */
-  omit?: Prisma.UserSourceOfIncomeOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserSourceOfIncomeInclude<ExtArgs> | null
-  where?: Prisma.UserSourceOfIncomeWhereInput
-  orderBy?:
-    | Prisma.UserSourceOfIncomeOrderByWithRelationInput
-    | Prisma.UserSourceOfIncomeOrderByWithRelationInput[]
-  cursor?: Prisma.UserSourceOfIncomeWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.UserSourceOfIncomeScalarFieldEnum | Prisma.UserSourceOfIncomeScalarFieldEnum[]
 }
 
 /**

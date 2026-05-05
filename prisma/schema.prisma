@@ -8,10 +8,14 @@ datasource db {
 }
 
 model User {
-  id                BigInt               @id @default(autoincrement())
-  external_id       String               @unique
-  sources_of_income UserSourceOfIncome[]
+  id                BigInt                   @id @default(autoincrement())
+  external_id       String                   @unique
+  categories        SourceOfIncomeCategory[]
+  sources_of_income SourceOfIncome[]
   payment_methods   PaymentMethod[]
+  expenses          Expense[]
+  created_at        DateTime                 @default(now())
+  updated_at        DateTime                 @updatedAt
 
   @@map("users")
 }
@@ -19,7 +23,11 @@ model User {
 model SourceOfIncomeCategory {
   id                BigInt           @id @default(autoincrement())
   name              String
+  user_id           BigInt
+  user              User             @relation(fields: [user_id], references: [id])
   sources_of_income SourceOfIncome[]
+  created_at        DateTime         @default(now())
+  updated_at        DateTime         @updatedAt
 
   @@map("source_of_income_categories")
 }
@@ -29,29 +37,53 @@ model SourceOfIncome {
   name        String
   category_id BigInt
   income      Float                  @default(0)
+  user_id     BigInt
+  user        User                   @relation(fields: [user_id], references: [id])
   category    SourceOfIncomeCategory @relation(fields: [category_id], references: [id])
-  users       UserSourceOfIncome[]
+  created_at  DateTime               @default(now())
+  updated_at  DateTime               @updatedAt
 
   @@map("sources_of_income")
 }
 
-model UserSourceOfIncome {
-  user_id             BigInt
-  source_of_income_id BigInt
-  user                User           @relation(fields: [user_id], references: [id])
-  source_of_income    SourceOfIncome @relation(fields: [source_of_income_id], references: [id])
-
-  @@id([user_id, source_of_income_id])
-  @@map("user_sources_of_income")
-}
-
 model PaymentMethod {
-  id       BigInt  @id @default(autoincrement())
-  name     String
-  bank     String?
-  receiver String?
-  user_id  BigInt
-  user     User    @relation(fields: [user_id], references: [id])
+  id          BigInt                 @id @default(autoincrement())
+  name        String
+  bank        String?
+  receiver    String?
+  user_id     BigInt
+  user        User                   @relation(fields: [user_id], references: [id])
+  expenses    ExpensePaymentMethod[]
+  created_at  DateTime               @default(now())
+  updated_at  DateTime               @updatedAt
 
   @@map("payment_methods")
+}
+
+model Expense {
+  id              BigInt                 @id @default(autoincrement())
+  name            String
+  amount          Float
+  is_paid         Boolean                @default(false)
+  is_saved        Boolean                @default(false)
+  saving_location String?
+  user_id         BigInt
+  user            User                   @relation(fields: [user_id], references: [id])
+  payment_methods ExpensePaymentMethod[]
+  created_at      DateTime               @default(now())
+  updated_at      DateTime               @updatedAt
+
+  @@map("expenses")
+}
+
+model ExpensePaymentMethod {
+  expense_id        BigInt
+  payment_method_id BigInt
+  partial_amount    Float
+  expense           Expense       @relation(fields: [expense_id], references: [id], onDelete: Cascade)
+  payment_method    PaymentMethod @relation(fields: [payment_method_id], references: [id])
+  created_at        DateTime      @default(now())
+
+  @@id([expense_id, payment_method_id])
+  @@map("expense_payment_methods")
 }

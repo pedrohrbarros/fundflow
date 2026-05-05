@@ -11,29 +11,39 @@ export const withBearerAuth = (app: Elysia<any, any, any, any, any, any, any>) =
     }
   })
 
+const deriveClerkUserId = (app: Elysia<any, any, any, any, any, any, any>) =>
+  app.derive(async ({ request }) => {
+    try {
+      const authorization_header = request.headers.get('Authorization')
+      if (!authorization_header?.startsWith('Bearer ')) return { clerk_user_id: null }
+
+      const token = authorization_header.slice(7)
+      const public_key = await getClerkPublicKey()
+      const { payload } = await jwtVerify(token, public_key, { algorithms: ['RS256'] })
+
+      const authorized_party = process.env.CLERK_AUTHORIZED_PARTY
+      if (authorized_party && payload.azp !== authorized_party) return { clerk_user_id: null }
+
+      const clerk_user_id = typeof payload.sub === 'string' ? payload.sub : null
+      return { clerk_user_id }
+    } catch {
+      return { clerk_user_id: null }
+    }
+  })
+
 export const withClerkAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
-  app
-    .derive(async ({ request }) => {
-      try {
-        const authorization_header = request.headers.get('Authorization')
-        if (!authorization_header?.startsWith('Bearer ')) return { clerk_user_id: null }
+  deriveClerkUserId(app).onBeforeHandle(({ clerk_user_id, set }) => {
+    if (!clerk_user_id) {
+      set.status = 401
+      return { error: 'Unauthorized' }
+    }
+  })
 
-        const token = authorization_header.slice(7)
-        const public_key = await getClerkPublicKey()
-        const { payload } = await jwtVerify(token, public_key, { algorithms: ['RS256'] })
-
-        const authorized_party = process.env.CLERK_AUTHORIZED_PARTY
-        if (authorized_party && payload.azp !== authorized_party) return { clerk_user_id: null }
-
-        const clerk_user_id = typeof payload.sub === 'string' ? payload.sub : null
-        return { clerk_user_id }
-      } catch {
-        return { clerk_user_id: null }
-      }
-    })
-    .onBeforeHandle(({ clerk_user_id, set }) => {
-      if (!clerk_user_id) {
-        set.status = 401
-        return { error: 'Unauthorized' }
-      }
-    })
+export const withClerkAndBearerAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
+  deriveClerkUserId(app).onBeforeHandle(({ request, clerk_user_id, set }) => {
+    const api_key = request.headers.get('X-Api-Key')
+    if (!clerk_user_id || api_key !== process.env.API_TOKEN) {
+      set.status = 401
+      return { error: 'Unauthorized' }
+    }
+  })

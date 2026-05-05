@@ -32,12 +32,17 @@ export type SourceOfIncomeCategory = Prisma.SourceOfIncomeCategoryModel
  */
 export type SourceOfIncome = Prisma.SourceOfIncomeModel
 /**
- * Model UserSourceOfIncome
- *
- */
-export type UserSourceOfIncome = Prisma.UserSourceOfIncomeModel
-/**
  * Model PaymentMethod
  *
  */
 export type PaymentMethod = Prisma.PaymentMethodModel
+/**
+ * Model Expense
+ *
+ */
+export type Expense = Prisma.ExpenseModel
+/**
+ * Model ExpensePaymentMethod
+ *
+ */
+export type ExpensePaymentMethod = Prisma.ExpensePaymentMethodModel

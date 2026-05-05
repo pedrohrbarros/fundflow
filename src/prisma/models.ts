@@ -10,6 +10,7 @@
 export type * from './models/User'
 export type * from './models/SourceOfIncomeCategory'
 export type * from './models/SourceOfIncome'
-export type * from './models/UserSourceOfIncome'
 export type * from './models/PaymentMethod'
+export type * from './models/Expense'
+export type * from './models/ExpensePaymentMethod'
 export type * from './commonInputTypes'
