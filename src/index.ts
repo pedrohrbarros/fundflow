@@ -58,6 +58,6 @@ export const app = new Elysia()
   .get('/docs', () => new Response(REDOC_HTML, { headers: { 'Content-Type': 'text/html' } }))
 
 if (import.meta.main) {
-  app.listen(3000)
+  app.listen(Number(process.env.PORT ?? 8000))
   logger.info(`Fundflow is running at ${app.server?.hostname}:${app.server?.port}`)
 }
