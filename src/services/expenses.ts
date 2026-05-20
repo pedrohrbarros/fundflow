@@ -13,7 +13,15 @@ type ExpenseWithSplits = {
   saving_location: string | null
   created_at: Date
   updated_at: Date
-  payment_methods: { payment_method_id: bigint; partial_amount: number }[]
+  payment_methods: {
+    payment_method_id: bigint
+    partial_amount: number
+    payment_method: {
+      name: string
+      bank: string | null
+      receiver: string | null
+    }
+  }[]
 }
 
 const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
@@ -23,9 +31,12 @@ const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
   is_paid: expense.is_paid,
   is_saved: expense.is_saved,
   saving_location: expense.saving_location,
-  payment_methods: expense.payment_methods.map((s) => ({
-    payment_method_id: s.payment_method_id.toString(),
-    partial_amount: s.partial_amount,
+  payment_methods: expense.payment_methods.map((split) => ({
+    payment_method_id: split.payment_method_id.toString(),
+    partial_amount: split.partial_amount,
+    name: split.payment_method.name,
+    bank: split.payment_method.bank,
+    receiver: split.payment_method.receiver,
   })),
   created_at: expense.created_at.toISOString(),
   updated_at: expense.updated_at.toISOString(),
@@ -94,7 +105,7 @@ export const ExpensesService = {
               }
             : {}),
         },
-        include: { payment_methods: true },
+        include: { payment_methods: { include: { payment_method: true } } },
       })
 
       return { ok: true, data: toRecord(expense) }
@@ -128,7 +139,7 @@ export const ExpensesService = {
           orderBy: { id: 'desc' },
           skip: (page - 1) * limit,
           take: limit,
-          include: { payment_methods: true },
+          include: { payment_methods: { include: { payment_method: true } } },
         }),
         db.expense.count({ where: { user_id: user.id } }),
       ])
@@ -198,7 +209,7 @@ export const ExpensesService = {
             ? { saving_location: input.saving_location }
             : {}),
         },
-        include: { payment_methods: true },
+        include: { payment_methods: { include: { payment_method: true } } },
       })
 
       return { ok: true, data: toRecord(expense) }

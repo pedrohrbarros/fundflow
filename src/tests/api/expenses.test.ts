@@ -103,8 +103,12 @@ describe('Expenses API', () => {
     expect(res.status).toBe(404)
   })
 
-  it('GET /v1/expenses returns paginated expenses', async () => {
-    await req('POST', '/v1/expenses', { name: `exp-${TS}-list`, amount: 10 })
+  it('GET /v1/expenses returns paginated expenses with full payment method data', async () => {
+    await req('POST', '/v1/expenses', {
+      name: `exp-${TS}-list`,
+      amount: 100,
+      payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
+    })
     const res = await req('GET', '/v1/expenses?page=1&limit=20')
     expect(res.status).toBe(200)
     const json = await res.json()
@@ -112,6 +116,17 @@ describe('Expenses API', () => {
     expect(json.pagination.page).toBe(1)
     expect(json.pagination.limit).toBe(20)
     expect(typeof json.pagination.total).toBe('number')
+    // Find the expense we just created
+    const expense = json.expenses.find((e: { name: string }) => e.name === `exp-${TS}-list`)
+    expect(expense).toBeDefined()
+    expect(expense.payment_methods).toHaveLength(1)
+    // Each payment method entry must include full data
+    const split = expense.payment_methods[0]
+    expect(split.payment_method_id).toBe(pm_id)
+    expect(typeof split.partial_amount).toBe('number')
+    expect(typeof split.name).toBe('string')
+    expect('bank' in split).toBe(true)
+    expect('receiver' in split).toBe(true)
   })
 
   it('PATCH /v1/expenses/:id updates expense fields', async () => {
