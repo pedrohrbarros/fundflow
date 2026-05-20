@@ -65,7 +65,9 @@ describe('Sources of income cache', () => {
     await req('GET', '/v1/sources_of_income')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
-    expect(Array.isArray(JSON.parse(cached!))).toBe(true)
+    const parsed = JSON.parse(cached!)
+    expect(typeof parsed).toBe('object')
+    expect(Array.isArray(parsed)).toBe(false)
   })
 
   it('POST /v1/sources_of_income invalidates the cache', async () => {
