@@ -68,7 +68,7 @@ describe('Sources of Income API', () => {
     expect(json.category_id).toBe(test_category_id)
   })
 
-  it("GET /v1/sources_of_income returns only the user's sources", async () => {
+  it('GET /v1/sources_of_income returns sources grouped by category', async () => {
     await req('POST', '/v1/sources_of_income', {
       name: `test-soi-${TS}-list`,
       category_id: Number(test_category_id),
@@ -76,10 +76,26 @@ describe('Sources of Income API', () => {
     const res = await req('GET', '/v1/sources_of_income')
     expect(res.status).toBe(200)
     const json = await res.json()
-    expect(Array.isArray(json.sources_of_income)).toBe(true)
-    expect(
-      json.sources_of_income.some((s: { name: string }) => s.name === `test-soi-${TS}-list`)
-    ).toBe(true)
+    // Response is an object keyed by category name — not a wrapped array
+    expect(typeof json).toBe('object')
+    expect(Array.isArray(json)).toBe(false)
+    expect('sources_of_income' in json).toBe(false)
+    // Keys are category names (strings), values are arrays of sources
+    const category_names = Object.keys(json)
+    expect(category_names.length).toBeGreaterThan(0)
+    for (const key of category_names) {
+      expect(Array.isArray(json[key])).toBe(true)
+    }
+    // Each entry has the expected shape
+    const all_sources = Object.values(
+      json as Record<string, { id: string; name: string; income: number }[]>
+    ).flat()
+    const first_source = all_sources[0]
+    expect(typeof first_source.id).toBe('string')
+    expect(typeof first_source.name).toBe('string')
+    expect(typeof first_source.income).toBe('number')
+    // The source we created appears under its category
+    expect(all_sources.some((s) => s.name === `test-soi-${TS}-list`)).toBe(true)
   })
 
   it('PATCH /v1/sources_of_income/:id updates a source of income', async () => {
