@@ -1,5 +1,6 @@
 import { db } from '../config/db'
 import { cacheGet, cacheSet, cacheDel } from '../middleware/cache'
+import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
 import type {
   SourceOfIncomeRecord,
@@ -86,6 +87,7 @@ export const SourcesOfIncomeService = {
       await cacheSet(key, data)
       return { ok: true, data }
     } catch (err: unknown) {
+      db_logger.error(err, 'Failed to fetch sources of income')
       return {
         ok: false,
         status: 500,

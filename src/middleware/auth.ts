@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia'
 import { jwtVerify } from 'jose'
 import { getClerkPublicKey } from '../config/clerk'
+import { logger } from '../config/logging'
 
 export const withBearerAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
   app.onBeforeHandle(({ request, set }) => {
@@ -26,7 +27,8 @@ const deriveClerkUserId = (app: Elysia<any, any, any, any, any, any, any>) =>
 
       const clerk_user_id = typeof payload.sub === 'string' ? payload.sub : null
       return { clerk_user_id }
-    } catch {
+    } catch (err) {
+      logger.warn({ err }, 'JWT verification failed')
       return { clerk_user_id: null }
     }
   })
@@ -43,6 +45,10 @@ export const withClerkAndBearerAuth = (app: Elysia<any, any, any, any, any, any,
   deriveClerkUserId(app).onBeforeHandle(({ request, clerk_user_id, set }) => {
     const api_key = request.headers.get('X-Api-Key')
     if (!clerk_user_id || api_key !== process.env.API_TOKEN) {
+      logger.warn(
+        { reason: !clerk_user_id ? 'invalid_jwt' : 'invalid_api_key' },
+        'Unauthorized request rejected'
+      )
       set.status = 401
       return { error: 'Unauthorized' }
     }

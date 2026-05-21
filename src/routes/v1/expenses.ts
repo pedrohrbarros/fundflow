@@ -6,7 +6,8 @@ import { deleteExpense } from './expenses/delete'
 import { ExpenseCreateBody, ExpenseUpdateBody } from '../../types/expenses'
 
 export const expenses = new Elysia()
-  .post('/expenses', createExpense, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .post('/expenses', createExpense as any, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -19,10 +20,12 @@ export const expenses = new Elysia()
       },
     },
   })
-  .get('/expenses', listExpenses, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .get('/expenses', listExpenses as any, {
     detail: { security: [{ clerkAuth: [] }] },
   })
-  .patch('/expenses/:id', updateExpense, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .patch('/expenses/:id', updateExpense as any, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -35,6 +38,7 @@ export const expenses = new Elysia()
       },
     },
   })
-  .delete('/expenses/:id', deleteExpense, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .delete('/expenses/:id', deleteExpense as any, {
     detail: { security: [{ clerkAuth: [] }] },
   })

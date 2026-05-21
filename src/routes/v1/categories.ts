@@ -6,7 +6,8 @@ import { deleteCategory } from './categories/delete'
 import { CategoryCreateBody, CategoryUpdateBody } from '../../types/categories'
 
 export const categories = new Elysia()
-  .post('/categories', createCategory, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .post('/categories', createCategory as any, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -19,10 +20,12 @@ export const categories = new Elysia()
       },
     },
   })
-  .get('/categories', listCategories, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .get('/categories', listCategories as any, {
     detail: { security: [{ clerkAuth: [] }] },
   })
-  .patch('/categories/:id', updateCategory, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .patch('/categories/:id', updateCategory as any, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -35,6 +38,7 @@ export const categories = new Elysia()
       },
     },
   })
-  .delete('/categories/:id', deleteCategory, {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  .delete('/categories/:id', deleteCategory as any, {
     detail: { security: [{ clerkAuth: [] }] },
   })

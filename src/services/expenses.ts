@@ -1,4 +1,5 @@
 import { db } from '../config/db'
+import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
 import type { ExpenseRecord, ExpenseCreateBodyType, ExpenseUpdateBodyType } from '../types/expenses'
 
@@ -152,6 +153,7 @@ export const ExpensesService = {
         },
       }
     } catch (err: unknown) {
+      db_logger.error(err, 'Failed to fetch expenses')
       return {
         ok: false,
         status: 500,
