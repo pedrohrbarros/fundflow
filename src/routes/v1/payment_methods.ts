@@ -4,10 +4,10 @@ import { listPaymentMethods } from './payment_methods/list'
 import { updatePaymentMethod } from './payment_methods/update'
 import { deletePaymentMethod } from './payment_methods/delete'
 import { PaymentMethodCreateBody, PaymentMethodUpdateBody } from '../../types/payment_methods'
+import type { RouteHandler } from '../../types/routes'
 
 export const payment_methods = new Elysia()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .post('/payment_methods', createPaymentMethod as any, {
+  .post('/payment_methods', createPaymentMethod as RouteHandler, {
     detail: {
       security: [{ bearerAuth: [] }],
       requestBody: {
@@ -20,14 +20,10 @@ export const payment_methods = new Elysia()
       },
     },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .get('/payment_methods', listPaymentMethods as any, {
-    detail: {
-      security: [{ bearerAuth: [] }],
-    },
+  .get('/payment_methods', listPaymentMethods as RouteHandler, {
+    detail: { security: [{ bearerAuth: [] }] },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .patch('/payment_methods/:id', updatePaymentMethod as any, {
+  .patch('/payment_methods/:id', updatePaymentMethod as RouteHandler, {
     detail: {
       security: [{ bearerAuth: [] }],
       requestBody: {
@@ -40,9 +36,6 @@ export const payment_methods = new Elysia()
       },
     },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .delete('/payment_methods/:id', deletePaymentMethod as any, {
-    detail: {
-      security: [{ bearerAuth: [] }],
-    },
+  .delete('/payment_methods/:id', deletePaymentMethod as RouteHandler, {
+    detail: { security: [{ bearerAuth: [] }] },
   })

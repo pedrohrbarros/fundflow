@@ -4,10 +4,10 @@ import { listSourcesOfIncome } from './sources_of_income/list'
 import { updateSourceOfIncome } from './sources_of_income/update'
 import { deleteSourceOfIncome } from './sources_of_income/delete'
 import { SourceOfIncomeCreateBody, SourceOfIncomeUpdateBody } from '../../types/sources_of_income'
+import type { RouteHandler } from '../../types/routes'
 
 export const sources_of_income = new Elysia()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .post('/sources_of_income', createSourceOfIncome as any, {
+  .post('/sources_of_income', createSourceOfIncome as RouteHandler, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -20,12 +20,10 @@ export const sources_of_income = new Elysia()
       },
     },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .get('/sources_of_income', listSourcesOfIncome as any, {
+  .get('/sources_of_income', listSourcesOfIncome as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .patch('/sources_of_income/:id', updateSourceOfIncome as any, {
+  .patch('/sources_of_income/:id', updateSourceOfIncome as RouteHandler, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -38,7 +36,6 @@ export const sources_of_income = new Elysia()
       },
     },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .delete('/sources_of_income/:id', deleteSourceOfIncome as any, {
+  .delete('/sources_of_income/:id', deleteSourceOfIncome as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })

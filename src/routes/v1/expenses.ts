@@ -4,10 +4,10 @@ import { listExpenses } from './expenses/list'
 import { updateExpense } from './expenses/update'
 import { deleteExpense } from './expenses/delete'
 import { ExpenseCreateBody, ExpenseUpdateBody } from '../../types/expenses'
+import type { RouteHandler } from '../../types/routes'
 
 export const expenses = new Elysia()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .post('/expenses', createExpense as any, {
+  .post('/expenses', createExpense as RouteHandler, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -20,12 +20,10 @@ export const expenses = new Elysia()
       },
     },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .get('/expenses', listExpenses as any, {
+  .get('/expenses', listExpenses as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .patch('/expenses/:id', updateExpense as any, {
+  .patch('/expenses/:id', updateExpense as RouteHandler, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -38,7 +36,6 @@ export const expenses = new Elysia()
       },
     },
   })
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  .delete('/expenses/:id', deleteExpense as any, {
+  .delete('/expenses/:id', deleteExpense as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
