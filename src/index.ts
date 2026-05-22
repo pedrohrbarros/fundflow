@@ -1,5 +1,6 @@
 import { Elysia } from 'elysia'
 import { cors } from '@elysiajs/cors'
+import { rateLimit } from 'elysia-rate-limit'
 import { swagger } from '@elysiajs/swagger'
 import { open_api_config } from './config/openapi'
 import { withBearerAuth, withClerkAndBearerAuth } from './middleware/auth'
@@ -49,6 +50,7 @@ export const app = new Elysia()
       credentials: true,
     })
   )
+  .use(rateLimit({ duration: 60_000, max: 100 }))
   .derive(() => ({ requestStart: Date.now() }))
   .onRequest(({ request }) => {
     endpoint_logger.info({ method: request.method, url: request.url }, 'Incoming request')
