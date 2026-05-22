@@ -1,4 +1,4 @@
-import { describe, it, expect, mock } from 'bun:test'
+import { describe, it, expect, afterAll, mock } from 'bun:test'
 
 process.env.ALLOWED_ORIGINS = '["http://localhost:3000"]'
 process.env.API_TOKEN = 'test-api-token'
@@ -17,6 +17,10 @@ mock.module('../../config/redis', () => ({
 }))
 
 const { app } = await import('../../index')
+
+afterAll(() => {
+  mock.restore()
+})
 
 describe('CORS', () => {
   it('returns Access-Control-Allow-Origin for configured origin', async () => {
