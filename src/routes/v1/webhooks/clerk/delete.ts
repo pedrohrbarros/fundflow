@@ -15,7 +15,7 @@ export const clerkDeleteWebhook = async ({ request, body, set }: Context) => {
       'svix-timestamp': request.headers.get('svix-timestamp'),
       'svix-signature': request.headers.get('svix-signature'),
     },
-    process.env.CLERK_WEBHOOK_SIGNING_SECRET ?? ''
+    process.env.CLERK_DELETE_USER_WEBHOOK_SIGNING_SECRET ?? ''
   )
 
   if (!verification.success)
