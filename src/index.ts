@@ -52,25 +52,17 @@ export const app = new Elysia()
   )
   .use(rateLimit({ duration: 60_000, max: 100 }))
   .derive(() => ({ requestStart: Date.now() }))
-  .onRequest(({ request }) => {
-    endpoint_logger.info({ method: request.method, url: request.url }, 'Incoming request')
+  .onRequest(() => {
+    endpoint_logger.info('Incoming request')
   })
-  .onAfterResponse(({ request, set, requestStart }) => {
+  .onAfterResponse(({ set, requestStart }) => {
     endpoint_logger.info(
-      {
-        method: request.method,
-        url: request.url,
-        status: set.status,
-        duration: Date.now() - requestStart,
-      },
+      { status: set.status, duration: `${Date.now() - requestStart}ms` },
       'Request completed'
     )
   })
-  .onError(({ error, request, set }) => {
-    endpoint_logger.error(
-      { method: request.method, url: request.url, status: set.status, error: String(error) },
-      'Request error'
-    )
+  .onError(({ error }) => {
+    endpoint_logger.error({ error: String(error) }, 'Request error')
   })
   .use(swagger(open_api_config))
   .group('/api/v1', (app) => withBearerAuth(app).use(webhooks))
