@@ -6,7 +6,10 @@ import { WEBHOOK_RATE_LIMIT } from '../../../constants/api/rules/webhooks'
 import { CLERK_ALLOWED_IPS_FLAT } from '../../../constants/webhooks/rules/clerk'
 import { isAllowedIP } from '../../../helpers/network/cidr'
 import { handleError } from '../../../middleware/error'
-import { ClerkUserCreatedWebhookBody } from '../../../types/webhooks/clerk'
+import {
+  ClerkUserCreatedWebhookBody,
+  ClerkUserDeletedWebhookBody,
+} from '../../../types/webhooks/clerk'
 
 const clerkIpGuard = ({
   request,
@@ -79,7 +82,7 @@ export const webhooks = new Elysia()
         required: true,
         content: {
           'application/json': {
-            schema: ClerkUserCreatedWebhookBody as unknown as Record<string, unknown>,
+            schema: ClerkUserDeletedWebhookBody as unknown as Record<string, unknown>,
           },
         },
       },
