@@ -1,26 +1,16 @@
-import { describe, it, expect, afterAll, mock } from 'bun:test'
+import { describe, it, expect, mock } from 'bun:test'
+import { generateKeyPair } from 'jose'
+
+const { publicKey: test_public_key } = await generateKeyPair('RS256')
+
+mock.module('../../config/clerk', () => ({
+  getClerkPublicKey: async () => test_public_key,
+}))
 
 process.env.ALLOWED_ORIGINS = '["http://localhost:3000"]'
 process.env.API_TOKEN = 'test-api-token'
 
-mock.module('../../config/db', () => ({
-  db: {},
-}))
-
-mock.module('../../config/redis', () => ({
-  client: {
-    get: async () => null,
-    set: async () => null,
-    del: async () => null,
-    quit: async () => null,
-  },
-}))
-
 const { app } = await import('../../index')
-
-afterAll(() => {
-  mock.restore()
-})
 
 describe('CORS', () => {
   it('returns Access-Control-Allow-Origin for configured origin', async () => {
