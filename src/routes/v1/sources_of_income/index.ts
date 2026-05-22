@@ -1,10 +1,13 @@
 import { Elysia } from 'elysia'
-import { createSourceOfIncome } from './sources_of_income/create'
-import { listSourcesOfIncome } from './sources_of_income/list'
-import { updateSourceOfIncome } from './sources_of_income/update'
-import { deleteSourceOfIncome } from './sources_of_income/delete'
-import { SourceOfIncomeCreateBody, SourceOfIncomeUpdateBody } from '../../types/sources_of_income'
-import type { RouteHandler } from '../../types/routes'
+import { createSourceOfIncome } from './create'
+import { listSourcesOfIncome } from './list'
+import { updateSourceOfIncome } from './update'
+import { deleteSourceOfIncome } from './delete'
+import {
+  SourceOfIncomeCreateBody,
+  SourceOfIncomeUpdateBody,
+} from '../../../types/sources_of_income'
+import type { RouteHandler } from '../../../types/routes'
 
 export const sources_of_income = new Elysia()
   .post('/sources_of_income', createSourceOfIncome as RouteHandler, {

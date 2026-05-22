@@ -1,10 +1,10 @@
 import { Elysia } from 'elysia'
-import { createExpense } from './expenses/create'
-import { listExpenses } from './expenses/list'
-import { updateExpense } from './expenses/update'
-import { deleteExpense } from './expenses/delete'
-import { ExpenseCreateBody, ExpenseUpdateBody } from '../../types/expenses'
-import type { RouteHandler } from '../../types/routes'
+import { createExpense } from './create'
+import { listExpenses } from './list'
+import { updateExpense } from './update'
+import { deleteExpense } from './delete'
+import { ExpenseCreateBody, ExpenseUpdateBody } from '../../../types/expenses'
+import type { RouteHandler } from '../../../types/routes'
 
 export const expenses = new Elysia()
   .post('/expenses', createExpense as RouteHandler, {
