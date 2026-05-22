@@ -1,6 +1,6 @@
 import { CategoriesService } from '../../../services/categories'
 import { handleError } from '../../../middleware/error'
-import type { CategoryCreateBodyType } from '../../../types/categories'
+import { CategoryCreateSchema } from '../../../schemas/categories'
 
 export const createCategory = async ({
   clerk_user_id,
@@ -11,8 +11,12 @@ export const createCategory = async ({
   body: unknown
   set: { status?: number | string }
 }) => {
-  const { name } = body as CategoryCreateBodyType
-  const result = await CategoriesService.create(clerk_user_id, name)
+  const parsed = CategoryCreateSchema.safeParse(body)
+  if (!parsed.success) {
+    set.status = 400
+    return { error: parsed.error.flatten().fieldErrors }
+  }
+  const result = await CategoriesService.create(clerk_user_id, parsed.data.name)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201
   return result.data

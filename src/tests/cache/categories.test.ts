@@ -56,37 +56,37 @@ afterAll(async () => {
 })
 
 describe('Categories cache', () => {
-  it('GET /v1/categories populates the per-user cache', async () => {
-    await req('GET', '/v1/categories')
+  it('GET /api/v1/categories populates the per-user cache', async () => {
+    await req('GET', '/api/v1/categories')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
     expect(Array.isArray(JSON.parse(cached!))).toBe(true)
   })
 
-  it('POST /v1/categories invalidates the cache', async () => {
-    await req('GET', '/v1/categories')
+  it('POST /api/v1/categories invalidates the cache', async () => {
+    await req('GET', '/api/v1/categories')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('POST', '/v1/categories', { name: `test-cache-cat-${TS}-create` })
+    await req('POST', '/api/v1/categories', { name: `test-cache-cat-${TS}-create` })
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 
-  it('PATCH /v1/categories/:id invalidates the cache', async () => {
+  it('PATCH /api/v1/categories/:id invalidates the cache', async () => {
     const created = await (
-      await req('POST', '/v1/categories', { name: `test-cache-cat-${TS}-patch` })
+      await req('POST', '/api/v1/categories', { name: `test-cache-cat-${TS}-patch` })
     ).json()
-    await req('GET', '/v1/categories')
+    await req('GET', '/api/v1/categories')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('PATCH', `/v1/categories/${created.id}`, { name: `test-cache-cat-${TS}-patched` })
+    await req('PATCH', `/api/v1/categories/${created.id}`, { name: `test-cache-cat-${TS}-patched` })
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 
-  it('DELETE /v1/categories/:id invalidates the cache', async () => {
+  it('DELETE /api/v1/categories/:id invalidates the cache', async () => {
     const created = await (
-      await req('POST', '/v1/categories', { name: `test-cache-cat-${TS}-del` })
+      await req('POST', '/api/v1/categories', { name: `test-cache-cat-${TS}-del` })
     ).json()
-    await req('GET', '/v1/categories')
+    await req('GET', '/api/v1/categories')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('DELETE', `/v1/categories/${created.id}`)
+    await req('DELETE', `/api/v1/categories/${created.id}`)
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 })

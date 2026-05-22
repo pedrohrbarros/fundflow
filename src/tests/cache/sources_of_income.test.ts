@@ -45,7 +45,7 @@ let test_category_id: string
 
 beforeAll(async () => {
   await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
-  const catRes = await req('POST', '/v1/categories', { name: `cache-soi-cat-${TS}` })
+  const catRes = await req('POST', '/api/v1/categories', { name: `cache-soi-cat-${TS}` })
   test_category_id = (await catRes.json()).id
 })
 
@@ -61,8 +61,8 @@ afterAll(async () => {
 })
 
 describe('Sources of income cache', () => {
-  it('GET /v1/sources_of_income populates the per-user cache', async () => {
-    await req('GET', '/v1/sources_of_income')
+  it('GET /api/v1/sources_of_income populates the per-user cache', async () => {
+    await req('GET', '/api/v1/sources_of_income')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
     const parsed = JSON.parse(cached!)
@@ -70,39 +70,41 @@ describe('Sources of income cache', () => {
     expect(Array.isArray(parsed)).toBe(false)
   })
 
-  it('POST /v1/sources_of_income invalidates the cache', async () => {
-    await req('GET', '/v1/sources_of_income')
+  it('POST /api/v1/sources_of_income invalidates the cache', async () => {
+    await req('GET', '/api/v1/sources_of_income')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('POST', '/v1/sources_of_income', {
+    await req('POST', '/api/v1/sources_of_income', {
       name: `cache-soi-${TS}-create`,
       category_id: Number(test_category_id),
     })
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 
-  it('PATCH /v1/sources_of_income/:id invalidates the cache', async () => {
+  it('PATCH /api/v1/sources_of_income/:id invalidates the cache', async () => {
     const created = await (
-      await req('POST', '/v1/sources_of_income', {
+      await req('POST', '/api/v1/sources_of_income', {
         name: `cache-soi-${TS}-patch`,
         category_id: Number(test_category_id),
       })
     ).json()
-    await req('GET', '/v1/sources_of_income')
+    await req('GET', '/api/v1/sources_of_income')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('PATCH', `/v1/sources_of_income/${created.id}`, { name: `cache-soi-${TS}-patched` })
+    await req('PATCH', `/api/v1/sources_of_income/${created.id}`, {
+      name: `cache-soi-${TS}-patched`,
+    })
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 
-  it('DELETE /v1/sources_of_income/:id invalidates the cache', async () => {
+  it('DELETE /api/v1/sources_of_income/:id invalidates the cache', async () => {
     const created = await (
-      await req('POST', '/v1/sources_of_income', {
+      await req('POST', '/api/v1/sources_of_income', {
         name: `cache-soi-${TS}-del`,
         category_id: Number(test_category_id),
       })
     ).json()
-    await req('GET', '/v1/sources_of_income')
+    await req('GET', '/api/v1/sources_of_income')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('DELETE', `/v1/sources_of_income/${created.id}`)
+    await req('DELETE', `/api/v1/sources_of_income/${created.id}`)
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 })
