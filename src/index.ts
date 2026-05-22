@@ -50,7 +50,16 @@ export const app = new Elysia()
       credentials: true,
     })
   )
-  .use(rateLimit({ duration: 60_000, max: 100 }))
+  .use(
+    rateLimit({
+      duration: 60_000,
+      max: 100,
+      generator: (request, server) =>
+        request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+        server?.requestIP(request)?.address ??
+        'unknown',
+    })
+  )
   .derive(() => ({ requestStart: Date.now() }))
   .onRequest(() => {
     endpoint_logger.info('Incoming request')

@@ -18,8 +18,8 @@ const clerkIpGuard = ({
   server: { requestIP: (req: Request) => { address: string } | null } | null
 }) => {
   const client_ip =
-    server?.requestIP(request)?.address ??
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    server?.requestIP(request)?.address ??
     ''
   if (!isAllowedIP(client_ip, CLERK_ALLOWED_IPS_FLAT)) {
     return handleError(set, 403, 'IP not allowed', { client_ip })

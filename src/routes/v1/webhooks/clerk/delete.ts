@@ -37,5 +37,5 @@ export const clerkDeleteWebhook = async ({ request, body, set }: Context) => {
   const result = await ClerkWebhookService.deleteUser(external_id)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
 
-  return result.data
+  set.status = 204
 }
