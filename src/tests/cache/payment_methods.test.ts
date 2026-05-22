@@ -55,33 +55,35 @@ afterAll(async () => {
 })
 
 describe('Payment methods cache', () => {
-  it('GET /v1/payment_methods populates the cache for the user', async () => {
-    await req('GET', '/v1/payment_methods')
+  it('GET /api/v1/payment_methods populates the cache for the user', async () => {
+    await req('GET', '/api/v1/payment_methods')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
     expect(Array.isArray(JSON.parse(cached!))).toBe(true)
   })
 
-  it('POST /v1/payment_methods invalidates the user cache', async () => {
-    await req('GET', '/v1/payment_methods')
+  it('POST /api/v1/payment_methods invalidates the user cache', async () => {
+    await req('GET', '/api/v1/payment_methods')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('POST', '/v1/payment_methods', { name: 'Test Bank' })
+    await req('POST', '/api/v1/payment_methods', { name: 'Test Bank' })
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 
-  it('PATCH /v1/payment_methods/:id invalidates the user cache', async () => {
-    const created = await (await req('POST', '/v1/payment_methods', { name: 'Old' })).json()
-    await req('GET', '/v1/payment_methods')
+  it('PATCH /api/v1/payment_methods/:id invalidates the user cache', async () => {
+    const created = await (await req('POST', '/api/v1/payment_methods', { name: 'Old' })).json()
+    await req('GET', '/api/v1/payment_methods')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('PATCH', `/v1/payment_methods/${created.id}`, { name: 'New' })
+    await req('PATCH', `/api/v1/payment_methods/${created.id}`, { name: 'New' })
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 
-  it('DELETE /v1/payment_methods/:id invalidates the user cache', async () => {
-    const created = await (await req('POST', '/v1/payment_methods', { name: 'To Delete' })).json()
-    await req('GET', '/v1/payment_methods')
+  it('DELETE /api/v1/payment_methods/:id invalidates the user cache', async () => {
+    const created = await (
+      await req('POST', '/api/v1/payment_methods', { name: 'To Delete' })
+    ).json()
+    await req('GET', '/api/v1/payment_methods')
     expect(await client.get(CACHE_KEY)).not.toBeNull()
-    await req('DELETE', `/v1/payment_methods/${created.id}`)
+    await req('DELETE', `/api/v1/payment_methods/${created.id}`)
     expect(await client.get(CACHE_KEY)).toBeNull()
   })
 })

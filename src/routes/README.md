@@ -1,6 +1,6 @@
 # Routes
 
-All routes are versioned under `/v1` and registered in `src/index.ts` via Elysia's `.group()`.
+All routes are prefixed with `/api/v1` and registered in `src/index.ts` via Elysia's `.group()`.
 
 ## Directory Structure
 
@@ -79,7 +79,7 @@ There are two authentication strategies, applied at the `.group()` level in `src
 | Bearer token only         | `withBearerAuth`           | `webhooks`                                                           |
 | Clerk JWT + Bearer token  | `withClerkAndBearerAuth`   | `categories`, `sources_of_income`, `payment_methods`, `expenses`     |
 
-**Webhook endpoints** (`/v1/webhooks/**`) require only a static Bearer token in the `Authorization` header:
+**Webhook endpoints** (`/api/v1/webhooks/**`) require only a static Bearer token in the `Authorization` header:
 
 ```
 Authorization: Bearer <API_TOKEN>
@@ -118,9 +118,9 @@ All cache keys are scoped per user using the Clerk user ID (`clerk_user_id`):
 
 | Endpoint                        | Cache key                                    |
 | ------------------------------- | -------------------------------------------- |
-| `GET /v1/categories`            | `categories:list:{clerk_user_id}`            |
-| `GET /v1/sources_of_income`     | `sources_of_income:list:{clerk_user_id}`     |
-| `GET /v1/payment_methods`       | `payment_methods:list:{clerk_user_id}`       |
+| `GET /api/v1/categories`            | `categories:list:{clerk_user_id}`            |
+| `GET /api/v1/sources_of_income`     | `sources_of_income:list:{clerk_user_id}`     |
+| `GET /api/v1/payment_methods`       | `payment_methods:list:{clerk_user_id}`       |
 
 When adding a new cacheable resource, follow the pattern in `src/services/categories.ts` and document the cache key in this table.
 
@@ -130,8 +130,8 @@ When adding a new cacheable resource, follow the pattern in `src/services/catego
 
 | Method | Path                          | Auth         | Description                                              |
 | ------ | ----------------------------- | ------------ | -------------------------------------------------------- |
-| `POST` | `/v1/webhooks/clerk/register` | Bearer token | Creates a user record from a Clerk `user.created` event  |
-| `POST` | `/v1/webhooks/clerk/delete`   | Bearer token | Deletes a user record from a Clerk `user.deleted` event  |
+| `POST` | `/api/v1/webhooks/clerk/register` | Bearer token | Creates a user record from a Clerk `user.created` event  |
+| `POST` | `/api/v1/webhooks/clerk/delete`   | Bearer token | Deletes a user record from a Clerk `user.deleted` event  |
 
 Both webhook endpoints additionally verify the Svix signature and enforce Clerk's IP allowlist.
 
@@ -139,34 +139,34 @@ Both webhook endpoints additionally verify the Svix signature and enforce Clerk'
 
 | Method   | Path                  | Auth                      | Description               |
 | -------- | --------------------- | ------------------------- | ------------------------- |
-| `POST`   | `/v1/categories`      | Clerk JWT + Bearer token  | Create a new category     |
-| `GET`    | `/v1/categories`      | Clerk JWT + Bearer token  | List all categories       |
-| `PATCH`  | `/v1/categories/:id`  | Clerk JWT + Bearer token  | Update a category by id   |
-| `DELETE` | `/v1/categories/:id`  | Clerk JWT + Bearer token  | Delete a category by id   |
+| `POST`   | `/api/v1/categories`      | Clerk JWT + Bearer token  | Create a new category     |
+| `GET`    | `/api/v1/categories`      | Clerk JWT + Bearer token  | List all categories       |
+| `PATCH`  | `/api/v1/categories/:id`  | Clerk JWT + Bearer token  | Update a category by id   |
+| `DELETE` | `/api/v1/categories/:id`  | Clerk JWT + Bearer token  | Delete a category by id   |
 
 ### Sources of Income
 
 | Method   | Path                        | Auth                      | Description                        |
 | -------- | --------------------------- | ------------------------- | ---------------------------------- |
-| `POST`   | `/v1/sources_of_income`     | Clerk JWT + Bearer token  | Create a new source of income      |
-| `GET`    | `/v1/sources_of_income`     | Clerk JWT + Bearer token  | List all sources of income         |
-| `PATCH`  | `/v1/sources_of_income/:id` | Clerk JWT + Bearer token  | Update a source of income by id    |
-| `DELETE` | `/v1/sources_of_income/:id` | Clerk JWT + Bearer token  | Delete a source of income by id    |
+| `POST`   | `/api/v1/sources_of_income`     | Clerk JWT + Bearer token  | Create a new source of income      |
+| `GET`    | `/api/v1/sources_of_income`     | Clerk JWT + Bearer token  | List all sources of income         |
+| `PATCH`  | `/api/v1/sources_of_income/:id` | Clerk JWT + Bearer token  | Update a source of income by id    |
+| `DELETE` | `/api/v1/sources_of_income/:id` | Clerk JWT + Bearer token  | Delete a source of income by id    |
 
 ### Payment Methods
 
 | Method   | Path                       | Auth                      | Description                                              |
 | -------- | -------------------------- | ------------------------- | -------------------------------------------------------- |
-| `POST`   | `/v1/payment_methods`      | Clerk JWT + Bearer token  | Create a payment method for the authenticated user       |
-| `GET`    | `/v1/payment_methods`      | Clerk JWT + Bearer token  | List all payment methods for the authenticated user      |
-| `PATCH`  | `/v1/payment_methods/:id`  | Clerk JWT + Bearer token  | Update a payment method owned by the authenticated user  |
-| `DELETE` | `/v1/payment_methods/:id`  | Clerk JWT + Bearer token  | Delete a payment method owned by the authenticated user  |
+| `POST`   | `/api/v1/payment_methods`      | Clerk JWT + Bearer token  | Create a payment method for the authenticated user       |
+| `GET`    | `/api/v1/payment_methods`      | Clerk JWT + Bearer token  | List all payment methods for the authenticated user      |
+| `PATCH`  | `/api/v1/payment_methods/:id`  | Clerk JWT + Bearer token  | Update a payment method owned by the authenticated user  |
+| `DELETE` | `/api/v1/payment_methods/:id`  | Clerk JWT + Bearer token  | Delete a payment method owned by the authenticated user  |
 
 ### Expenses
 
 | Method   | Path                  | Auth                      | Description                                        |
 | -------- | --------------------- | ------------------------- | -------------------------------------------------- |
-| `POST`   | `/v1/expenses`        | Clerk JWT + Bearer token  | Create an expense for the authenticated user       |
-| `GET`    | `/v1/expenses`        | Clerk JWT + Bearer token  | List expenses for the authenticated user (paginated) |
-| `PATCH`  | `/v1/expenses/:id`    | Clerk JWT + Bearer token  | Update an expense owned by the authenticated user  |
-| `DELETE` | `/v1/expenses/:id`    | Clerk JWT + Bearer token  | Delete an expense owned by the authenticated user  |
+| `POST`   | `/api/v1/expenses`        | Clerk JWT + Bearer token  | Create an expense for the authenticated user       |
+| `GET`    | `/api/v1/expenses`        | Clerk JWT + Bearer token  | List expenses for the authenticated user (paginated) |
+| `PATCH`  | `/api/v1/expenses/:id`    | Clerk JWT + Bearer token  | Update an expense owned by the authenticated user  |
+| `DELETE` | `/api/v1/expenses/:id`    | Clerk JWT + Bearer token  | Delete an expense owned by the authenticated user  |

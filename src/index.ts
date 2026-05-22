@@ -46,8 +46,8 @@ export const app = new Elysia()
     )
   })
   .use(swagger(open_api_config))
-  .group('/v1', (app) => withBearerAuth(app).use(webhooks))
-  .group('/v1', (app) =>
+  .group('/api/v1', (app) => withBearerAuth(app).use(webhooks))
+  .group('/api/v1', (app) =>
     withClerkAndBearerAuth(app)
       .use(categories)
       .use(sources_of_income)

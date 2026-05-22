@@ -15,7 +15,7 @@ const ALLOWED_CLERK_IP = '44.228.126.217'
 
 const makeDeleteRequest = (payload: unknown) =>
   app.handle(
-    new Request('http://localhost/v1/webhooks/clerk/delete', {
+    new Request('http://localhost/api/v1/webhooks/clerk/delete', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

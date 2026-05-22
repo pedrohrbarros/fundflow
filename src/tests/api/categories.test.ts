@@ -50,8 +50,8 @@ afterAll(async () => {
 })
 
 describe('Categories API', () => {
-  it('POST /v1/categories creates a category', async () => {
-    const res = await req('POST', '/v1/categories', { name: `test-cat-${TS}-create` })
+  it('POST /api/v1/categories creates a category', async () => {
+    const res = await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-create` })
     expect(res.status).toBe(201)
     const json = await res.json()
     expect(json.id).toBeDefined()
@@ -60,9 +60,9 @@ describe('Categories API', () => {
     expect(json.updated_at).toBeDefined()
   })
 
-  it("GET /v1/categories returns only the user's categories", async () => {
-    await req('POST', '/v1/categories', { name: `test-cat-${TS}-list` })
-    const res = await req('GET', '/v1/categories')
+  it("GET /api/v1/categories returns only the user's categories", async () => {
+    await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-list` })
+    const res = await req('GET', '/api/v1/categories')
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(Array.isArray(json.categories)).toBe(true)
@@ -71,11 +71,11 @@ describe('Categories API', () => {
     )
   })
 
-  it('PATCH /v1/categories/:id updates a category', async () => {
+  it('PATCH /api/v1/categories/:id updates a category', async () => {
     const created = await (
-      await req('POST', '/v1/categories', { name: `test-cat-${TS}-patch-old` })
+      await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-patch-old` })
     ).json()
-    const res = await req('PATCH', `/v1/categories/${created.id}`, {
+    const res = await req('PATCH', `/api/v1/categories/${created.id}`, {
       name: `test-cat-${TS}-patch-new`,
     })
     expect(res.status).toBe(200)
@@ -83,27 +83,27 @@ describe('Categories API', () => {
     expect(json.name).toBe(`test-cat-${TS}-patch-new`)
   })
 
-  it('PATCH /v1/categories/:id returns 404 for unknown id', async () => {
-    const res = await req('PATCH', '/v1/categories/999999999', { name: `test-cat-${TS}-x` })
+  it('PATCH /api/v1/categories/:id returns 404 for unknown id', async () => {
+    const res = await req('PATCH', '/api/v1/categories/999999999', { name: `test-cat-${TS}-x` })
     expect(res.status).toBe(404)
   })
 
-  it('DELETE /v1/categories/:id deletes a category', async () => {
+  it('DELETE /api/v1/categories/:id deletes a category', async () => {
     const created = await (
-      await req('POST', '/v1/categories', { name: `test-cat-${TS}-del` })
+      await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-del` })
     ).json()
-    const res = await req('DELETE', `/v1/categories/${created.id}`)
+    const res = await req('DELETE', `/api/v1/categories/${created.id}`)
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.message).toBeDefined()
   })
 
-  it('DELETE /v1/categories/:id returns 404 for unknown id', async () => {
-    const res = await req('DELETE', '/v1/categories/999999999')
+  it('DELETE /api/v1/categories/:id returns 404 for unknown id', async () => {
+    const res = await req('DELETE', '/api/v1/categories/999999999')
     expect(res.status).toBe(404)
   })
 
-  it('POST /v1/categories returns 400 when user has 100 categories', async () => {
+  it('POST /api/v1/categories returns 400 when user has 100 categories', async () => {
     const user = await db.user.findUnique({ where: { external_id: TEST_EXTERNAL_ID } })
     await db.sourceOfIncomeCategory.createMany({
       data: Array.from({ length: 100 }, (_, i) => ({
@@ -111,7 +111,7 @@ describe('Categories API', () => {
         user_id: user!.id,
       })),
     })
-    const res = await req('POST', '/v1/categories', { name: `test-cat-${TS}-over-limit` })
+    const res = await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-over-limit` })
     expect(res.status).toBe(400)
     await db.sourceOfIncomeCategory.deleteMany({
       where: { name: { startsWith: `limit-cat-${TS}` } },
