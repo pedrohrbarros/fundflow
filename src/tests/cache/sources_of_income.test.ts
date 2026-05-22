@@ -62,12 +62,29 @@ afterAll(async () => {
 
 describe('Sources of income cache', () => {
   it('GET /api/v1/sources_of_income populates the per-user cache', async () => {
+    await req('POST', '/api/v1/sources_of_income', {
+      name: `cache-soi-${TS}-populate`,
+      category_id: Number(test_category_id),
+    })
     await req('GET', '/api/v1/sources_of_income')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
-    const parsed = JSON.parse(cached!)
+    const parsed = JSON.parse(cached!) as Record<
+      string,
+      { id: string; name: string; income: number }[]
+    >
     expect(typeof parsed).toBe('object')
     expect(Array.isArray(parsed)).toBe(false)
+    const category_names = Object.keys(parsed)
+    expect(category_names.length).toBeGreaterThan(0)
+    for (const key of category_names) {
+      expect(Array.isArray(parsed[key])).toBe(true)
+    }
+    const all_sources = Object.values(parsed).flat()
+    const first_source = all_sources[0]
+    expect(typeof first_source.id).toBe('string')
+    expect(typeof first_source.name).toBe('string')
+    expect(typeof first_source.income).toBe('number')
   })
 
   it('POST /api/v1/sources_of_income invalidates the cache', async () => {
