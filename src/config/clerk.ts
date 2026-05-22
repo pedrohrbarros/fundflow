@@ -1,8 +1,8 @@
-import { importSPKI, type KeyLike } from 'jose'
+import { importSPKI } from 'jose'
 
-let _key: KeyLike | null = null
+let _key: CryptoKey | null = null
 
-export async function getClerkPublicKey(): Promise<KeyLike> {
+export async function getClerkPublicKey(): Promise<CryptoKey> {
   if (_key) return _key
   const pem = process.env.CLERK_PEM_PUBLIC_KEY
   if (!pem) throw new Error('CLERK_PEM_PUBLIC_KEY environment variable is not set')
