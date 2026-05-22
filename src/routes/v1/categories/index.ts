@@ -1,12 +1,13 @@
 import { Elysia } from 'elysia'
-import { createCategory } from './categories/create'
-import { listCategories } from './categories/list'
-import { updateCategory } from './categories/update'
-import { deleteCategory } from './categories/delete'
-import { CategoryCreateBody, CategoryUpdateBody } from '../../types/categories'
+import { createCategory } from './create'
+import { listCategories } from './list'
+import { updateCategory } from './update'
+import { deleteCategory } from './delete'
+import { CategoryCreateBody, CategoryUpdateBody } from '../../../types/categories'
+import type { RouteHandler } from '../../../types/routes'
 
 export const categories = new Elysia()
-  .post('/categories', createCategory, {
+  .post('/categories', createCategory as RouteHandler, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -19,10 +20,10 @@ export const categories = new Elysia()
       },
     },
   })
-  .get('/categories', listCategories, {
+  .get('/categories', listCategories as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
-  .patch('/categories/:id', updateCategory, {
+  .patch('/categories/:id', updateCategory as RouteHandler, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -35,6 +36,6 @@ export const categories = new Elysia()
       },
     },
   })
-  .delete('/categories/:id', deleteCategory, {
+  .delete('/categories/:id', deleteCategory as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })

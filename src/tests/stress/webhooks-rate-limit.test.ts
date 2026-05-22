@@ -7,11 +7,11 @@ import { WEBHOOK_RATE_LIMIT } from '../../constants/api/rules/webhooks'
 const makeApp = () =>
   new Elysia()
     .use(rateLimit({ ...WEBHOOK_RATE_LIMIT, scoping: 'scoped', generator: () => 'test-client' }))
-    .post('/webhooks/clerk/register', () => ({ ok: true }))
+    .post('/api/v1/webhooks/clerk/register', () => ({ ok: true }))
 
 const makeRequest = (app: ReturnType<typeof makeApp>) =>
   app.handle(
-    new Request('http://localhost/webhooks/clerk/register', { method: 'POST', body: '{}' })
+    new Request('http://localhost/api/v1/webhooks/clerk/register', { method: 'POST', body: '{}' })
   )
 
 describe('Webhook rate limiter — stress test', () => {

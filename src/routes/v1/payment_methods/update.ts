@@ -1,6 +1,6 @@
 import { PaymentMethodsService } from '../../../services/payment_methods'
 import { handleError } from '../../../middleware/error'
-import type { PaymentMethodUpdateBodyType } from '../../../types/payment_methods'
+import { PaymentMethodUpdateSchema } from '../../../schemas/payment_methods'
 
 export const updatePaymentMethod = async ({
   clerk_user_id,
@@ -13,12 +13,16 @@ export const updatePaymentMethod = async ({
   body: unknown
   set: { status?: number | string }
 }) => {
-  const id = BigInt((params as { id: string }).id)
-  const { name, bank, receiver } = body as PaymentMethodUpdateBodyType
+  const parsed = PaymentMethodUpdateSchema.safeParse(body)
+  if (!parsed.success) {
+    set.status = 400
+    return { error: parsed.error.flatten().fieldErrors }
+  }
+  const id = BigInt(params.id)
   const data: { name?: string; bank?: string | null; receiver?: string | null } = {}
-  if (name !== undefined) data.name = name
-  if (bank !== undefined) data.bank = bank
-  if (receiver !== undefined) data.receiver = receiver
+  if (parsed.data.name !== undefined) data.name = parsed.data.name
+  if (parsed.data.bank !== undefined) data.bank = parsed.data.bank
+  if (parsed.data.receiver !== undefined) data.receiver = parsed.data.receiver
   const result = await PaymentMethodsService.update(id, clerk_user_id, data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data

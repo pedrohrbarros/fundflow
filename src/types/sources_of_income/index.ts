@@ -10,6 +10,10 @@ export type SourceOfIncomeRecord = {
   updated_at: string
 }
 
+export type SourcesOfIncomeByCategoryRecord = {
+  [category_name: string]: SourceOfIncomeRecord[]
+}
+
 export const SourceOfIncomeCreateBody = t.Object({
   name: t.String({ minLength: 1 }),
   category_id: t.Integer(),

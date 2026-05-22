@@ -59,3 +59,22 @@ export const ClerkUserCreatedWebhookBody = t.Object({
 })
 
 export type ClerkUserCreatedEvent = Static<typeof ClerkUserCreatedWebhookBody>
+
+export const ClerkUserDeletedWebhookBody = t.Object({
+  data: t.Object({
+    deleted: t.Boolean(),
+    id: t.String(),
+    object: t.Literal('user'),
+  }),
+  event_attributes: t.Object({
+    http_request: t.Object({
+      client_ip: t.String(),
+      user_agent: t.String(),
+    }),
+  }),
+  object: t.Literal('event'),
+  timestamp: t.Number(),
+  type: t.Literal('user.deleted'),
+})
+
+export type ClerkUserDeletedEvent = Static<typeof ClerkUserDeletedWebhookBody>

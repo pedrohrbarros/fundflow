@@ -43,7 +43,7 @@ let test_category_id: string
 
 beforeAll(async () => {
   await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
-  const catRes = await req('POST', '/v1/categories', { name: `test-soi-cat-${TS}` })
+  const catRes = await req('POST', '/api/v1/categories', { name: `test-soi-cat-${TS}` })
   const cat = await catRes.json()
   test_category_id = cat.id
 })
@@ -56,8 +56,8 @@ afterAll(async () => {
 })
 
 describe('Sources of Income API', () => {
-  it('POST /v1/sources_of_income creates a source of income', async () => {
-    const res = await req('POST', '/v1/sources_of_income', {
+  it('POST /api/v1/sources_of_income creates a source of income', async () => {
+    const res = await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-create`,
       category_id: Number(test_category_id),
     })
@@ -68,28 +68,44 @@ describe('Sources of Income API', () => {
     expect(json.category_id).toBe(test_category_id)
   })
 
-  it("GET /v1/sources_of_income returns only the user's sources", async () => {
-    await req('POST', '/v1/sources_of_income', {
+  it('GET /api/v1/sources_of_income returns sources grouped by category', async () => {
+    await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-list`,
       category_id: Number(test_category_id),
     })
-    const res = await req('GET', '/v1/sources_of_income')
+    const res = await req('GET', '/api/v1/sources_of_income')
     expect(res.status).toBe(200)
     const json = await res.json()
-    expect(Array.isArray(json.sources_of_income)).toBe(true)
-    expect(
-      json.sources_of_income.some((s: { name: string }) => s.name === `test-soi-${TS}-list`)
-    ).toBe(true)
+    // Response is an object keyed by category name — not a wrapped array
+    expect(typeof json).toBe('object')
+    expect(Array.isArray(json)).toBe(false)
+    expect('sources_of_income' in json).toBe(false)
+    // Keys are category names (strings), values are arrays of sources
+    const category_names = Object.keys(json)
+    expect(category_names.length).toBeGreaterThan(0)
+    for (const key of category_names) {
+      expect(Array.isArray(json[key])).toBe(true)
+    }
+    // Each entry has the expected shape
+    const all_sources = Object.values(
+      json as Record<string, { id: string; name: string; income: number }[]>
+    ).flat()
+    const first_source = all_sources[0]
+    expect(typeof first_source.id).toBe('string')
+    expect(typeof first_source.name).toBe('string')
+    expect(typeof first_source.income).toBe('number')
+    // The source we created appears under its category
+    expect(all_sources.some((s) => s.name === `test-soi-${TS}-list`)).toBe(true)
   })
 
-  it('PATCH /v1/sources_of_income/:id updates a source of income', async () => {
+  it('PATCH /api/v1/sources_of_income/:id updates a source of income', async () => {
     const created = await (
-      await req('POST', '/v1/sources_of_income', {
+      await req('POST', '/api/v1/sources_of_income', {
         name: `test-soi-${TS}-patch-old`,
         category_id: Number(test_category_id),
       })
     ).json()
-    const res = await req('PATCH', `/v1/sources_of_income/${created.id}`, {
+    const res = await req('PATCH', `/api/v1/sources_of_income/${created.id}`, {
       name: `test-soi-${TS}-patch-new`,
     })
     expect(res.status).toBe(200)
@@ -97,45 +113,45 @@ describe('Sources of Income API', () => {
     expect(json.name).toBe(`test-soi-${TS}-patch-new`)
   })
 
-  it('PATCH /v1/sources_of_income/:id returns 404 for unknown id', async () => {
-    const res = await req('PATCH', '/v1/sources_of_income/999999999', {
+  it('PATCH /api/v1/sources_of_income/:id returns 404 for unknown id', async () => {
+    const res = await req('PATCH', '/api/v1/sources_of_income/999999999', {
       name: `test-soi-${TS}-x`,
     })
     expect(res.status).toBe(404)
   })
 
-  it('PATCH /v1/sources_of_income/:id returns 404 for category not owned by user', async () => {
+  it('PATCH /api/v1/sources_of_income/:id returns 404 for category not owned by user', async () => {
     const created = await (
-      await req('POST', '/v1/sources_of_income', {
+      await req('POST', '/api/v1/sources_of_income', {
         name: `test-soi-${TS}-cat-check`,
         category_id: Number(test_category_id),
       })
     ).json()
-    const res = await req('PATCH', `/v1/sources_of_income/${created.id}`, {
+    const res = await req('PATCH', `/api/v1/sources_of_income/${created.id}`, {
       category_id: 999999999,
     })
     expect(res.status).toBe(404)
   })
 
-  it('DELETE /v1/sources_of_income/:id deletes a source of income', async () => {
+  it('DELETE /api/v1/sources_of_income/:id deletes a source of income', async () => {
     const created = await (
-      await req('POST', '/v1/sources_of_income', {
+      await req('POST', '/api/v1/sources_of_income', {
         name: `test-soi-${TS}-del`,
         category_id: Number(test_category_id),
       })
     ).json()
-    const res = await req('DELETE', `/v1/sources_of_income/${created.id}`)
+    const res = await req('DELETE', `/api/v1/sources_of_income/${created.id}`)
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.message).toBeDefined()
   })
 
-  it('DELETE /v1/sources_of_income/:id returns 404 for unknown id', async () => {
-    const res = await req('DELETE', '/v1/sources_of_income/999999999')
+  it('DELETE /api/v1/sources_of_income/:id returns 404 for unknown id', async () => {
+    const res = await req('DELETE', '/api/v1/sources_of_income/999999999')
     expect(res.status).toBe(404)
   })
 
-  it('POST /v1/sources_of_income returns 400 when user has 100 sources', async () => {
+  it('POST /api/v1/sources_of_income returns 400 when user has 100 sources', async () => {
     const user = await db.user.findUnique({ where: { external_id: TEST_EXTERNAL_ID } })
     const cat = await db.sourceOfIncomeCategory.findFirst({ where: { user_id: user!.id } })
     await db.sourceOfIncome.createMany({
@@ -145,7 +161,7 @@ describe('Sources of Income API', () => {
         user_id: user!.id,
       })),
     })
-    const res = await req('POST', '/v1/sources_of_income', {
+    const res = await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-over-limit`,
       category_id: Number(test_category_id),
     })

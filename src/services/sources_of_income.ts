@@ -1,7 +1,11 @@
 import { db } from '../config/db'
 import { cacheGet, cacheSet, cacheDel } from '../middleware/cache'
+import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
-import type { SourceOfIncomeRecord } from '../types/sources_of_income'
+import type {
+  SourceOfIncomeRecord,
+  SourcesOfIncomeByCategoryRecord,
+} from '../types/sources_of_income'
 
 const cacheKey = (user_external_id: string) => `sources_of_income:list:${user_external_id}`
 
@@ -53,9 +57,11 @@ export const SourcesOfIncomeService = {
     }
   },
 
-  async listForUser(user_external_id: string): Promise<ServiceResult<SourceOfIncomeRecord[]>> {
+  async listForUser(
+    user_external_id: string
+  ): Promise<ServiceResult<SourcesOfIncomeByCategoryRecord>> {
     const key = cacheKey(user_external_id)
-    const cached = await cacheGet<SourceOfIncomeRecord[]>(key)
+    const cached = await cacheGet<SourcesOfIncomeByCategoryRecord>(key)
     if (cached) return { ok: true, data: cached }
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
@@ -63,18 +69,25 @@ export const SourcesOfIncomeService = {
       const sources_of_income = await db.sourceOfIncome.findMany({
         where: { user_id: user.id },
         orderBy: { id: 'asc' },
+        include: { category: true },
       })
-      const data = sources_of_income.map((s) => ({
-        id: s.id.toString(),
-        name: s.name,
-        category_id: s.category_id.toString(),
-        income: s.income,
-        created_at: s.created_at.toISOString(),
-        updated_at: s.updated_at.toISOString(),
-      }))
+      const data: SourcesOfIncomeByCategoryRecord = {}
+      for (const source of sources_of_income) {
+        const category_name = source.category.name
+        if (!data[category_name]) data[category_name] = []
+        data[category_name].push({
+          id: source.id.toString(),
+          name: source.name,
+          category_id: source.category_id.toString(),
+          income: source.income,
+          created_at: source.created_at.toISOString(),
+          updated_at: source.updated_at.toISOString(),
+        })
+      }
       await cacheSet(key, data)
       return { ok: true, data }
     } catch (err: unknown) {
+      db_logger.error(err, 'Failed to fetch sources of income')
       return {
         ok: false,
         status: 500,

@@ -1,5 +1,6 @@
 import { db } from '../config/db'
 import { cacheGet, cacheSet, cacheDel } from '../middleware/cache'
+import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
 import type { PaymentMethodRecord } from '../types/payment_methods'
 
@@ -67,6 +68,7 @@ export const PaymentMethodsService = {
       await cacheSet(key, data)
       return { ok: true, data }
     } catch (err: unknown) {
+      db_logger.error(err, 'Failed to fetch payment methods')
       return {
         ok: false,
         status: 500,

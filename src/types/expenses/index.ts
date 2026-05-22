@@ -4,6 +4,9 @@ import type { Static } from '@sinclair/typebox'
 export type ExpensePaymentMethodRecord = {
   payment_method_id: string
   partial_amount: number
+  name: string
+  bank: string | null
+  receiver: string | null
 }
 
 export type ExpenseRecord = {

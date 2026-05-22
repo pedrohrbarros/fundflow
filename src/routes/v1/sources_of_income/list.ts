@@ -10,5 +10,5 @@ export const listSourcesOfIncome = async ({
 }) => {
   const result = await SourcesOfIncomeService.listForUser(clerk_user_id)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
-  return { sources_of_income: result.data }
+  return result.data
 }

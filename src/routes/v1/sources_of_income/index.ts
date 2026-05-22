@@ -1,12 +1,16 @@
 import { Elysia } from 'elysia'
-import { createSourceOfIncome } from './sources_of_income/create'
-import { listSourcesOfIncome } from './sources_of_income/list'
-import { updateSourceOfIncome } from './sources_of_income/update'
-import { deleteSourceOfIncome } from './sources_of_income/delete'
-import { SourceOfIncomeCreateBody, SourceOfIncomeUpdateBody } from '../../types/sources_of_income'
+import { createSourceOfIncome } from './create'
+import { listSourcesOfIncome } from './list'
+import { updateSourceOfIncome } from './update'
+import { deleteSourceOfIncome } from './delete'
+import {
+  SourceOfIncomeCreateBody,
+  SourceOfIncomeUpdateBody,
+} from '../../../types/sources_of_income'
+import type { RouteHandler } from '../../../types/routes'
 
 export const sources_of_income = new Elysia()
-  .post('/sources_of_income', createSourceOfIncome, {
+  .post('/sources_of_income', createSourceOfIncome as RouteHandler, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -19,10 +23,10 @@ export const sources_of_income = new Elysia()
       },
     },
   })
-  .get('/sources_of_income', listSourcesOfIncome, {
+  .get('/sources_of_income', listSourcesOfIncome as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
-  .patch('/sources_of_income/:id', updateSourceOfIncome, {
+  .patch('/sources_of_income/:id', updateSourceOfIncome as RouteHandler, {
     detail: {
       security: [{ clerkAuth: [] }],
       requestBody: {
@@ -35,6 +39,6 @@ export const sources_of_income = new Elysia()
       },
     },
   })
-  .delete('/sources_of_income/:id', deleteSourceOfIncome, {
+  .delete('/sources_of_income/:id', deleteSourceOfIncome as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
