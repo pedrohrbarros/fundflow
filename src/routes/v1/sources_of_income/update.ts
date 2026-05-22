@@ -1,6 +1,6 @@
 import { SourcesOfIncomeService } from '../../../services/sources_of_income'
 import { handleError } from '../../../middleware/error'
-import type { SourceOfIncomeUpdateBodyType } from '../../../types/sources_of_income'
+import { SourceOfIncomeUpdateSchema } from '../../../schemas/sources_of_income'
 
 export const updateSourceOfIncome = async ({
   clerk_user_id,
@@ -13,12 +13,16 @@ export const updateSourceOfIncome = async ({
   body: unknown
   set: { status?: number | string }
 }) => {
+  const parsed = SourceOfIncomeUpdateSchema.safeParse(body)
+  if (!parsed.success) {
+    set.status = 400
+    return { error: parsed.error.flatten().fieldErrors }
+  }
   const id = BigInt(params.id)
-  const { name, category_id, income } = body as SourceOfIncomeUpdateBodyType
   const data: { name?: string; category_id?: bigint; income?: number } = {}
-  if (name !== undefined) data.name = name
-  if (category_id !== undefined) data.category_id = BigInt(category_id)
-  if (income !== undefined) data.income = income
+  if (parsed.data.name !== undefined) data.name = parsed.data.name
+  if (parsed.data.category_id !== undefined) data.category_id = BigInt(parsed.data.category_id)
+  if (parsed.data.income !== undefined) data.income = parsed.data.income
   const result = await SourcesOfIncomeService.update(id, clerk_user_id, data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data

@@ -1,6 +1,6 @@
 import { ExpensesService } from '../../../services/expenses'
 import { handleError } from '../../../middleware/error'
-import type { ExpenseCreateBodyType } from '../../../types/expenses'
+import { ExpenseCreateSchema } from '../../../schemas/expenses'
 
 export const createExpense = async ({
   clerk_user_id,
@@ -11,8 +11,12 @@ export const createExpense = async ({
   body: unknown
   set: { status?: number | string }
 }) => {
-  const input = body as ExpenseCreateBodyType
-  const result = await ExpensesService.create(clerk_user_id, input)
+  const parsed = ExpenseCreateSchema.safeParse(body)
+  if (!parsed.success) {
+    set.status = 400
+    return { error: parsed.error.flatten().fieldErrors }
+  }
+  const result = await ExpensesService.create(clerk_user_id, parsed.data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201
   return result.data

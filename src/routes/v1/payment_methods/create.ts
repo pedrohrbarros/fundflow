@@ -1,6 +1,6 @@
 import { PaymentMethodsService } from '../../../services/payment_methods'
 import { handleError } from '../../../middleware/error'
-import type { PaymentMethodCreateBodyType } from '../../../types/payment_methods'
+import { PaymentMethodCreateSchema } from '../../../schemas/payment_methods'
 
 export const createPaymentMethod = async ({
   clerk_user_id,
@@ -11,8 +11,17 @@ export const createPaymentMethod = async ({
   body: unknown
   set: { status?: number | string }
 }) => {
-  const { name, bank, receiver } = body as PaymentMethodCreateBodyType
-  const result = await PaymentMethodsService.create(clerk_user_id, name, bank, receiver)
+  const parsed = PaymentMethodCreateSchema.safeParse(body)
+  if (!parsed.success) {
+    set.status = 400
+    return { error: parsed.error.flatten().fieldErrors }
+  }
+  const result = await PaymentMethodsService.create(
+    clerk_user_id,
+    parsed.data.name,
+    parsed.data.bank,
+    parsed.data.receiver
+  )
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201
   return result.data
