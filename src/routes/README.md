@@ -7,30 +7,31 @@ All routes are versioned under `/v1` and registered in `src/index.ts` via Elysia
 ```
 routes/
 └── v1/
-    ├── webhooks.ts              # Elysia plugin that mounts all webhook routes
     ├── webhooks/
+    │   ├── index.ts             # Elysia plugin that mounts all webhook routes
     │   └── clerk/
-    │       └── user-created.ts  # Handler for Clerk user.created webhook
-    ├── categories.ts            # Elysia plugin for categories routes
+    │       ├── register.ts      # Handler for Clerk user.created webhook
+    │       └── delete.ts        # Handler for Clerk user.deleted webhook
     ├── categories/
+    │   ├── index.ts             # Elysia plugin for categories routes
     │   ├── create.ts
     │   ├── list.ts
     │   ├── update.ts
     │   └── delete.ts
-    ├── sources_of_income.ts     # Elysia plugin for sources of income routes
     ├── sources_of_income/
+    │   ├── index.ts             # Elysia plugin for sources of income routes
     │   ├── create.ts
     │   ├── list.ts
     │   ├── update.ts
     │   └── delete.ts
-    ├── payment_methods.ts       # Elysia plugin for payment methods routes
     ├── payment_methods/
+    │   ├── index.ts             # Elysia plugin for payment methods routes
     │   ├── create.ts
     │   ├── list.ts
     │   ├── update.ts
     │   └── delete.ts
-    ├── expenses.ts              # Elysia plugin for expenses routes
     └── expenses/
+        ├── index.ts             # Elysia plugin for expenses routes
         ├── create.ts
         ├── list.ts
         ├── update.ts
@@ -41,16 +42,16 @@ routes/
 
 ### File layout
 
-Each route group has two parts:
+Each route group is a self-contained folder:
 
-- **`<resource>.ts`** — the Elysia plugin that declares the route paths and wires handlers together.
+- **`<resource>/index.ts`** — the Elysia plugin that declares the route paths and wires handlers together.
 - **`<resource>/<action>.ts`** — the handler function for a specific action, exported as a named `const`.
 
 ### Naming
 
 | What           | Pattern                          | Example               |
 | -------------- | -------------------------------- | --------------------- |
-| Plugin file    | `<resource>.ts`                  | `payment_methods.ts`  |
+| Plugin file    | `<resource>/index.ts`            | `payment_methods/index.ts` |
 | Handler file   | `<action>.ts`                    | `create.ts`           |
 | Handler export | `<action><Resource>` (camelCase) | `createPaymentMethod` |
 
@@ -102,7 +103,7 @@ Handlers on Clerk-authenticated routes receive `clerk_user_id: string` in their 
 ### Adding a new endpoint
 
 1. Create the handler in `routes/v1/<resource>/<action>.ts`.
-2. Import and register it in `routes/v1/<resource>.ts`.
+2. Import and register it in `routes/v1/<resource>/index.ts`.
 3. Add the corresponding request/response types under `src/types/<resource>/`.
 4. Document the endpoint in this README.
 5. Register the plugin in the appropriate `.group()` call in `src/index.ts` — use `withClerkAndBearerAuth` for user-facing resources, `withBearerAuth` for webhooks.
@@ -127,9 +128,12 @@ When adding a new cacheable resource, follow the pattern in `src/services/catego
 
 ### Webhooks
 
-| Method | Path                                       | Auth          | Description                                             |
-| ------ | ------------------------------------------ | ------------- | ------------------------------------------------------- |
-| `POST` | `/v1/webhooks/clerk/user-created/listener` | Bearer token  | Creates a user record from a Clerk `user.created` event |
+| Method | Path                          | Auth         | Description                                              |
+| ------ | ----------------------------- | ------------ | -------------------------------------------------------- |
+| `POST` | `/v1/webhooks/clerk/register` | Bearer token | Creates a user record from a Clerk `user.created` event  |
+| `POST` | `/v1/webhooks/clerk/delete`   | Bearer token | Deletes a user record from a Clerk `user.deleted` event  |
+
+Both webhook endpoints additionally verify the Svix signature and enforce Clerk's IP allowlist.
 
 ### Categories
 
