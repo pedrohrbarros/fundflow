@@ -1,15 +1,15 @@
 import { Elysia } from 'elysia'
 import { rateLimit } from 'elysia-rate-limit'
-import { clerkRegisterWebhook } from './webhooks/clerk/register'
-import { clerkDeleteWebhook } from './webhooks/clerk/delete'
-import { WEBHOOK_RATE_LIMIT } from '../../constants/api/rules/webhooks'
-import { CLERK_ALLOWED_IPS_FLAT } from '../../constants/webhooks/rules/clerk'
-import { isAllowedIP } from '../../helpers/network/cidr'
-import { handleError } from '../../middleware/error'
+import { clerkRegisterWebhook } from './clerk/register'
+import { clerkDeleteWebhook } from './clerk/delete'
+import { WEBHOOK_RATE_LIMIT } from '../../../constants/api/rules/webhooks'
+import { CLERK_ALLOWED_IPS_FLAT } from '../../../constants/webhooks/rules/clerk'
+import { isAllowedIP } from '../../../helpers/network/cidr'
+import { handleError } from '../../../middleware/error'
 import {
   ClerkUserCreatedWebhookBody,
   ClerkUserDeletedWebhookBody,
-} from '../../types/webhooks/clerk'
+} from '../../../types/webhooks/clerk'
 
 const clerkIpGuard = ({
   request,
@@ -34,21 +34,21 @@ const svixHeaderDetail = [
     name: 'svix-id',
     in: 'header',
     required: true,
-    schema: { type: 'string' },
+    schema: { type: 'string' as const },
     description: 'Unique message identifier for the webhook payload',
   },
   {
     name: 'svix-timestamp',
     in: 'header',
     required: true,
-    schema: { type: 'string' },
+    schema: { type: 'string' as const },
     description: 'Unix timestamp (seconds) when the webhook was sent',
   },
   {
     name: 'svix-signature',
     in: 'header',
     required: true,
-    schema: { type: 'string' },
+    schema: { type: 'string' as const },
     description: 'Space-delimited list of signatures (e.g. v1,<base64>)',
   },
 ]
