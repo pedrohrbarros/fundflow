@@ -1,7 +1,8 @@
 import { db } from '../config/db'
 import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
-import type { ExpenseRecord, ExpenseCreateBodyType, ExpenseUpdateBodyType } from '../types/expenses'
+import type { ExpenseRecord } from '../types/expenses'
+import type { ExpenseCreateInput, ExpenseUpdateInput } from '../schemas/expenses'
 
 type Split = { payment_method_id: number; partial_amount: number }
 
@@ -73,7 +74,7 @@ async function validateSplits(
 export const ExpensesService = {
   async create(
     user_external_id: string,
-    input: ExpenseCreateBodyType
+    input: ExpenseCreateInput
   ): Promise<ServiceResult<ExpenseRecord>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
@@ -166,7 +167,7 @@ export const ExpensesService = {
   async update(
     id: bigint,
     user_external_id: string,
-    input: ExpenseUpdateBodyType
+    input: ExpenseUpdateInput
   ): Promise<ServiceResult<ExpenseRecord>> {
     if (Object.keys(input).length === 0)
       return { ok: false, status: 400, message: 'No fields to update' }

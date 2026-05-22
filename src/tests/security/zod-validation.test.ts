@@ -54,6 +54,9 @@ describe('Zod Validation', () => {
     it('POST /api/v1/categories returns 400 when name is empty string', async () => {
       const res = await req('POST', '/api/v1/categories', { name: '' })
       expect(res.status).toBe(400)
+      const body = await res.json()
+      expect(body.error).toBeDefined()
+      expect(body.error.name).toBeDefined()
     })
 
     it('POST /api/v1/categories returns 400 when name field is missing', async () => {
