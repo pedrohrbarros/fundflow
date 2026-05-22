@@ -1,4 +1,5 @@
 import { Elysia } from 'elysia'
+import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
 import { open_api_config } from './config/openapi'
 import { withBearerAuth, withClerkAndBearerAuth } from './middleware/auth'
@@ -23,7 +24,19 @@ const REDOC_HTML = `<!DOCTYPE html>
   </body>
 </html>`
 
+const allowed_origins = JSON.parse(
+  process.env.ALLOWED_ORIGINS ?? '["http://localhost:3000"]'
+) as string[]
+
 export const app = new Elysia()
+  .use(
+    cors({
+      origin: allowed_origins,
+      methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Authorization', 'Content-Type', 'X-Api-Key'],
+      credentials: true,
+    })
+  )
   .derive(() => ({ requestStart: Date.now() }))
   .onRequest(({ request }) => {
     endpoint_logger.info({ method: request.method, url: request.url }, 'Incoming request')
