@@ -28,12 +28,13 @@ describe('CORS', () => {
     expect(res.headers.get('access-control-allow-origin')).toBe('http://localhost:3000')
   })
 
-  it('does not reflect unknown origin in CORS header', async () => {
+  it('does not set Access-Control-Allow-Origin for unknown origin', async () => {
     const res = await app.handle(
       new Request('http://localhost/', {
         headers: { Origin: 'http://evil.com' },
       })
     )
-    expect(res.headers.get('access-control-allow-origin')).not.toBe('http://evil.com')
+    const origin_header = res.headers.get('access-control-allow-origin')
+    expect(origin_header).toBeNull()
   })
 })

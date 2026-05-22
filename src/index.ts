@@ -24,9 +24,21 @@ const REDOC_HTML = `<!DOCTYPE html>
   </body>
 </html>`
 
-const allowed_origins = JSON.parse(
-  process.env.ALLOWED_ORIGINS ?? '["http://localhost:3000"]'
-) as string[]
+function parse_allowed_origins(): string[] {
+  const raw = process.env.ALLOWED_ORIGINS
+  if (!raw) return ['http://localhost:3000']
+  try {
+    const parsed = JSON.parse(raw)
+    if (!Array.isArray(parsed) || parsed.some((value) => typeof value !== 'string')) {
+      throw new TypeError('Expected a JSON array of strings')
+    }
+    return parsed
+  } catch (error) {
+    throw new Error(`Invalid ALLOWED_ORIGINS: ${error}`)
+  }
+}
+
+const allowed_origins = parse_allowed_origins()
 
 export const app = new Elysia()
   .use(
