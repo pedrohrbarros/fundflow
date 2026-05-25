@@ -141,7 +141,12 @@ No new endpoints. The existing `POST /api/v1/payment_methods` and `PATCH /api/v1
 
 **`src/tests/cache/payment_methods.test.ts`**
 
-All `POST` requests in this file create payment methods without `origin` (e.g. `{ name: 'Test Bank' }`). Since `origin` is now mandatory, every create fixture in this file must include `origin`. Update all four test bodies to add `origin: 'Test Bank'` (or any non-empty string).
+Three tests in this file create payment methods without `origin` and will break:
+- `POST /api/v1/payment_methods invalidates the user cache`
+- `PATCH /api/v1/payment_methods/:id invalidates the user cache`
+- `DELETE /api/v1/payment_methods/:id invalidates the user cache`
+
+**Delete these three tests.** The GET cache population test (`GET /api/v1/payment_methods populates the cache for the user`) does not create any payment methods and can stay as-is.
 
 ---
 
