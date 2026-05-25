@@ -2,13 +2,13 @@ import { z } from 'zod'
 
 export const PaymentMethodCreateSchema = z.object({
   name: z.string().min(1),
-  bank: z.string().min(1).optional(),
+  origin: z.string().min(1),
   receiver: z.string().min(1).optional(),
 })
 
 export const PaymentMethodUpdateSchema = z.object({
   name: z.string().min(1).optional(),
-  bank: z.union([z.string().min(1), z.null()]).optional(),
+  origin: z.string().min(1).optional(),
   receiver: z.union([z.string().min(1), z.null()]).optional(),
 })
 

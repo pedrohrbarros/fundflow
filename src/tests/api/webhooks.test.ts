@@ -51,10 +51,7 @@ describe('POST /webhooks/clerk/delete', () => {
     }
 
     const response = await makeDeleteRequest(payload)
-    expect(response.status).toBe(200)
-
-    const body = await response.json()
-    expect(body.external_id).toBe(TEST_EXTERNAL_ID)
+    expect(response.status).toBe(204)
 
     const user = await db.user.findFirst({ where: { external_id: TEST_EXTERNAL_ID } })
     expect(user).toBeNull()

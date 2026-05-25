@@ -43,7 +43,9 @@ let pm_id: string
 
 beforeAll(async () => {
   await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
-  const pm = await (await req('POST', '/api/v1/payment_methods', { name: `test-pm-${TS}` })).json()
+  const pm = await (
+    await req('POST', '/api/v1/payment_methods', { name: `test-pm-${TS}`, origin: 'Test Bank' })
+  ).json()
   pm_id = pm.id
 })
 
@@ -125,7 +127,7 @@ describe('Expenses API', () => {
     expect(split.payment_method_id).toBe(pm_id)
     expect(typeof split.partial_amount).toBe('number')
     expect(typeof split.name).toBe('string')
-    expect('bank' in split).toBe(true)
+    expect('origin' in split).toBe(true)
     expect('receiver' in split).toBe(true)
   })
 

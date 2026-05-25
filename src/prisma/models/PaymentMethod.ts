@@ -38,7 +38,7 @@ export type PaymentMethodSumAggregateOutputType = {
 export type PaymentMethodMinAggregateOutputType = {
   id: bigint | null
   name: string | null
-  bank: string | null
+  origin: string | null
   receiver: string | null
   user_id: bigint | null
   created_at: Date | null
@@ -48,7 +48,7 @@ export type PaymentMethodMinAggregateOutputType = {
 export type PaymentMethodMaxAggregateOutputType = {
   id: bigint | null
   name: string | null
-  bank: string | null
+  origin: string | null
   receiver: string | null
   user_id: bigint | null
   created_at: Date | null
@@ -58,7 +58,7 @@ export type PaymentMethodMaxAggregateOutputType = {
 export type PaymentMethodCountAggregateOutputType = {
   id: number
   name: number
-  bank: number
+  origin: number
   receiver: number
   user_id: number
   created_at: number
@@ -79,7 +79,7 @@ export type PaymentMethodSumAggregateInputType = {
 export type PaymentMethodMinAggregateInputType = {
   id?: true
   name?: true
-  bank?: true
+  origin?: true
   receiver?: true
   user_id?: true
   created_at?: true
@@ -89,7 +89,7 @@ export type PaymentMethodMinAggregateInputType = {
 export type PaymentMethodMaxAggregateInputType = {
   id?: true
   name?: true
-  bank?: true
+  origin?: true
   receiver?: true
   user_id?: true
   created_at?: true
@@ -99,7 +99,7 @@ export type PaymentMethodMaxAggregateInputType = {
 export type PaymentMethodCountAggregateInputType = {
   id?: true
   name?: true
-  bank?: true
+  origin?: true
   receiver?: true
   user_id?: true
   created_at?: true
@@ -201,7 +201,7 @@ export type PaymentMethodGroupByArgs<
 export type PaymentMethodGroupByOutputType = {
   id: bigint
   name: string
-  bank: string | null
+  origin: string
   receiver: string | null
   user_id: bigint
   created_at: Date
@@ -232,7 +232,7 @@ export type PaymentMethodWhereInput = {
   NOT?: Prisma.PaymentMethodWhereInput | Prisma.PaymentMethodWhereInput[]
   id?: Prisma.BigIntFilter<'PaymentMethod'> | bigint | number
   name?: Prisma.StringFilter<'PaymentMethod'> | string
-  bank?: Prisma.StringNullableFilter<'PaymentMethod'> | string | null
+  origin?: Prisma.StringFilter<'PaymentMethod'> | string
   receiver?: Prisma.StringNullableFilter<'PaymentMethod'> | string | null
   user_id?: Prisma.BigIntFilter<'PaymentMethod'> | bigint | number
   created_at?: Prisma.DateTimeFilter<'PaymentMethod'> | Date | string
@@ -244,7 +244,7 @@ export type PaymentMethodWhereInput = {
 export type PaymentMethodOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  bank?: Prisma.SortOrderInput | Prisma.SortOrder
+  origin?: Prisma.SortOrder
   receiver?: Prisma.SortOrderInput | Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -260,7 +260,7 @@ export type PaymentMethodWhereUniqueInput = Prisma.AtLeast<
     OR?: Prisma.PaymentMethodWhereInput[]
     NOT?: Prisma.PaymentMethodWhereInput | Prisma.PaymentMethodWhereInput[]
     name?: Prisma.StringFilter<'PaymentMethod'> | string
-    bank?: Prisma.StringNullableFilter<'PaymentMethod'> | string | null
+    origin?: Prisma.StringFilter<'PaymentMethod'> | string
     receiver?: Prisma.StringNullableFilter<'PaymentMethod'> | string | null
     user_id?: Prisma.BigIntFilter<'PaymentMethod'> | bigint | number
     created_at?: Prisma.DateTimeFilter<'PaymentMethod'> | Date | string
@@ -274,7 +274,7 @@ export type PaymentMethodWhereUniqueInput = Prisma.AtLeast<
 export type PaymentMethodOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  bank?: Prisma.SortOrderInput | Prisma.SortOrder
+  origin?: Prisma.SortOrder
   receiver?: Prisma.SortOrderInput | Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -296,7 +296,7 @@ export type PaymentMethodScalarWhereWithAggregatesInput = {
     | Prisma.PaymentMethodScalarWhereWithAggregatesInput[]
   id?: Prisma.BigIntWithAggregatesFilter<'PaymentMethod'> | bigint | number
   name?: Prisma.StringWithAggregatesFilter<'PaymentMethod'> | string
-  bank?: Prisma.StringNullableWithAggregatesFilter<'PaymentMethod'> | string | null
+  origin?: Prisma.StringWithAggregatesFilter<'PaymentMethod'> | string
   receiver?: Prisma.StringNullableWithAggregatesFilter<'PaymentMethod'> | string | null
   user_id?: Prisma.BigIntWithAggregatesFilter<'PaymentMethod'> | bigint | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<'PaymentMethod'> | Date | string
@@ -306,7 +306,7 @@ export type PaymentMethodScalarWhereWithAggregatesInput = {
 export type PaymentMethodCreateInput = {
   id?: bigint | number
   name: string
-  bank?: string | null
+  origin: string
   receiver?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -317,7 +317,7 @@ export type PaymentMethodCreateInput = {
 export type PaymentMethodUncheckedCreateInput = {
   id?: bigint | number
   name: string
-  bank?: string | null
+  origin: string
   receiver?: string | null
   user_id: bigint | number
   created_at?: Date | string
@@ -328,7 +328,7 @@ export type PaymentMethodUncheckedCreateInput = {
 export type PaymentMethodUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -339,7 +339,7 @@ export type PaymentMethodUpdateInput = {
 export type PaymentMethodUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -350,7 +350,7 @@ export type PaymentMethodUncheckedUpdateInput = {
 export type PaymentMethodCreateManyInput = {
   id?: bigint | number
   name: string
-  bank?: string | null
+  origin: string
   receiver?: string | null
   user_id: bigint | number
   created_at?: Date | string
@@ -360,7 +360,7 @@ export type PaymentMethodCreateManyInput = {
 export type PaymentMethodUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -369,7 +369,7 @@ export type PaymentMethodUpdateManyMutationInput = {
 export type PaymentMethodUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -389,7 +389,7 @@ export type PaymentMethodOrderByRelationAggregateInput = {
 export type PaymentMethodCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  bank?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
   receiver?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -404,7 +404,7 @@ export type PaymentMethodAvgOrderByAggregateInput = {
 export type PaymentMethodMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  bank?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
   receiver?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -414,7 +414,7 @@ export type PaymentMethodMaxOrderByAggregateInput = {
 export type PaymentMethodMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  bank?: Prisma.SortOrder
+  origin?: Prisma.SortOrder
   receiver?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
@@ -550,7 +550,7 @@ export type PaymentMethodUpdateOneRequiredWithoutExpensesNestedInput = {
 export type PaymentMethodCreateWithoutUserInput = {
   id?: bigint | number
   name: string
-  bank?: string | null
+  origin: string
   receiver?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -560,7 +560,7 @@ export type PaymentMethodCreateWithoutUserInput = {
 export type PaymentMethodUncheckedCreateWithoutUserInput = {
   id?: bigint | number
   name: string
-  bank?: string | null
+  origin: string
   receiver?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -614,7 +614,7 @@ export type PaymentMethodScalarWhereInput = {
   NOT?: Prisma.PaymentMethodScalarWhereInput | Prisma.PaymentMethodScalarWhereInput[]
   id?: Prisma.BigIntFilter<'PaymentMethod'> | bigint | number
   name?: Prisma.StringFilter<'PaymentMethod'> | string
-  bank?: Prisma.StringNullableFilter<'PaymentMethod'> | string | null
+  origin?: Prisma.StringFilter<'PaymentMethod'> | string
   receiver?: Prisma.StringNullableFilter<'PaymentMethod'> | string | null
   user_id?: Prisma.BigIntFilter<'PaymentMethod'> | bigint | number
   created_at?: Prisma.DateTimeFilter<'PaymentMethod'> | Date | string
@@ -624,7 +624,7 @@ export type PaymentMethodScalarWhereInput = {
 export type PaymentMethodCreateWithoutExpensesInput = {
   id?: bigint | number
   name: string
-  bank?: string | null
+  origin: string
   receiver?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -634,7 +634,7 @@ export type PaymentMethodCreateWithoutExpensesInput = {
 export type PaymentMethodUncheckedCreateWithoutExpensesInput = {
   id?: bigint | number
   name: string
-  bank?: string | null
+  origin: string
   receiver?: string | null
   user_id: bigint | number
   created_at?: Date | string
@@ -672,7 +672,7 @@ export type PaymentMethodUpdateToOneWithWhereWithoutExpensesInput = {
 export type PaymentMethodUpdateWithoutExpensesInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -682,7 +682,7 @@ export type PaymentMethodUpdateWithoutExpensesInput = {
 export type PaymentMethodUncheckedUpdateWithoutExpensesInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -692,7 +692,7 @@ export type PaymentMethodUncheckedUpdateWithoutExpensesInput = {
 export type PaymentMethodCreateManyUserInput = {
   id?: bigint | number
   name: string
-  bank?: string | null
+  origin: string
   receiver?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -701,7 +701,7 @@ export type PaymentMethodCreateManyUserInput = {
 export type PaymentMethodUpdateWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -711,7 +711,7 @@ export type PaymentMethodUpdateWithoutUserInput = {
 export type PaymentMethodUncheckedUpdateWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -721,7 +721,7 @@ export type PaymentMethodUncheckedUpdateWithoutUserInput = {
 export type PaymentMethodUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  bank?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  origin?: Prisma.StringFieldUpdateOperationsInput | string
   receiver?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -768,7 +768,7 @@ export type PaymentMethodSelect<
   {
     id?: boolean
     name?: boolean
-    bank?: boolean
+    origin?: boolean
     receiver?: boolean
     user_id?: boolean
     created_at?: boolean
@@ -786,7 +786,7 @@ export type PaymentMethodSelectCreateManyAndReturn<
   {
     id?: boolean
     name?: boolean
-    bank?: boolean
+    origin?: boolean
     receiver?: boolean
     user_id?: boolean
     created_at?: boolean
@@ -802,7 +802,7 @@ export type PaymentMethodSelectUpdateManyAndReturn<
   {
     id?: boolean
     name?: boolean
-    bank?: boolean
+    origin?: boolean
     receiver?: boolean
     user_id?: boolean
     created_at?: boolean
@@ -815,7 +815,7 @@ export type PaymentMethodSelectUpdateManyAndReturn<
 export type PaymentMethodSelectScalar = {
   id?: boolean
   name?: boolean
-  bank?: boolean
+  origin?: boolean
   receiver?: boolean
   user_id?: boolean
   created_at?: boolean
@@ -825,7 +825,7 @@ export type PaymentMethodSelectScalar = {
 export type PaymentMethodOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'name' | 'bank' | 'receiver' | 'user_id' | 'created_at' | 'updated_at',
+  'id' | 'name' | 'origin' | 'receiver' | 'user_id' | 'created_at' | 'updated_at',
   ExtArgs['result']['paymentMethod']
 >
 export type PaymentMethodInclude<
@@ -858,7 +858,7 @@ export type $PaymentMethodPayload<
     {
       id: bigint
       name: string
-      bank: string | null
+      origin: string
       receiver: string | null
       user_id: bigint
       created_at: Date
@@ -1460,7 +1460,7 @@ export interface Prisma__PaymentMethodClient<
 export interface PaymentMethodFieldRefs {
   readonly id: Prisma.FieldRef<'PaymentMethod', 'BigInt'>
   readonly name: Prisma.FieldRef<'PaymentMethod', 'String'>
-  readonly bank: Prisma.FieldRef<'PaymentMethod', 'String'>
+  readonly origin: Prisma.FieldRef<'PaymentMethod', 'String'>
   readonly receiver: Prisma.FieldRef<'PaymentMethod', 'String'>
   readonly user_id: Prisma.FieldRef<'PaymentMethod', 'BigInt'>
   readonly created_at: Prisma.FieldRef<'PaymentMethod', 'DateTime'>

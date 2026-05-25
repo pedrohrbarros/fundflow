@@ -10,7 +10,7 @@ export const PaymentMethodsService = {
   async create(
     user_external_id: string,
     name: string,
-    bank?: string,
+    origin: string,
     receiver?: string
   ): Promise<ServiceResult<PaymentMethodRecord>> {
     try {
@@ -20,7 +20,7 @@ export const PaymentMethodsService = {
       if (count >= 100)
         return { ok: false, status: 400, message: 'Payment method limit reached (100 per user)' }
       const payment_method = await db.paymentMethod.create({
-        data: { name, bank: bank ?? null, receiver: receiver ?? null, user_id: user.id },
+        data: { name, origin, receiver: receiver ?? null, user_id: user.id },
       })
       await cacheDel(pmCacheKey(user_external_id))
       return {
@@ -28,7 +28,7 @@ export const PaymentMethodsService = {
         data: {
           id: payment_method.id.toString(),
           name: payment_method.name,
-          bank: payment_method.bank,
+          origin: payment_method.origin,
           receiver: payment_method.receiver,
           user_id: payment_method.user_id.toString(),
           created_at: payment_method.created_at.toISOString(),
@@ -59,7 +59,7 @@ export const PaymentMethodsService = {
       const data = payment_methods.map((pm) => ({
         id: pm.id.toString(),
         name: pm.name,
-        bank: pm.bank,
+        origin: pm.origin,
         receiver: pm.receiver,
         user_id: pm.user_id.toString(),
         created_at: pm.created_at.toISOString(),
@@ -81,7 +81,7 @@ export const PaymentMethodsService = {
   async update(
     id: bigint,
     user_external_id: string,
-    data: { name?: string; bank?: string | null; receiver?: string | null }
+    data: { name?: string; origin?: string; receiver?: string | null }
   ): Promise<ServiceResult<PaymentMethodRecord>> {
     if (Object.keys(data).length === 0)
       return { ok: false, status: 400, message: 'No fields to update' }
@@ -99,7 +99,7 @@ export const PaymentMethodsService = {
         data: {
           id: payment_method.id.toString(),
           name: payment_method.name,
-          bank: payment_method.bank,
+          origin: payment_method.origin,
           receiver: payment_method.receiver,
           user_id: payment_method.user_id.toString(),
           created_at: payment_method.created_at.toISOString(),
