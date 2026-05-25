@@ -52,24 +52,30 @@ describe('Payment Methods API', () => {
       new Request('http://localhost/api/v1/payment_methods', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Test' }),
+        body: JSON.stringify({ name: 'Test', origin: 'Test Bank' }),
       })
     )
     expect(res.status).toBe(401)
   })
 
+  it('POST /api/v1/payment_methods returns 400 when origin is missing', async () => {
+    const token = await makeToken(TEST_EXTERNAL_ID)
+    const res = await req('POST', '/api/v1/payment_methods', token, { name: 'No Origin' })
+    expect(res.status).toBe(400)
+  })
+
   it('POST /api/v1/payment_methods creates a payment method', async () => {
     const token = await makeToken(TEST_EXTERNAL_ID)
     const res = await req('POST', '/api/v1/payment_methods', token, {
-      name: 'My Bank',
-      bank: 'Nubank',
+      name: 'My Card',
+      origin: 'Inter Bank',
       receiver: 'Pedro',
     })
     expect(res.status).toBe(201)
     const json = await res.json()
     expect(json.id).toBeDefined()
-    expect(json.name).toBe('My Bank')
-    expect(json.bank).toBe('Nubank')
+    expect(json.name).toBe('My Card')
+    expect(json.origin).toBe('Inter Bank')
     expect(json.receiver).toBe('Pedro')
   })
 
@@ -79,20 +85,28 @@ describe('Payment Methods API', () => {
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(Array.isArray(json.payment_methods)).toBe(true)
-    expect(json.payment_methods.some((pm: { name: string }) => pm.name === 'My Bank')).toBe(true)
+    expect(json.payment_methods.some((pm: { name: string }) => pm.name === 'My Card')).toBe(true)
+    expect(
+      json.payment_methods.every((pm: { origin: string }) => typeof pm.origin === 'string')
+    ).toBe(true)
   })
 
   it('PATCH /api/v1/payment_methods/:id updates a payment method', async () => {
     const token = await makeToken(TEST_EXTERNAL_ID)
     const created = await (
-      await req('POST', '/api/v1/payment_methods', token, { name: 'Old Name' })
+      await req('POST', '/api/v1/payment_methods', token, {
+        name: 'Old Name',
+        origin: 'Old Bank',
+      })
     ).json()
     const res = await req('PATCH', `/api/v1/payment_methods/${created.id}`, token, {
       name: 'New Name',
+      origin: 'New Bank',
     })
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.name).toBe('New Name')
+    expect(json.origin).toBe('New Bank')
   })
 
   it('PATCH /api/v1/payment_methods/:id returns 404 for nonexistent id', async () => {
@@ -104,7 +118,10 @@ describe('Payment Methods API', () => {
   it('DELETE /api/v1/payment_methods/:id deletes a payment method', async () => {
     const token = await makeToken(TEST_EXTERNAL_ID)
     const created = await (
-      await req('POST', '/api/v1/payment_methods', token, { name: 'To Delete' })
+      await req('POST', '/api/v1/payment_methods', token, {
+        name: 'To Delete',
+        origin: 'Test Bank',
+      })
     ).json()
     const res = await req('DELETE', `/api/v1/payment_methods/${created.id}`, token)
     expect(res.status).toBe(200)
