@@ -20,7 +20,7 @@ type ExpenseWithSplits = {
     partial_amount: number
     payment_method: {
       name: string
-      bank: string | null
+      origin: string
       receiver: string | null
     }
   }[]
@@ -37,7 +37,7 @@ const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
     payment_method_id: split.payment_method_id.toString(),
     partial_amount: split.partial_amount,
     name: split.payment_method.name,
-    bank: split.payment_method.bank,
+    origin: split.payment_method.origin,
     receiver: split.payment_method.receiver,
   })),
   created_at: expense.created_at.toISOString(),
