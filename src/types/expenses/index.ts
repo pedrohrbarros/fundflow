@@ -5,7 +5,7 @@ export type ExpensePaymentMethodRecord = {
   payment_method_id: string
   partial_amount: number
   name: string
-  bank: string | null
+  origin: string
   receiver: string | null
 }
 

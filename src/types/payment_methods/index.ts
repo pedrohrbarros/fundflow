@@ -4,7 +4,7 @@ import type { Static } from '@sinclair/typebox'
 export type PaymentMethodRecord = {
   id: string
   name: string
-  bank: string | null
+  origin: string
   receiver: string | null
   user_id: string
   created_at: string
@@ -13,13 +13,13 @@ export type PaymentMethodRecord = {
 
 export const PaymentMethodCreateBody = t.Object({
   name: t.String({ minLength: 1 }),
-  bank: t.Optional(t.String({ minLength: 1 })),
+  origin: t.String({ minLength: 1 }),
   receiver: t.Optional(t.String({ minLength: 1 })),
 })
 
 export const PaymentMethodUpdateBody = t.Object({
   name: t.Optional(t.String({ minLength: 1 })),
-  bank: t.Optional(t.Union([t.String({ minLength: 1 }), t.Null()])),
+  origin: t.Optional(t.String({ minLength: 1 })),
   receiver: t.Optional(t.Union([t.String({ minLength: 1 }), t.Null()])),
 })
 
