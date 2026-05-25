@@ -127,7 +127,7 @@ No new endpoints. The existing `POST /api/v1/payment_methods` and `PATCH /api/v1
 
 ### 5. Tests
 
-File: `src/tests/api/payment_methods.test.ts`
+**`src/tests/api/payment_methods.test.ts`**
 
 | Test | Change |
 |---|---|
@@ -138,6 +138,10 @@ File: `src/tests/api/payment_methods.test.ts`
 | `PATCH returns 404` | Update create fixture to include `origin` |
 | `DELETE deletes a payment method` | Update create fixture to include `origin` |
 | `DELETE returns 404` | No change needed (no create in this test) |
+
+**`src/tests/cache/payment_methods.test.ts`**
+
+All `POST` requests in this file create payment methods without `origin` (e.g. `{ name: 'Test Bank' }`). Since `origin` is now mandatory, every create fixture in this file must include `origin`. Update all four test bodies to add `origin: 'Test Bank'` (or any non-empty string).
 
 ---
 
