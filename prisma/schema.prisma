@@ -47,15 +47,15 @@ model SourceOfIncome {
 }
 
 model PaymentMethod {
-  id          BigInt                 @id @default(autoincrement())
-  name        String
-  bank        String?
-  receiver    String?
-  user_id     BigInt
-  user        User                   @relation(fields: [user_id], references: [id])
-  expenses    ExpensePaymentMethod[]
-  created_at  DateTime               @default(now())
-  updated_at  DateTime               @updatedAt
+  id         BigInt                 @id @default(autoincrement())
+  name       String
+  origin     String
+  receiver   String?
+  user_id    BigInt
+  user       User                   @relation(fields: [user_id], references: [id])
+  expenses   ExpensePaymentMethod[]
+  created_at DateTime               @default(now())
+  updated_at DateTime               @updatedAt
 
   @@map("payment_methods")
 }

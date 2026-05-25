@@ -108,7 +108,7 @@ export type SourceOfIncomeScalarFieldEnum =
 export const PaymentMethodScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  bank: 'bank',
+  origin: 'origin',
   receiver: 'receiver',
   user_id: 'user_id',
   created_at: 'created_at',
