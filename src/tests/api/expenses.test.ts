@@ -191,4 +191,9 @@ describe('Expenses API', () => {
     const res = await req('DELETE', '/api/v1/expenses/999999999')
     expect(res.status).toBe(404)
   })
+
+  it('GET /api/v1/expenses with limit=5001 returns 400', async () => {
+    const res = await req('GET', '/api/v1/expenses?limit=5001')
+    expect(res.status).toBe(400)
+  })
 })
