@@ -2,6 +2,7 @@ import { describe, it, expect } from 'bun:test'
 import {
   parsePagination,
   PAGINATION_MAX_LIMIT,
+  PAGINATION_MAX_PAGE,
   PAGINATION_DEFAULT_LIMIT,
   PAGINATION_DEFAULT_PAGE,
 } from '../../helpers/pagination'
@@ -54,5 +55,15 @@ describe('parsePagination', () => {
   it('falls back to default page for non-numeric string', () => {
     const result = parsePagination({ page: 'abc' })
     expect(result).toEqual({ ok: true, page: 1, limit: PAGINATION_DEFAULT_LIMIT })
+  })
+
+  it('accepts the maximum page exactly', () => {
+    const result = parsePagination({ page: String(PAGINATION_MAX_PAGE) })
+    expect(result).toEqual({ ok: true, page: PAGINATION_MAX_PAGE, limit: PAGINATION_DEFAULT_LIMIT })
+  })
+
+  it('returns error when page exceeds maximum', () => {
+    const result = parsePagination({ page: String(PAGINATION_MAX_PAGE + 1) })
+    expect(result).toEqual({ ok: false, error: `page must not exceed ${PAGINATION_MAX_PAGE}` })
   })
 })

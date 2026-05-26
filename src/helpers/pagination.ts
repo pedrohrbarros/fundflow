@@ -1,6 +1,7 @@
 export const PAGINATION_MAX_LIMIT = 5000
 export const PAGINATION_DEFAULT_LIMIT = 20
 export const PAGINATION_DEFAULT_PAGE = 1
+export const PAGINATION_MAX_PAGE = 10000
 
 type PaginationOk = { ok: true; page: number; limit: number }
 type PaginationError = { ok: false; error: string }
@@ -16,5 +17,7 @@ export const parsePagination = (query: { page?: string; limit?: string }): Pagin
   if (limit < 1) return { ok: false, error: 'limit must be at least 1' }
   if (limit > PAGINATION_MAX_LIMIT)
     return { ok: false, error: `limit must not exceed ${PAGINATION_MAX_LIMIT}` }
+  if (page > PAGINATION_MAX_PAGE)
+    return { ok: false, error: `page must not exceed ${PAGINATION_MAX_PAGE}` }
   return { ok: true, page, limit }
 }
