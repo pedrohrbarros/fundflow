@@ -2,6 +2,7 @@ import { describe, it, expect, mock, beforeAll, afterEach, afterAll } from 'bun:
 import { generateKeyPair, SignJWT } from 'jose'
 import { db } from '../../config/db'
 import { client } from '../../config/redis'
+import { PAGINATION_DEFAULT_PAGE, PAGINATION_DEFAULT_LIMIT } from '../../helpers/pagination'
 
 const { privateKey: testPrivateKey, publicKey: testPublicKey } = await generateKeyPair('RS256')
 
@@ -15,7 +16,7 @@ process.env.API_TOKEN = 'test-api-token'
 const { app } = await import('../../index')
 
 const TEST_EXTERNAL_ID = `user_cache_cat_${Date.now()}`
-const CACHE_KEY = `categories:list:${TEST_EXTERNAL_ID}`
+const CACHE_KEY = `categories:list:${TEST_EXTERNAL_ID}:${PAGINATION_DEFAULT_PAGE}:${PAGINATION_DEFAULT_LIMIT}`
 const TS = Date.now()
 
 const makeToken = () =>
@@ -60,7 +61,14 @@ describe('Categories cache', () => {
     await req('GET', '/api/v1/categories')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
-    expect(Array.isArray(JSON.parse(cached!))).toBe(true)
+    const parsed = JSON.parse(cached!) as {
+      categories: { id: string; name: string }[]
+      pagination: { page: number; limit: number; total: number }
+    }
+    expect(Array.isArray(parsed.categories)).toBe(true)
+    expect(typeof parsed.pagination).toBe('object')
+    expect(typeof parsed.pagination.page).toBe('number')
+    expect(typeof parsed.pagination.total).toBe('number')
   })
 
   it('POST /api/v1/categories invalidates the cache', async () => {

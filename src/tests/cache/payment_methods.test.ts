@@ -2,6 +2,7 @@ import { describe, it, expect, mock, beforeAll, afterAll } from 'bun:test'
 import { generateKeyPair, SignJWT } from 'jose'
 import { db } from '../../config/db'
 import { client } from '../../config/redis'
+import { PAGINATION_DEFAULT_LIMIT, PAGINATION_DEFAULT_PAGE } from '../../helpers/pagination'
 
 const { privateKey: testPrivateKey, publicKey: testPublicKey } = await generateKeyPair('RS256')
 
@@ -15,7 +16,7 @@ process.env.API_TOKEN = 'test-api-token'
 const { app } = await import('../../index')
 
 const TEST_EXTERNAL_ID = `user_cache_pm_test_${Date.now()}`
-const CACHE_KEY = `payment_methods:list:${TEST_EXTERNAL_ID}`
+const CACHE_KEY = `payment_methods:list:${TEST_EXTERNAL_ID}:${PAGINATION_DEFAULT_PAGE}:${PAGINATION_DEFAULT_LIMIT}`
 
 const makeToken = () =>
   new SignJWT({ azp: process.env.CLERK_AUTHORIZED_PARTY })
@@ -55,6 +56,7 @@ describe('Payment methods cache', () => {
     await req('GET', '/api/v1/payment_methods')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
-    expect(Array.isArray(JSON.parse(cached!))).toBe(true)
+    const parsed = JSON.parse(cached!)
+    expect(Array.isArray(parsed.payment_methods)).toBe(true)
   })
 })

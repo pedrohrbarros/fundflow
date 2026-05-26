@@ -71,6 +71,21 @@ describe('Categories API', () => {
     )
   })
 
+  it('GET /api/v1/categories returns pagination metadata', async () => {
+    const res = await req('GET', '/api/v1/categories')
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.pagination).toBeDefined()
+    expect(typeof json.pagination.page).toBe('number')
+    expect(typeof json.pagination.limit).toBe('number')
+    expect(typeof json.pagination.total).toBe('number')
+  })
+
+  it('GET /api/v1/categories with limit=5001 returns 400', async () => {
+    const res = await req('GET', '/api/v1/categories?limit=5001')
+    expect(res.status).toBe(400)
+  })
+
   it('PATCH /api/v1/categories/:id updates a category', async () => {
     const created = await (
       await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-patch-old` })

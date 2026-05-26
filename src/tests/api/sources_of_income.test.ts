@@ -68,7 +68,7 @@ describe('Sources of Income API', () => {
     expect(json.category_id).toBe(test_category_id)
   })
 
-  it('GET /api/v1/sources_of_income returns sources grouped by category', async () => {
+  it('GET /api/v1/sources_of_income returns sources grouped by category with pagination', async () => {
     await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-list`,
       category_id: Number(test_category_id),
@@ -76,19 +76,21 @@ describe('Sources of Income API', () => {
     const res = await req('GET', '/api/v1/sources_of_income')
     expect(res.status).toBe(200)
     const json = await res.json()
-    // Response is an object keyed by category name — not a wrapped array
-    expect(typeof json).toBe('object')
-    expect(Array.isArray(json)).toBe(false)
-    expect('sources_of_income' in json).toBe(false)
-    // Keys are category names (strings), values are arrays of sources
-    const category_names = Object.keys(json)
+    // Response is now wrapped: { sources_of_income: {...}, pagination: {...} }
+    expect('sources_of_income' in json).toBe(true)
+    expect('pagination' in json).toBe(true)
+    expect(typeof json.pagination.page).toBe('number')
+    expect(typeof json.pagination.limit).toBe('number')
+    expect(typeof json.pagination.total).toBe('number')
+    // Keys inside sources_of_income are category names (strings), values are arrays
+    const category_names = Object.keys(json.sources_of_income)
     expect(category_names.length).toBeGreaterThan(0)
     for (const key of category_names) {
-      expect(Array.isArray(json[key])).toBe(true)
+      expect(Array.isArray(json.sources_of_income[key])).toBe(true)
     }
     // Each entry has the expected shape
     const all_sources = Object.values(
-      json as Record<string, { id: string; name: string; income: number }[]>
+      json.sources_of_income as Record<string, { id: string; name: string; income: number }[]>
     ).flat()
     const first_source = all_sources[0]
     expect(typeof first_source.id).toBe('string')
@@ -167,5 +169,20 @@ describe('Sources of Income API', () => {
     })
     expect(res.status).toBe(400)
     await db.sourceOfIncome.deleteMany({ where: { name: { startsWith: `limit-soi-${TS}` } } })
+  })
+
+  it('GET /api/v1/sources_of_income returns pagination metadata', async () => {
+    const res = await req('GET', '/api/v1/sources_of_income')
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.pagination).toBeDefined()
+    expect(typeof json.pagination.page).toBe('number')
+    expect(typeof json.pagination.limit).toBe('number')
+    expect(typeof json.pagination.total).toBe('number')
+  })
+
+  it('GET /api/v1/sources_of_income with limit=5001 returns 400', async () => {
+    const res = await req('GET', '/api/v1/sources_of_income?limit=5001')
+    expect(res.status).toBe(400)
   })
 })

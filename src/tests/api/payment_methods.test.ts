@@ -91,6 +91,23 @@ describe('Payment Methods API', () => {
     ).toBe(true)
   })
 
+  it('GET /api/v1/payment_methods returns pagination metadata', async () => {
+    const token = await makeToken(TEST_EXTERNAL_ID)
+    const res = await req('GET', '/api/v1/payment_methods', token)
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.pagination).toBeDefined()
+    expect(typeof json.pagination.page).toBe('number')
+    expect(typeof json.pagination.limit).toBe('number')
+    expect(typeof json.pagination.total).toBe('number')
+  })
+
+  it('GET /api/v1/payment_methods with limit=5001 returns 400', async () => {
+    const token = await makeToken(TEST_EXTERNAL_ID)
+    const res = await req('GET', '/api/v1/payment_methods?limit=5001', token)
+    expect(res.status).toBe(400)
+  })
+
   it('PATCH /api/v1/payment_methods/:id updates a payment method', async () => {
     const token = await makeToken(TEST_EXTERNAL_ID)
     const created = await (
