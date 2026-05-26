@@ -62,12 +62,12 @@ Add:
 
 ```ts
 export const cacheDelPattern = async (pattern: string): Promise<void> => {
-  let cursor = 0
+  let cursor = '0'
   do {
-    const [nextCursor, keys] = await client.scan(cursor, { MATCH: pattern, COUNT: 100 })
-    cursor = Number(nextCursor)
+    const { cursor: nextCursor, keys } = await client.scan(cursor, { MATCH: pattern, COUNT: 100 })
+    cursor = nextCursor
     if (keys.length > 0) await client.del(keys)
-  } while (cursor !== 0)
+  } while (cursor !== '0')
 }
 ```
 
