@@ -2,6 +2,7 @@ import { describe, it, expect, mock, beforeAll, afterEach, afterAll } from 'bun:
 import { generateKeyPair, SignJWT } from 'jose'
 import { db } from '../../config/db'
 import { client } from '../../config/redis'
+import { PAGINATION_DEFAULT_PAGE, PAGINATION_DEFAULT_LIMIT } from '../../helpers/pagination'
 
 const { privateKey: testPrivateKey, publicKey: testPublicKey } = await generateKeyPair('RS256')
 
@@ -15,7 +16,7 @@ process.env.API_TOKEN = 'test-api-token'
 const { app } = await import('../../index')
 
 const TEST_EXTERNAL_ID = `user_cache_soi_${Date.now()}`
-const CACHE_KEY = `sources_of_income:list:${TEST_EXTERNAL_ID}`
+const CACHE_KEY = `sources_of_income:list:${TEST_EXTERNAL_ID}:${PAGINATION_DEFAULT_PAGE}:${PAGINATION_DEFAULT_LIMIT}`
 const TS = Date.now()
 
 const makeToken = () =>
@@ -69,22 +70,24 @@ describe('Sources of income cache', () => {
     await req('GET', '/api/v1/sources_of_income')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
-    const parsed = JSON.parse(cached!) as Record<
-      string,
-      { id: string; name: string; income: number }[]
-    >
-    expect(typeof parsed).toBe('object')
-    expect(Array.isArray(parsed)).toBe(false)
-    const category_names = Object.keys(parsed)
+    const parsed = JSON.parse(cached!) as {
+      sources_of_income: Record<string, { id: string; name: string; income: number }[]>
+      pagination: { page: number; limit: number; total: number }
+    }
+    expect(typeof parsed.sources_of_income).toBe('object')
+    expect(Array.isArray(parsed.sources_of_income)).toBe(false)
+    const category_names = Object.keys(parsed.sources_of_income)
     expect(category_names.length).toBeGreaterThan(0)
     for (const key of category_names) {
-      expect(Array.isArray(parsed[key])).toBe(true)
+      expect(Array.isArray(parsed.sources_of_income[key])).toBe(true)
     }
-    const all_sources = Object.values(parsed).flat()
+    const all_sources = Object.values(parsed.sources_of_income).flat()
     const first_source = all_sources[0]
     expect(typeof first_source.id).toBe('string')
     expect(typeof first_source.name).toBe('string')
     expect(typeof first_source.income).toBe('number')
+    expect(typeof parsed.pagination.page).toBe('number')
+    expect(typeof parsed.pagination.total).toBe('number')
   })
 
   it('POST /api/v1/sources_of_income invalidates the cache', async () => {
