@@ -15,7 +15,7 @@ process.env.API_TOKEN = 'test-api-token'
 const { app } = await import('../../index')
 
 const TEST_EXTERNAL_ID = `user_cache_pm_test_${Date.now()}`
-const CACHE_KEY = `payment_methods:list:${TEST_EXTERNAL_ID}`
+const CACHE_KEY = `payment_methods:list:${TEST_EXTERNAL_ID}:1:20`
 
 const makeToken = () =>
   new SignJWT({ azp: process.env.CLERK_AUTHORIZED_PARTY })
@@ -55,6 +55,7 @@ describe('Payment methods cache', () => {
     await req('GET', '/api/v1/payment_methods')
     const cached = await client.get(CACHE_KEY)
     expect(cached).not.toBeNull()
-    expect(Array.isArray(JSON.parse(cached!))).toBe(true)
+    const parsed = JSON.parse(cached!)
+    expect(Array.isArray(parsed.payment_methods)).toBe(true)
   })
 })
