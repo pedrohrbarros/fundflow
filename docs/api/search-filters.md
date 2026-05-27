@@ -28,7 +28,7 @@ A `FilterNode` is either a **condition** or a **group**:
 { logic: "AND" | "OR", conditions: FilterNode[] }
 ```
 
-Groups can be nested to arbitrary depth. An empty `conditions` array is valid (it matches everything).
+Groups can be nested to arbitrary depth. The `conditions` array must contain at least one `FilterNode`; empty arrays are rejected.
 
 ---
 
