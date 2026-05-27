@@ -1,21 +1,17 @@
 import { db } from '../config/db'
-import { cacheGet, cacheSet, cacheDelPattern } from '../middleware/cache'
 import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
 import type {
   SourceOfIncomeRecord,
   SourcesOfIncomeByCategoryRecord,
 } from '../types/sources_of_income'
+import { buildWhereClause } from '../helpers/filters'
+import type { FilterNode } from '../helpers/filters'
 
 type SourcesOfIncomeListData = {
   sources_of_income: SourcesOfIncomeByCategoryRecord
   pagination: { page: number; limit: number; total: number }
 }
-
-const soiCacheKey = (user_external_id: string, page: number, limit: number) =>
-  `sources_of_income:list:${user_external_id}:${page}:${limit}`
-
-const soiCachePattern = (user_external_id: string) => `sources_of_income:list:${user_external_id}:*`
 
 export const SourcesOfIncomeService = {
   async create(
@@ -43,7 +39,6 @@ export const SourcesOfIncomeService = {
       const source_of_income = await db.sourceOfIncome.create({
         data: { name, category_id, user_id: user.id, ...(income !== undefined ? { income } : {}) },
       })
-      await cacheDelPattern(soiCachePattern(user_external_id))
       return {
         ok: true,
         data: {
@@ -65,26 +60,28 @@ export const SourcesOfIncomeService = {
     }
   },
 
-  async listForUser(
+  async search(
     user_external_id: string,
     page: number,
-    limit: number
+    limit: number,
+    filters?: FilterNode
   ): Promise<ServiceResult<SourcesOfIncomeListData>> {
-    const key = soiCacheKey(user_external_id, page, limit)
-    const cached = await cacheGet<SourcesOfIncomeListData>(key)
-    if (cached) return { ok: true, data: cached }
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
+      const where = {
+        user_id: user.id,
+        ...(filters ? buildWhereClause(filters) : {}),
+      }
       const [sources, total] = await db.$transaction([
         db.sourceOfIncome.findMany({
-          where: { user_id: user.id },
+          where,
           orderBy: { id: 'asc' },
           skip: (page - 1) * limit,
           take: limit,
           include: { category: true },
         }),
-        db.sourceOfIncome.count({ where: { user_id: user.id } }),
+        db.sourceOfIncome.count({ where }),
       ])
       const sources_of_income: SourcesOfIncomeByCategoryRecord = {}
       for (const source of sources) {
@@ -99,12 +96,13 @@ export const SourcesOfIncomeService = {
           updated_at: source.updated_at.toISOString(),
         })
       }
-      const data: SourcesOfIncomeListData = {
-        sources_of_income,
-        pagination: { page, limit, total },
+      return {
+        ok: true,
+        data: {
+          sources_of_income,
+          pagination: { page, limit, total },
+        },
       }
-      await cacheSet(key, data)
-      return { ok: true, data }
     } catch (err: unknown) {
       db_logger.error(err, 'Failed to fetch sources of income')
       return {
@@ -142,7 +140,6 @@ export const SourcesOfIncomeService = {
         where: { id, user_id: user.id },
         data,
       })
-      await cacheDelPattern(soiCachePattern(user_external_id))
       return {
         ok: true,
         data: {
@@ -177,7 +174,6 @@ export const SourcesOfIncomeService = {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
       await db.sourceOfIncome.delete({ where: { id, user_id: user.id } })
-      await cacheDelPattern(soiCachePattern(user_external_id))
       return { ok: true, data: { message: 'Source of income deleted' } }
     } catch (err: unknown) {
       if ((err as { code?: string })?.code === 'P2025')

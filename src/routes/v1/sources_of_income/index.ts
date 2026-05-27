@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
 import { createSourceOfIncome } from './create'
-import { listSourcesOfIncome } from './list'
+import { searchSourcesOfIncome } from './search'
 import { updateSourceOfIncome } from './update'
 import { deleteSourceOfIncome } from './delete'
 import {
@@ -23,7 +23,7 @@ export const sources_of_income = new Elysia()
       },
     },
   })
-  .get('/sources_of_income', listSourcesOfIncome as RouteHandler, {
+  .post('/sources_of_income/search', searchSourcesOfIncome as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
   .patch('/sources_of_income/:id', updateSourceOfIncome as RouteHandler, {

@@ -79,9 +79,9 @@ describe('Payment Methods API', () => {
     expect(json.receiver).toBe('Pedro')
   })
 
-  it('GET /api/v1/payment_methods returns the list for the authenticated user', async () => {
+  it('POST /api/v1/payment_methods/search returns the list for the authenticated user', async () => {
     const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('GET', '/api/v1/payment_methods', token)
+    const res = await req('POST', '/api/v1/payment_methods/search', token, {})
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(Array.isArray(json.payment_methods)).toBe(true)
@@ -91,9 +91,9 @@ describe('Payment Methods API', () => {
     ).toBe(true)
   })
 
-  it('GET /api/v1/payment_methods returns pagination metadata', async () => {
+  it('POST /api/v1/payment_methods/search returns pagination metadata', async () => {
     const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('GET', '/api/v1/payment_methods', token)
+    const res = await req('POST', '/api/v1/payment_methods/search', token, {})
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.pagination).toBeDefined()
@@ -102,9 +102,28 @@ describe('Payment Methods API', () => {
     expect(typeof json.pagination.total).toBe('number')
   })
 
-  it('GET /api/v1/payment_methods with limit=5001 returns 400', async () => {
+  it('POST /api/v1/payment_methods/search with limit=5001 returns 400', async () => {
     const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('GET', '/api/v1/payment_methods?limit=5001', token)
+    const res = await req('POST', '/api/v1/payment_methods/search', token, { limit: 5001 })
+    expect(res.status).toBe(400)
+  })
+
+  it('POST /api/v1/payment_methods/search with is_equal filter on name returns only matching methods', async () => {
+    const token = await makeToken(TEST_EXTERNAL_ID)
+    const res = await req('POST', '/api/v1/payment_methods/search', token, {
+      filters: { field: 'name', op: 'is_equal', value: 'My Card' },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.payment_methods.every((pm: { name: string }) => pm.name === 'My Card')).toBe(true)
+    expect(json.payment_methods.length).toBeGreaterThan(0)
+  })
+
+  it('POST /api/v1/payment_methods/search with unknown field returns 400', async () => {
+    const token = await makeToken(TEST_EXTERNAL_ID)
+    const res = await req('POST', '/api/v1/payment_methods/search', token, {
+      filters: { field: 'nonexistent', op: 'is_equal', value: 'x' },
+    })
     expect(res.status).toBe(400)
   })
 

@@ -68,27 +68,24 @@ describe('Sources of Income API', () => {
     expect(json.category_id).toBe(test_category_id)
   })
 
-  it('GET /api/v1/sources_of_income returns sources grouped by category with pagination', async () => {
+  it('POST /api/v1/sources_of_income/search returns sources grouped by category with pagination', async () => {
     await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-list`,
       category_id: Number(test_category_id),
     })
-    const res = await req('GET', '/api/v1/sources_of_income')
+    const res = await req('POST', '/api/v1/sources_of_income/search', {})
     expect(res.status).toBe(200)
     const json = await res.json()
-    // Response is now wrapped: { sources_of_income: {...}, pagination: {...} }
     expect('sources_of_income' in json).toBe(true)
     expect('pagination' in json).toBe(true)
     expect(typeof json.pagination.page).toBe('number')
     expect(typeof json.pagination.limit).toBe('number')
     expect(typeof json.pagination.total).toBe('number')
-    // Keys inside sources_of_income are category names (strings), values are arrays
     const category_names = Object.keys(json.sources_of_income)
     expect(category_names.length).toBeGreaterThan(0)
     for (const key of category_names) {
       expect(Array.isArray(json.sources_of_income[key])).toBe(true)
     }
-    // Each entry has the expected shape
     const all_sources = Object.values(
       json.sources_of_income as Record<string, { id: string; name: string; income: number }[]>
     ).flat()
@@ -96,7 +93,6 @@ describe('Sources of Income API', () => {
     expect(typeof first_source.id).toBe('string')
     expect(typeof first_source.name).toBe('string')
     expect(typeof first_source.income).toBe('number')
-    // The source we created appears under its category
     expect(all_sources.some((s) => s.name === `test-soi-${TS}-list`)).toBe(true)
   })
 
@@ -171,8 +167,8 @@ describe('Sources of Income API', () => {
     await db.sourceOfIncome.deleteMany({ where: { name: { startsWith: `limit-soi-${TS}` } } })
   })
 
-  it('GET /api/v1/sources_of_income returns pagination metadata', async () => {
-    const res = await req('GET', '/api/v1/sources_of_income')
+  it('POST /api/v1/sources_of_income/search returns pagination metadata', async () => {
+    const res = await req('POST', '/api/v1/sources_of_income/search', {})
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.pagination).toBeDefined()
@@ -181,8 +177,37 @@ describe('Sources of Income API', () => {
     expect(typeof json.pagination.total).toBe('number')
   })
 
-  it('GET /api/v1/sources_of_income with limit=5001 returns 400', async () => {
-    const res = await req('GET', '/api/v1/sources_of_income?limit=5001')
+  it('POST /api/v1/sources_of_income/search with limit=5001 returns 400', async () => {
+    const res = await req('POST', '/api/v1/sources_of_income/search', { limit: 5001 })
+    expect(res.status).toBe(400)
+  })
+
+  it('POST /api/v1/sources_of_income/search with is_equal filter returns only matching sources', async () => {
+    const name = `test-soi-${TS}-filter-eq`
+    await req('POST', '/api/v1/sources_of_income', {
+      name,
+      category_id: Number(test_category_id),
+    })
+    await req('POST', '/api/v1/sources_of_income', {
+      name: `test-soi-${TS}-filter-other`,
+      category_id: Number(test_category_id),
+    })
+    const res = await req('POST', '/api/v1/sources_of_income/search', {
+      filters: { field: 'name', op: 'is_equal', value: name },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    const all_sources = Object.values(
+      json.sources_of_income as Record<string, { name: string }[]>
+    ).flat()
+    expect(all_sources.every((s) => s.name === name)).toBe(true)
+    expect(all_sources.length).toBeGreaterThan(0)
+  })
+
+  it('POST /api/v1/sources_of_income/search with unknown field returns 400', async () => {
+    const res = await req('POST', '/api/v1/sources_of_income/search', {
+      filters: { field: 'nonexistent', op: 'is_equal', value: 'x' },
+    })
     expect(res.status).toBe(400)
   })
 })

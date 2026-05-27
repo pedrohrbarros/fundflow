@@ -3,6 +3,8 @@ import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
 import type { ExpenseRecord } from '../types/expenses'
 import type { ExpenseCreateInput, ExpenseUpdateInput } from '../schemas/expenses'
+import { buildWhereClause } from '../helpers/filters'
+import type { FilterNode } from '../helpers/filters'
 
 type Split = { payment_method_id: number; partial_amount: number }
 
@@ -121,10 +123,11 @@ export const ExpensesService = {
     }
   },
 
-  async listForUser(
+  async search(
     user_external_id: string,
     page: number,
-    limit: number
+    limit: number,
+    filters?: FilterNode
   ): Promise<
     ServiceResult<{
       expenses: ExpenseRecord[]
@@ -135,15 +138,19 @@ export const ExpensesService = {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
 
+      const where = {
+        user_id: user.id,
+        ...(filters ? buildWhereClause(filters) : {}),
+      }
       const [expenses, total] = await db.$transaction([
         db.expense.findMany({
-          where: { user_id: user.id },
+          where,
           orderBy: { id: 'desc' },
           skip: (page - 1) * limit,
           take: limit,
           include: { payment_methods: { include: { payment_method: true } } },
         }),
-        db.expense.count({ where: { user_id: user.id } }),
+        db.expense.count({ where }),
       ])
 
       return {
