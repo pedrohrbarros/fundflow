@@ -105,13 +105,13 @@ describe('Expenses API', () => {
     expect(res.status).toBe(404)
   })
 
-  it('GET /api/v1/expenses returns paginated expenses with full payment method data', async () => {
+  it('POST /api/v1/expenses/search returns paginated expenses with full payment method data', async () => {
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-list`,
       amount: 100,
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
     })
-    const res = await req('GET', '/api/v1/expenses?page=1&limit=20')
+    const res = await req('POST', '/api/v1/expenses/search', { page: 1, limit: 20 })
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(Array.isArray(json.expenses)).toBe(true)
@@ -192,8 +192,49 @@ describe('Expenses API', () => {
     expect(res.status).toBe(404)
   })
 
-  it('GET /api/v1/expenses with limit=5001 returns 400', async () => {
-    const res = await req('GET', '/api/v1/expenses?limit=5001')
+  it('POST /api/v1/expenses/search with limit=5001 returns 400', async () => {
+    const res = await req('POST', '/api/v1/expenses/search', { limit: 5001 })
+    expect(res.status).toBe(400)
+  })
+
+  it('POST /api/v1/expenses/search with is_equal filter returns only matching expenses', async () => {
+    const name = `exp-${TS}-filter-eq`
+    await req('POST', '/api/v1/expenses', { name, amount: 50 })
+    await req('POST', '/api/v1/expenses', { name: `exp-${TS}-filter-other`, amount: 50 })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      filters: { field: 'name', op: 'is_equal', value: name },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses.every((e: { name: string }) => e.name === name)).toBe(true)
+    expect(json.expenses.length).toBeGreaterThan(0)
+  })
+
+  it('POST /api/v1/expenses/search with is_between filter returns only in-range expenses', async () => {
+    await req('POST', '/api/v1/expenses', { name: `exp-${TS}-range-low`, amount: 10 })
+    await req('POST', '/api/v1/expenses', { name: `exp-${TS}-range-mid`, amount: 150 })
+    await req('POST', '/api/v1/expenses', { name: `exp-${TS}-range-high`, amount: 500 })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      filters: { field: 'amount', op: 'is_between', value: [100, 200] },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses.every((e: { amount: number }) => e.amount >= 100 && e.amount <= 200)).toBe(
+      true
+    )
+  })
+
+  it('POST /api/v1/expenses/search with unknown field returns 400', async () => {
+    const res = await req('POST', '/api/v1/expenses/search', {
+      filters: { field: 'nonexistent', op: 'is_equal', value: 'x' },
+    })
+    expect(res.status).toBe(400)
+  })
+
+  it('POST /api/v1/expenses/search with op invalid for field type returns 400', async () => {
+    const res = await req('POST', '/api/v1/expenses/search', {
+      filters: { field: 'is_paid', op: 'is_contains', value: 'x' },
+    })
     expect(res.status).toBe(400)
   })
 })

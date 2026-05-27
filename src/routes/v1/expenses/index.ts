@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
 import { createExpense } from './create'
-import { listExpenses } from './list'
+import { searchExpenses } from './search'
 import { updateExpense } from './update'
 import { deleteExpense } from './delete'
 import { ExpenseCreateBody, ExpenseUpdateBody } from '../../../types/expenses'
@@ -20,7 +20,7 @@ export const expenses = new Elysia()
       },
     },
   })
-  .get('/expenses', listExpenses as RouteHandler, {
+  .post('/expenses/search', searchExpenses as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
   .patch('/expenses/:id', updateExpense as RouteHandler, {
