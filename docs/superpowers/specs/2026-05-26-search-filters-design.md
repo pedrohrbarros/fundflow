@@ -264,7 +264,7 @@ export const searchExpenses = async ({ clerk_user_id, body, set }) => {
 
   let filters: FilterNode | undefined
   if (body.filters !== undefined) {
-    const result = parseFilterBody(body.raw_filters, EXPENSE_ALLOWED_FIELDS)
+    const result = parseFilterBody(body.filters, EXPENSE_ALLOWED_FIELDS)
     if (!result.ok) return handleError(set, 400, result.error)
     filters = result.node
   }
