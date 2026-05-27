@@ -60,9 +60,9 @@ describe('Categories API', () => {
     expect(json.updated_at).toBeDefined()
   })
 
-  it("GET /api/v1/categories returns only the user's categories", async () => {
+  it("POST /api/v1/categories/search returns only the user's categories", async () => {
     await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-list` })
-    const res = await req('GET', '/api/v1/categories')
+    const res = await req('POST', '/api/v1/categories/search', {})
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(Array.isArray(json.categories)).toBe(true)
@@ -71,8 +71,8 @@ describe('Categories API', () => {
     )
   })
 
-  it('GET /api/v1/categories returns pagination metadata', async () => {
-    const res = await req('GET', '/api/v1/categories')
+  it('POST /api/v1/categories/search returns pagination metadata', async () => {
+    const res = await req('POST', '/api/v1/categories/search', {})
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.pagination).toBeDefined()
@@ -81,8 +81,28 @@ describe('Categories API', () => {
     expect(typeof json.pagination.total).toBe('number')
   })
 
-  it('GET /api/v1/categories with limit=5001 returns 400', async () => {
-    const res = await req('GET', '/api/v1/categories?limit=5001')
+  it('POST /api/v1/categories/search with limit=5001 returns 400', async () => {
+    const res = await req('POST', '/api/v1/categories/search', { limit: 5001 })
+    expect(res.status).toBe(400)
+  })
+
+  it('POST /api/v1/categories/search with is_equal filter returns only matching categories', async () => {
+    const name = `test-cat-${TS}-filter-eq`
+    await req('POST', '/api/v1/categories', { name })
+    await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-filter-other` })
+    const res = await req('POST', '/api/v1/categories/search', {
+      filters: { field: 'name', op: 'is_equal', value: name },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.categories.every((c: { name: string }) => c.name === name)).toBe(true)
+    expect(json.categories.length).toBeGreaterThan(0)
+  })
+
+  it('POST /api/v1/categories/search with unknown field returns 400', async () => {
+    const res = await req('POST', '/api/v1/categories/search', {
+      filters: { field: 'nonexistent', op: 'is_equal', value: 'x' },
+    })
     expect(res.status).toBe(400)
   })
 

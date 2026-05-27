@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
 import { createCategory } from './create'
-import { listCategories } from './list'
+import { searchCategories } from './search'
 import { updateCategory } from './update'
 import { deleteCategory } from './delete'
 import { CategoryCreateBody, CategoryUpdateBody } from '../../../types/categories'
@@ -20,7 +20,7 @@ export const categories = new Elysia()
       },
     },
   })
-  .get('/categories', listCategories as RouteHandler, {
+  .post('/categories/search', searchCategories as RouteHandler, {
     detail: { security: [{ clerkAuth: [] }] },
   })
   .patch('/categories/:id', updateCategory as RouteHandler, {
