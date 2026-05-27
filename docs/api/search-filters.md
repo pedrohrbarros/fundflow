@@ -38,11 +38,11 @@ Groups can be nested to arbitrary depth. The `conditions` array must contain at 
 
 | Operator | Description | `value` shape |
 |----------|-------------|---------------|
-| `eq` | Exact match (case-sensitive) | `string` |
-| `neq` | Not equal | `string` |
-| `contains` | Substring match (case-insensitive) | `string` |
-| `starts_with` | Prefix match (case-insensitive) | `string` |
-| `ends_with` | Suffix match (case-insensitive) | `string` |
+| `is_equal` | Exact match (case-sensitive) | `string` |
+| `is_not_equal` | Not equal | `string` |
+| `is_contains` | Substring match (case-insensitive) | `string` |
+| `is_starts_with` | Prefix match (case-insensitive) | `string` |
+| `is_ends_with` | Suffix match (case-insensitive) | `string` |
 
 ### `string_nullable` fields
 
