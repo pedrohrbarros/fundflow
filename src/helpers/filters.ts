@@ -61,11 +61,9 @@ const VALID_OPS: Record<FieldType, FilterOp[]> = {
   datetime: ['is_equal', 'is_before', 'is_after', 'is_between'],
 }
 
-const isValidIso8601 = (value: unknown): value is string => {
-  if (typeof value !== 'string') return false
-  const date = new Date(value)
-  return !isNaN(date.getTime())
-}
+const ISO_8601_RE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2}))?$/
+const isValidIso8601 = (value: unknown): value is string =>
+  typeof value === 'string' && ISO_8601_RE.test(value) && !isNaN(new Date(value).getTime())
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -121,7 +119,7 @@ export const parseFilterBody = (raw: unknown, allowlist: FieldAllowlist): Filter
   const filterOp = op as FilterOp
 
   if (filterOp === 'is_null' || filterOp === 'is_not_null') {
-    if (value !== undefined) {
+    if (value !== undefined && value !== null) {
       return { ok: false, error: `value must be absent for op '${filterOp}'` }
     }
     return { ok: true, node: { field, fieldType, op: filterOp } }
@@ -135,7 +133,12 @@ export const parseFilterBody = (raw: unknown, allowlist: FieldAllowlist): Filter
     const [valueA, valueB] = value
 
     if (fieldType === 'float') {
-      if (typeof valueA !== 'number' || typeof valueB !== 'number') {
+      if (
+        typeof valueA !== 'number' ||
+        !Number.isFinite(valueA) ||
+        typeof valueB !== 'number' ||
+        !Number.isFinite(valueB)
+      ) {
         return { ok: false, error: 'is_between for float requires both values to be numbers' }
       }
       if (valueA > valueB) {
@@ -173,7 +176,7 @@ export const parseFilterBody = (raw: unknown, allowlist: FieldAllowlist): Filter
       return { ok: false, error: `value must be a string for field type '${fieldType}'` }
     }
   } else if (fieldType === 'float') {
-    if (typeof value !== 'number') {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
       return { ok: false, error: `value must be a number for field type 'float'` }
     }
   } else if (fieldType === 'boolean') {
@@ -225,13 +228,13 @@ export const buildWhereClause = (node: FilterNode): Record<string, unknown> => {
     case 'is_not_null':
       return { [field]: { not: null } }
     case 'is_greater':
-      return { [field]: { gt: fieldType === 'datetime' ? toDate(value) : value } }
+      return { [field]: { gt: value } }
     case 'is_greater_or_equal':
-      return { [field]: { gte: fieldType === 'datetime' ? toDate(value) : value } }
+      return { [field]: { gte: value } }
     case 'is_lower':
-      return { [field]: { lt: fieldType === 'datetime' ? toDate(value) : value } }
+      return { [field]: { lt: value } }
     case 'is_lower_or_equal':
-      return { [field]: { lte: fieldType === 'datetime' ? toDate(value) : value } }
+      return { [field]: { lte: value } }
     case 'is_between': {
       const [valueA, valueB] = value as [number, number] | [string, string]
       return {

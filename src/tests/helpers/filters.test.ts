@@ -327,6 +327,68 @@ describe('buildWhereClause', () => {
     })
   })
 
+  it('string is_not_equal', () => {
+    const condition: FilterCondition = {
+      field: 'name',
+      fieldType: 'string',
+      op: 'is_not_equal',
+      value: 'foo',
+    }
+    expect(buildWhereClause(condition)).toEqual({ name: { not: 'foo' } })
+  })
+
+  it('string is_starts_with', () => {
+    const condition: FilterCondition = {
+      field: 'name',
+      fieldType: 'string',
+      op: 'is_starts_with',
+      value: 'foo',
+    }
+    expect(buildWhereClause(condition)).toEqual({
+      name: { startsWith: 'foo', mode: 'insensitive' },
+    })
+  })
+
+  it('string is_ends_with', () => {
+    const condition: FilterCondition = {
+      field: 'name',
+      fieldType: 'string',
+      op: 'is_ends_with',
+      value: 'foo',
+    }
+    expect(buildWhereClause(condition)).toEqual({ name: { endsWith: 'foo', mode: 'insensitive' } })
+  })
+
+  it('float is_greater_or_equal', () => {
+    const condition: FilterCondition = {
+      field: 'score',
+      fieldType: 'float',
+      op: 'is_greater_or_equal',
+      value: 5,
+    }
+    expect(buildWhereClause(condition)).toEqual({ score: { gte: 5 } })
+  })
+
+  it('float is_lower', () => {
+    const condition: FilterCondition = {
+      field: 'score',
+      fieldType: 'float',
+      op: 'is_lower',
+      value: 5,
+    }
+    expect(buildWhereClause(condition)).toEqual({ score: { lt: 5 } })
+  })
+
+  it('float is_lower_or_equal', () => {
+    const condition: FilterCondition = {
+      field: 'score',
+      fieldType: 'float',
+      op: 'is_lower_or_equal',
+      value: 5,
+    }
+    expect(buildWhereClause(condition)).toEqual({ score: { lte: 5 } })
+  })
+
   it('nested group', () => {
     const group: FilterGroup = {
       logic: 'AND',
