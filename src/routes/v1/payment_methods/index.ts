@@ -1,6 +1,6 @@
 import { Elysia } from 'elysia'
 import { createPaymentMethod } from './create'
-import { listPaymentMethods } from './list'
+import { searchPaymentMethods } from './search'
 import { updatePaymentMethod } from './update'
 import { deletePaymentMethod } from './delete'
 import { PaymentMethodCreateBody, PaymentMethodUpdateBody } from '../../../types/payment_methods'
@@ -20,7 +20,7 @@ export const payment_methods = new Elysia()
       },
     },
   })
-  .get('/payment_methods', listPaymentMethods as RouteHandler, {
+  .post('/payment_methods/search', searchPaymentMethods as RouteHandler, {
     detail: { security: [{ bearerAuth: [] }] },
   })
   .patch('/payment_methods/:id', updatePaymentMethod as RouteHandler, {
