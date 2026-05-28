@@ -60,12 +60,14 @@ describe('Sources of Income API', () => {
     const res = await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-create`,
       category_id: Number(test_category_id),
+      currency: 'EUR',
     })
     expect(res.status).toBe(201)
     const json = await res.json()
     expect(json.id).toBeDefined()
     expect(json.name).toBe(`test-soi-${TS}-create`)
     expect(json.category_id).toBe(test_category_id)
+    expect(json.currency).toBe('EUR')
   })
 
   it('POST /api/v1/sources_of_income/search returns sources grouped by category with pagination', async () => {
@@ -87,12 +89,16 @@ describe('Sources of Income API', () => {
       expect(Array.isArray(json.sources_of_income[key])).toBe(true)
     }
     const all_sources = Object.values(
-      json.sources_of_income as Record<string, { id: string; name: string; income: number }[]>
+      json.sources_of_income as Record<
+        string,
+        { id: string; name: string; income: number; currency: string }[]
+      >
     ).flat()
     const first_source = all_sources[0]
     expect(typeof first_source.id).toBe('string')
     expect(typeof first_source.name).toBe('string')
     expect(typeof first_source.income).toBe('number')
+    expect(typeof first_source.currency).toBe('string')
     expect(all_sources.some((s) => s.name === `test-soi-${TS}-list`)).toBe(true)
   })
 
@@ -105,10 +111,12 @@ describe('Sources of Income API', () => {
     ).json()
     const res = await req('PATCH', `/api/v1/sources_of_income/${created.id}`, {
       name: `test-soi-${TS}-patch-new`,
+      currency: 'GBP',
     })
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.name).toBe(`test-soi-${TS}-patch-new`)
+    expect(json.currency).toBe('GBP')
   })
 
   it('PATCH /api/v1/sources_of_income/:id returns 404 for unknown id', async () => {
