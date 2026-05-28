@@ -19,10 +19,11 @@ export const updateSourceOfIncome = async ({
     return { error: parsed.error.flatten().fieldErrors }
   }
   const id = BigInt(params.id)
-  const data: { name?: string; category_id?: bigint; income?: number } = {}
+  const data: { name?: string; category_id?: bigint; income?: number; currency?: string } = {}
   if (parsed.data.name !== undefined) data.name = parsed.data.name
   if (parsed.data.category_id !== undefined) data.category_id = BigInt(parsed.data.category_id)
   if (parsed.data.income !== undefined) data.income = parsed.data.income
+  if (parsed.data.currency !== undefined) data.currency = parsed.data.currency
   const result = await SourcesOfIncomeService.update(id, clerk_user_id, data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data
