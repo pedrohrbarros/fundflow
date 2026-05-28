@@ -9,6 +9,7 @@ import { categories } from './routes/v1/categories'
 import { sources_of_income } from './routes/v1/sources_of_income'
 import { payment_methods } from './routes/v1/payment_methods'
 import { expenses } from './routes/v1/expenses'
+import { users } from './routes/v1/users'
 import { endpoint_logger, logger } from './config/logging'
 
 const REDOC_HTML = `<!DOCTYPE html>
@@ -81,6 +82,7 @@ export const app = new Elysia()
       .use(sources_of_income)
       .use(payment_methods)
       .use(expenses)
+      .use(users)
   )
   .get('/', () => 'Fundflow API')
   .get('/docs', () => new Response(REDOC_HTML, { headers: { 'Content-Type': 'text/html' } }))

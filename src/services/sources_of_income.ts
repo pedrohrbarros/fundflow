@@ -13,12 +13,33 @@ type SourcesOfIncomeListData = {
   pagination: { page: number; limit: number; total: number }
 }
 
+function toRecord(source: {
+  id: bigint
+  name: string
+  category_id: bigint
+  income: number
+  currency: string
+  created_at: Date
+  updated_at: Date
+}): SourceOfIncomeRecord {
+  return {
+    id: source.id.toString(),
+    name: source.name,
+    category_id: source.category_id.toString(),
+    income: source.income,
+    currency: source.currency,
+    created_at: source.created_at.toISOString(),
+    updated_at: source.updated_at.toISOString(),
+  }
+}
+
 export const SourcesOfIncomeService = {
   async create(
     user_external_id: string,
     name: string,
     category_id: bigint,
-    income?: number
+    income?: number,
+    currency?: string
   ): Promise<ServiceResult<SourceOfIncomeRecord>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
@@ -37,19 +58,15 @@ export const SourcesOfIncomeService = {
           meta: { category_id: category_id.toString() },
         }
       const source_of_income = await db.sourceOfIncome.create({
-        data: { name, category_id, user_id: user.id, ...(income !== undefined ? { income } : {}) },
-      })
-      return {
-        ok: true,
         data: {
-          id: source_of_income.id.toString(),
-          name: source_of_income.name,
-          category_id: source_of_income.category_id.toString(),
-          income: source_of_income.income,
-          created_at: source_of_income.created_at.toISOString(),
-          updated_at: source_of_income.updated_at.toISOString(),
+          name,
+          category_id,
+          user_id: user.id,
+          ...(income !== undefined ? { income } : {}),
+          ...(currency !== undefined ? { currency } : {}),
         },
-      }
+      })
+      return { ok: true, data: toRecord(source_of_income) }
     } catch (err: unknown) {
       return {
         ok: false,
@@ -87,14 +104,7 @@ export const SourcesOfIncomeService = {
       for (const source of sources) {
         const category_name = source.category.name
         if (!sources_of_income[category_name]) sources_of_income[category_name] = []
-        sources_of_income[category_name].push({
-          id: source.id.toString(),
-          name: source.name,
-          category_id: source.category_id.toString(),
-          income: source.income,
-          created_at: source.created_at.toISOString(),
-          updated_at: source.updated_at.toISOString(),
-        })
+        sources_of_income[category_name].push(toRecord(source))
       }
       return {
         ok: true,
@@ -117,7 +127,7 @@ export const SourcesOfIncomeService = {
   async update(
     id: bigint,
     user_external_id: string,
-    data: { name?: string; category_id?: bigint; income?: number }
+    data: { name?: string; category_id?: bigint; income?: number; currency?: string }
   ): Promise<ServiceResult<SourceOfIncomeRecord>> {
     if (Object.keys(data).length === 0)
       return { ok: false, status: 400, message: 'No fields to update' }
@@ -140,17 +150,7 @@ export const SourcesOfIncomeService = {
         where: { id, user_id: user.id },
         data,
       })
-      return {
-        ok: true,
-        data: {
-          id: source_of_income.id.toString(),
-          name: source_of_income.name,
-          category_id: source_of_income.category_id.toString(),
-          income: source_of_income.income,
-          created_at: source_of_income.created_at.toISOString(),
-          updated_at: source_of_income.updated_at.toISOString(),
-        },
-      }
+      return { ok: true, data: toRecord(source_of_income) }
     } catch (err: unknown) {
       const code = (err as { code?: string })?.code
       if (code === 'P2025')

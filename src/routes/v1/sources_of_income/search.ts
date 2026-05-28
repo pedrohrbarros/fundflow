@@ -8,6 +8,7 @@ import type { FieldAllowlist } from '../../../helpers/filters'
 const SOURCE_OF_INCOME_ALLOWED_FIELDS: FieldAllowlist = {
   name: 'string',
   income: 'float',
+  currency: 'string',
   created_at: 'datetime',
   updated_at: 'datetime',
 }

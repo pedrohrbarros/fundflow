@@ -20,7 +20,8 @@ export const createSourceOfIncome = async ({
     clerk_user_id,
     parsed.data.name,
     BigInt(parsed.data.category_id),
-    parsed.data.income
+    parsed.data.income,
+    parsed.data.currency
   )
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201

@@ -36,6 +36,7 @@ export type UserSumAggregateOutputType = {
 export type UserMinAggregateOutputType = {
   id: bigint | null
   external_id: string | null
+  country: string | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -43,6 +44,7 @@ export type UserMinAggregateOutputType = {
 export type UserMaxAggregateOutputType = {
   id: bigint | null
   external_id: string | null
+  country: string | null
   created_at: Date | null
   updated_at: Date | null
 }
@@ -50,6 +52,7 @@ export type UserMaxAggregateOutputType = {
 export type UserCountAggregateOutputType = {
   id: number
   external_id: number
+  country: number
   created_at: number
   updated_at: number
   _all: number
@@ -66,6 +69,7 @@ export type UserSumAggregateInputType = {
 export type UserMinAggregateInputType = {
   id?: true
   external_id?: true
+  country?: true
   created_at?: true
   updated_at?: true
 }
@@ -73,6 +77,7 @@ export type UserMinAggregateInputType = {
 export type UserMaxAggregateInputType = {
   id?: true
   external_id?: true
+  country?: true
   created_at?: true
   updated_at?: true
 }
@@ -80,6 +85,7 @@ export type UserMaxAggregateInputType = {
 export type UserCountAggregateInputType = {
   id?: true
   external_id?: true
+  country?: true
   created_at?: true
   updated_at?: true
   _all?: true
@@ -175,6 +181,7 @@ export type UserGroupByArgs<
 export type UserGroupByOutputType = {
   id: bigint
   external_id: string
+  country: string
   created_at: Date
   updated_at: Date
   _count: UserCountAggregateOutputType | null
@@ -202,6 +209,7 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.BigIntFilter<'User'> | bigint | number
   external_id?: Prisma.StringFilter<'User'> | string
+  country?: Prisma.StringFilter<'User'> | string
   created_at?: Prisma.DateTimeFilter<'User'> | Date | string
   updated_at?: Prisma.DateTimeFilter<'User'> | Date | string
   categories?: Prisma.SourceOfIncomeCategoryListRelationFilter
@@ -213,6 +221,7 @@ export type UserWhereInput = {
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   external_id?: Prisma.SortOrder
+  country?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   categories?: Prisma.SourceOfIncomeCategoryOrderByRelationAggregateInput
@@ -228,6 +237,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
     AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
     OR?: Prisma.UserWhereInput[]
     NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
+    country?: Prisma.StringFilter<'User'> | string
     created_at?: Prisma.DateTimeFilter<'User'> | Date | string
     updated_at?: Prisma.DateTimeFilter<'User'> | Date | string
     categories?: Prisma.SourceOfIncomeCategoryListRelationFilter
@@ -241,6 +251,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   external_id?: Prisma.SortOrder
+  country?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -256,6 +267,7 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.BigIntWithAggregatesFilter<'User'> | bigint | number
   external_id?: Prisma.StringWithAggregatesFilter<'User'> | string
+  country?: Prisma.StringWithAggregatesFilter<'User'> | string
   created_at?: Prisma.DateTimeWithAggregatesFilter<'User'> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<'User'> | Date | string
 }
@@ -263,6 +275,7 @@ export type UserScalarWhereWithAggregatesInput = {
 export type UserCreateInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   categories?: Prisma.SourceOfIncomeCategoryCreateNestedManyWithoutUserInput
@@ -274,6 +287,7 @@ export type UserCreateInput = {
 export type UserUncheckedCreateInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   categories?: Prisma.SourceOfIncomeCategoryUncheckedCreateNestedManyWithoutUserInput
@@ -285,6 +299,7 @@ export type UserUncheckedCreateInput = {
 export type UserUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.SourceOfIncomeCategoryUpdateManyWithoutUserNestedInput
@@ -296,6 +311,7 @@ export type UserUpdateInput = {
 export type UserUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.SourceOfIncomeCategoryUncheckedUpdateManyWithoutUserNestedInput
@@ -307,6 +323,7 @@ export type UserUncheckedUpdateInput = {
 export type UserCreateManyInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -314,6 +331,7 @@ export type UserCreateManyInput = {
 export type UserUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -321,6 +339,7 @@ export type UserUpdateManyMutationInput = {
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -328,6 +347,7 @@ export type UserUncheckedUpdateManyInput = {
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   external_id?: Prisma.SortOrder
+  country?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -339,6 +359,7 @@ export type UserAvgOrderByAggregateInput = {
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   external_id?: Prisma.SortOrder
+  country?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -346,6 +367,7 @@ export type UserMaxOrderByAggregateInput = {
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   external_id?: Prisma.SortOrder
+  country?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
 }
@@ -482,6 +504,7 @@ export type UserUpdateOneRequiredWithoutExpensesNestedInput = {
 export type UserCreateWithoutCategoriesInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   sources_of_income?: Prisma.SourceOfIncomeCreateNestedManyWithoutUserInput
@@ -492,6 +515,7 @@ export type UserCreateWithoutCategoriesInput = {
 export type UserUncheckedCreateWithoutCategoriesInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   sources_of_income?: Prisma.SourceOfIncomeUncheckedCreateNestedManyWithoutUserInput
@@ -530,6 +554,7 @@ export type UserUpdateToOneWithWhereWithoutCategoriesInput = {
 export type UserUpdateWithoutCategoriesInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sources_of_income?: Prisma.SourceOfIncomeUpdateManyWithoutUserNestedInput
@@ -540,6 +565,7 @@ export type UserUpdateWithoutCategoriesInput = {
 export type UserUncheckedUpdateWithoutCategoriesInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sources_of_income?: Prisma.SourceOfIncomeUncheckedUpdateManyWithoutUserNestedInput
@@ -550,6 +576,7 @@ export type UserUncheckedUpdateWithoutCategoriesInput = {
 export type UserCreateWithoutSources_of_incomeInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   categories?: Prisma.SourceOfIncomeCategoryCreateNestedManyWithoutUserInput
@@ -560,6 +587,7 @@ export type UserCreateWithoutSources_of_incomeInput = {
 export type UserUncheckedCreateWithoutSources_of_incomeInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   categories?: Prisma.SourceOfIncomeCategoryUncheckedCreateNestedManyWithoutUserInput
@@ -598,6 +626,7 @@ export type UserUpdateToOneWithWhereWithoutSources_of_incomeInput = {
 export type UserUpdateWithoutSources_of_incomeInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.SourceOfIncomeCategoryUpdateManyWithoutUserNestedInput
@@ -608,6 +637,7 @@ export type UserUpdateWithoutSources_of_incomeInput = {
 export type UserUncheckedUpdateWithoutSources_of_incomeInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.SourceOfIncomeCategoryUncheckedUpdateManyWithoutUserNestedInput
@@ -618,6 +648,7 @@ export type UserUncheckedUpdateWithoutSources_of_incomeInput = {
 export type UserCreateWithoutPayment_methodsInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   categories?: Prisma.SourceOfIncomeCategoryCreateNestedManyWithoutUserInput
@@ -628,6 +659,7 @@ export type UserCreateWithoutPayment_methodsInput = {
 export type UserUncheckedCreateWithoutPayment_methodsInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   categories?: Prisma.SourceOfIncomeCategoryUncheckedCreateNestedManyWithoutUserInput
@@ -666,6 +698,7 @@ export type UserUpdateToOneWithWhereWithoutPayment_methodsInput = {
 export type UserUpdateWithoutPayment_methodsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.SourceOfIncomeCategoryUpdateManyWithoutUserNestedInput
@@ -676,6 +709,7 @@ export type UserUpdateWithoutPayment_methodsInput = {
 export type UserUncheckedUpdateWithoutPayment_methodsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.SourceOfIncomeCategoryUncheckedUpdateManyWithoutUserNestedInput
@@ -686,6 +720,7 @@ export type UserUncheckedUpdateWithoutPayment_methodsInput = {
 export type UserCreateWithoutExpensesInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   categories?: Prisma.SourceOfIncomeCategoryCreateNestedManyWithoutUserInput
@@ -696,6 +731,7 @@ export type UserCreateWithoutExpensesInput = {
 export type UserUncheckedCreateWithoutExpensesInput = {
   id?: bigint | number
   external_id: string
+  country?: string
   created_at?: Date | string
   updated_at?: Date | string
   categories?: Prisma.SourceOfIncomeCategoryUncheckedCreateNestedManyWithoutUserInput
@@ -734,6 +770,7 @@ export type UserUpdateToOneWithWhereWithoutExpensesInput = {
 export type UserUpdateWithoutExpensesInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.SourceOfIncomeCategoryUpdateManyWithoutUserNestedInput
@@ -744,6 +781,7 @@ export type UserUpdateWithoutExpensesInput = {
 export type UserUncheckedUpdateWithoutExpensesInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   external_id?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   categories?: Prisma.SourceOfIncomeCategoryUncheckedUpdateManyWithoutUserNestedInput
@@ -825,6 +863,7 @@ export type UserSelect<
   {
     id?: boolean
     external_id?: boolean
+    country?: boolean
     created_at?: boolean
     updated_at?: boolean
     categories?: boolean | Prisma.User$categoriesArgs<ExtArgs>
@@ -842,6 +881,7 @@ export type UserSelectCreateManyAndReturn<
   {
     id?: boolean
     external_id?: boolean
+    country?: boolean
     created_at?: boolean
     updated_at?: boolean
   },
@@ -854,6 +894,7 @@ export type UserSelectUpdateManyAndReturn<
   {
     id?: boolean
     external_id?: boolean
+    country?: boolean
     created_at?: boolean
     updated_at?: boolean
   },
@@ -863,6 +904,7 @@ export type UserSelectUpdateManyAndReturn<
 export type UserSelectScalar = {
   id?: boolean
   external_id?: boolean
+  country?: boolean
   created_at?: boolean
   updated_at?: boolean
 }
@@ -870,7 +912,7 @@ export type UserSelectScalar = {
 export type UserOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'external_id' | 'created_at' | 'updated_at',
+  'id' | 'external_id' | 'country' | 'created_at' | 'updated_at',
   ExtArgs['result']['user']
 >
 export type UserInclude<
@@ -903,6 +945,7 @@ export type $UserPayload<
     {
       id: bigint
       external_id: string
+      country: string
       created_at: Date
       updated_at: Date
     },
@@ -1492,6 +1535,7 @@ export interface Prisma__UserClient<
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<'User', 'BigInt'>
   readonly external_id: Prisma.FieldRef<'User', 'String'>
+  readonly country: Prisma.FieldRef<'User', 'String'>
   readonly created_at: Prisma.FieldRef<'User', 'DateTime'>
   readonly updated_at: Prisma.FieldRef<'User', 'DateTime'>
 }

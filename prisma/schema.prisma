@@ -10,6 +10,7 @@ datasource db {
 model User {
   id                BigInt                   @id @default(autoincrement())
   external_id       String                   @unique
+  country           String                   @default("BR")
   categories        SourceOfIncomeCategory[]
   sources_of_income SourceOfIncome[]
   payment_methods   PaymentMethod[]
@@ -37,6 +38,7 @@ model SourceOfIncome {
   name        String
   category_id BigInt
   income      Float                  @default(0)
+  currency    String                 @default("USD")
   user_id     BigInt
   user        User                   @relation(fields: [user_id], references: [id])
   category    SourceOfIncomeCategory @relation(fields: [category_id], references: [id])
