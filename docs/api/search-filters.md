@@ -279,6 +279,7 @@ Search sources of income belonging to the authenticated user.
 |-------|------|
 | `name` | `string` |
 | `income` | `float` |
+| `currency` | `string` |
 | `created_at` | `datetime` |
 | `updated_at` | `datetime` |
 
@@ -312,6 +313,7 @@ Content-Type: application/json
         "user_id": "clx0user00001",
         "name": "Main job",
         "income": 5000.00,
+        "currency": "USD",
         "category_id": "clx3cat000001",
         "created_at": "2024-02-01T08:00:00.000Z",
         "updated_at": "2024-02-01T08:00:00.000Z"
@@ -323,6 +325,7 @@ Content-Type: application/json
         "user_id": "clx0user00001",
         "name": "Consulting",
         "income": 1500.00,
+        "currency": "USD",
         "category_id": "clx3cat000002",
         "created_at": "2024-02-15T10:00:00.000Z",
         "updated_at": "2024-02-15T10:00:00.000Z"
