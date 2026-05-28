@@ -19,14 +19,14 @@ export const SourceOfIncomeCreateBody = t.Object({
   name: t.String({ minLength: 1 }),
   category_id: t.Integer(),
   income: t.Optional(t.Number({ minimum: 0 })),
-  currency: t.Optional(t.String({ minLength: 3, maxLength: 3 })),
+  currency: t.Optional(t.String({ minLength: 3, maxLength: 3, pattern: '^[A-Z]{3}$' })),
 })
 
 export const SourceOfIncomeUpdateBody = t.Object({
   name: t.Optional(t.String({ minLength: 1 })),
   category_id: t.Optional(t.Integer()),
   income: t.Optional(t.Number({ minimum: 0 })),
-  currency: t.Optional(t.String({ minLength: 3, maxLength: 3 })),
+  currency: t.Optional(t.String({ minLength: 3, maxLength: 3, pattern: '^[A-Z]{3}$' })),
 })
 
 export type SourceOfIncomeCreateBodyType = Static<typeof SourceOfIncomeCreateBody>

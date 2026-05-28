@@ -5,7 +5,7 @@ export const UpdateCountrySchema = z.object({
     .string()
     .length(2)
     .transform((value) => value.toUpperCase())
-    .regex(/^[A-Z]{2}$/),
+    .refine((value) => /^[A-Z]{2}$/.test(value)),
 })
 
 export type UpdateCountryInput = z.infer<typeof UpdateCountrySchema>

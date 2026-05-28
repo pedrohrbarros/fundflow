@@ -904,6 +904,7 @@ export type TransactionIsolationLevel =
 export const UserScalarFieldEnum = {
   id: 'id',
   external_id: 'external_id',
+  country: 'country',
   created_at: 'created_at',
   updated_at: 'updated_at',
 } as const
@@ -926,6 +927,7 @@ export const SourceOfIncomeScalarFieldEnum = {
   name: 'name',
   category_id: 'category_id',
   income: 'income',
+  currency: 'currency',
   user_id: 'user_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
