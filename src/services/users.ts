@@ -2,7 +2,7 @@ import { db } from '../config/db'
 import type { ServiceResult } from './types'
 
 export type UserRecord = {
-  id: string
+  id: number
   country: string
   created_at: string
   updated_at: string
@@ -16,7 +16,7 @@ export const UserService = {
       return {
         ok: true,
         data: {
-          id: user.id.toString(),
+          id: Number(user.id),
           country: user.country,
           created_at: user.created_at.toISOString(),
           updated_at: user.updated_at.toISOString(),
@@ -46,7 +46,7 @@ export const UserService = {
       return {
         ok: true,
         data: {
-          id: updated.id.toString(),
+          id: Number(updated.id),
           country: updated.country,
           created_at: updated.created_at.toISOString(),
           updated_at: updated.updated_at.toISOString(),

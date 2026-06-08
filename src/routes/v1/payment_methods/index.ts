@@ -4,38 +4,64 @@ import { searchPaymentMethods } from './search'
 import { updatePaymentMethod } from './update'
 import { deletePaymentMethod } from './delete'
 import { PaymentMethodCreateBody, PaymentMethodUpdateBody } from '../../../types/payment_methods'
+import { PaymentMethodSearchBody } from '../../../types/search'
+import {
+  PaymentMethodResponse,
+  PaymentMethodSearchResponse,
+  DeletedResponse,
+} from '../../../types/responses'
 import type { RouteHandler } from '../../../types/routes'
+
+const s = (schema: object) => ({
+  'application/json': { schema: schema as Record<string, unknown> },
+})
 
 export const payment_methods = new Elysia()
   .post('/payment_methods', createPaymentMethod as RouteHandler, {
     detail: {
-      security: [{ bearerAuth: [] }],
+      tags: ['Payment Methods'],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
-        content: {
-          'application/json': {
-            schema: PaymentMethodCreateBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(PaymentMethodCreateBody),
+      },
+      responses: {
+        '201': { description: 'Created', content: s(PaymentMethodResponse) },
       },
     },
   })
   .post('/payment_methods/search', searchPaymentMethods as RouteHandler, {
-    detail: { security: [{ bearerAuth: [] }] },
+    detail: {
+      tags: ['Payment Methods'],
+      security: [{ apiKey: [] }],
+      requestBody: {
+        required: false,
+        content: s(PaymentMethodSearchBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(PaymentMethodSearchResponse) },
+      },
+    },
   })
   .patch('/payment_methods/:id', updatePaymentMethod as RouteHandler, {
     detail: {
-      security: [{ bearerAuth: [] }],
+      tags: ['Payment Methods'],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
-        content: {
-          'application/json': {
-            schema: PaymentMethodUpdateBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(PaymentMethodUpdateBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(PaymentMethodResponse) },
       },
     },
   })
   .delete('/payment_methods/:id', deletePaymentMethod as RouteHandler, {
-    detail: { security: [{ bearerAuth: [] }] },
+    detail: {
+      tags: ['Payment Methods'],
+      security: [{ apiKey: [] }],
+      responses: {
+        '200': { description: 'OK', content: s(DeletedResponse) },
+      },
+    },
   })

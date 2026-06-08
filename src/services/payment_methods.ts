@@ -29,11 +29,11 @@ export const PaymentMethodsService = {
       return {
         ok: true,
         data: {
-          id: payment_method.id.toString(),
+          id: Number(payment_method.id),
           name: payment_method.name,
           origin: payment_method.origin,
           receiver: payment_method.receiver,
-          user_id: payment_method.user_id.toString(),
+          user_id: Number(payment_method.user_id),
           created_at: payment_method.created_at.toISOString(),
           updated_at: payment_method.updated_at.toISOString(),
         },
@@ -74,11 +74,11 @@ export const PaymentMethodsService = {
         ok: true,
         data: {
           payment_methods: payment_methods.map((pm) => ({
-            id: pm.id.toString(),
+            id: Number(pm.id),
             name: pm.name,
             origin: pm.origin,
             receiver: pm.receiver,
-            user_id: pm.user_id.toString(),
+            user_id: Number(pm.user_id),
             created_at: pm.created_at.toISOString(),
             updated_at: pm.updated_at.toISOString(),
           })),
@@ -113,11 +113,11 @@ export const PaymentMethodsService = {
       return {
         ok: true,
         data: {
-          id: payment_method.id.toString(),
+          id: Number(payment_method.id),
           name: payment_method.name,
           origin: payment_method.origin,
           receiver: payment_method.receiver,
-          user_id: payment_method.user_id.toString(),
+          user_id: Number(payment_method.user_id),
           created_at: payment_method.created_at.toISOString(),
           updated_at: payment_method.updated_at.toISOString(),
         },

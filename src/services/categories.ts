@@ -3,7 +3,7 @@ import type { ServiceResult } from './types'
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
 
-type CategoryRecord = { id: string; name: string; created_at: string; updated_at: string }
+type CategoryRecord = { id: number; name: string; created_at: string; updated_at: string }
 
 type CategoryListData = {
   categories: CategoryRecord[]
@@ -24,7 +24,7 @@ export const CategoriesService = {
       return {
         ok: true,
         data: {
-          id: category.id.toString(),
+          id: Number(category.id),
           name: category.name,
           created_at: category.created_at.toISOString(),
           updated_at: category.updated_at.toISOString(),
@@ -66,7 +66,7 @@ export const CategoriesService = {
         ok: true,
         data: {
           categories: categories.map((c) => ({
-            id: c.id.toString(),
+            id: Number(c.id),
             name: c.name,
             created_at: c.created_at.toISOString(),
             updated_at: c.updated_at.toISOString(),
@@ -99,7 +99,7 @@ export const CategoriesService = {
       return {
         ok: true,
         data: {
-          id: category.id.toString(),
+          id: Number(category.id),
           name: category.name,
           created_at: category.created_at.toISOString(),
           updated_at: category.updated_at.toISOString(),

@@ -23,9 +23,9 @@ function toRecord(source: {
   updated_at: Date
 }): SourceOfIncomeRecord {
   return {
-    id: source.id.toString(),
+    id: Number(source.id),
     name: source.name,
-    category_id: source.category_id.toString(),
+    category_id: Number(source.category_id),
     income: source.income,
     currency: source.currency,
     created_at: source.created_at.toISOString(),

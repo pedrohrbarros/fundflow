@@ -7,6 +7,7 @@ Shared utility modules used across routes and services.
 Parses and validates `page` and `limit` query/body parameters.
 
 **Exports:**
+
 - `parsePagination(query)` — returns `PaginationResult` (`{ ok: true, page, limit }` or `{ ok: false, error }`)
 - `PAGINATION_DEFAULT_PAGE` = 1
 - `PAGINATION_DEFAULT_LIMIT` = 20
@@ -18,11 +19,13 @@ Parses and validates `page` and `limit` query/body parameters.
 Validates a recursive AND/OR filter tree and converts it to a Prisma `where` clause.
 
 **Exports:**
+
 - `parseFilterBody(raw, allowlist)` — validates a raw JSON value as a `FilterNode` against the given field allowlist. Returns `FilterResult` (`{ ok: true, node }` or `{ ok: false, error }`).
 - `buildWhereClause(node)` — converts a validated `FilterNode` to a Prisma-compatible `where` fragment.
 - Types: `FieldType`, `FieldAllowlist`, `FilterOp`, `FilterValue`, `FilterCondition`, `FilterGroup`, `FilterNode`, `FilterResult`
 
 **Usage pattern:**
+
 ```ts
 const ALLOWED_FIELDS: FieldAllowlist = {
   name: 'string',

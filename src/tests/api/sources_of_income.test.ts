@@ -39,7 +39,7 @@ const req = async (method: string, path: string, body?: unknown) => {
   )
 }
 
-let test_category_id: string
+let test_category_id: number
 
 beforeAll(async () => {
   await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
@@ -91,11 +91,11 @@ describe('Sources of Income API', () => {
     const all_sources = Object.values(
       json.sources_of_income as Record<
         string,
-        { id: string; name: string; income: number; currency: string }[]
+        { id: number; name: string; income: number; currency: string }[]
       >
     ).flat()
     const first_source = all_sources[0]
-    expect(typeof first_source.id).toBe('string')
+    expect(typeof first_source.id).toBe('number')
     expect(typeof first_source.name).toBe('string')
     expect(typeof first_source.income).toBe('number')
     expect(typeof first_source.currency).toBe('string')

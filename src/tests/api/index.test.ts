@@ -2,7 +2,7 @@ import { describe, it, expect } from 'bun:test'
 import { app } from '../../index'
 
 describe('Documentation endpoints', () => {
-  it('GET /openapi.json returns a valid OpenAPI 3.0 spec', async () => {
+  it('GET /openapi/json returns a valid OpenAPI 3.0 spec', async () => {
     const response = await app.handle(new Request('http://localhost/openapi/json'))
     expect(response.status).toBe(200)
     const json = await response.json()
@@ -11,21 +11,30 @@ describe('Documentation endpoints', () => {
     expect(json.info.version).toBe('1.0.0')
   })
 
-  it('GET /openapi/json spec includes bearerAuth security scheme', async () => {
+  it('GET /openapi/json spec includes apiKey security scheme', async () => {
     const response = await app.handle(new Request('http://localhost/openapi/json'))
     const json = await response.json()
-    const bearerAuth = json.components?.securitySchemes?.bearerAuth
-    expect(bearerAuth).toBeDefined()
-    expect(bearerAuth.type).toBe('http')
-    expect(bearerAuth.scheme).toBe('bearer')
+    const apiKey = json.components?.securitySchemes?.apiKey
+    expect(apiKey).toBeDefined()
+    expect(apiKey.type).toBe('apiKey')
+    expect(apiKey.in).toBe('header')
+    expect(apiKey.name).toBe('X-Api-Key')
   })
 
-  it('GET /docs returns an HTML page embedding ReDoc', async () => {
+  it('GET /openapi/json spec does not expose webhook routes', async () => {
+    const response = await app.handle(new Request('http://localhost/openapi/json'))
+    const json = await response.json()
+    const paths = Object.keys(json.paths ?? {})
+    expect(paths.some((p) => p.includes('webhook'))).toBe(false)
+  })
+
+  it('GET /docs returns an HTML page embedding Swagger UI', async () => {
     const response = await app.handle(new Request('http://localhost/docs'))
     expect(response.status).toBe(200)
     expect(response.headers.get('Content-Type')).toContain('text/html')
     const html = await response.text()
-    expect(html).toContain('<redoc')
+    expect(html).toContain('swagger-ui')
     expect(html).toContain('/openapi/json')
+    expect(html).toContain('X-Docs-Mode')
   })
 })

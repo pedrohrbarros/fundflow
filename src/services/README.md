@@ -16,27 +16,36 @@ Handlers call `handleError(set, result.status, result.message, result.meta)` whe
 
 ## Modules
 
-| File                   | Export                   | Responsibility                                        |
-| ---------------------- | ------------------------ | ----------------------------------------------------- |
-| `categories.ts`        | `CategoriesService`      | CRUD + `search()` for `SourceOfIncomeCategory`        |
-| `sources_of_income.ts` | `SourcesOfIncomeService` | CRUD + `search()` for `SourceOfIncome`                |
-| `payment_methods.ts`   | `PaymentMethodsService`  | User-scoped CRUD + `search()` for `PaymentMethod`     |
-| `expenses.ts`          | `ExpensesService`        | User-scoped CRUD + `search()` for `Expense`           |
+| File                   | Export                   | Responsibility                                    |
+| ---------------------- | ------------------------ | ------------------------------------------------- |
+| `categories.ts`        | `CategoriesService`      | CRUD + `search()` for `SourceOfIncomeCategory`    |
+| `sources_of_income.ts` | `SourcesOfIncomeService` | CRUD + `search()` for `SourceOfIncome`            |
+| `payment_methods.ts`   | `PaymentMethodsService`  | User-scoped CRUD + `search()` for `PaymentMethod` |
+| `expenses.ts`          | `ExpensesService`        | User-scoped CRUD + `search()` for `Expense`       |
+| `users.ts`             | `UserService`            | `getMe()` and `updateCountry()` for `User`        |
+| `docs.ts`              | `DocsService`            | Monthly test user lifecycle for Swagger UI access |
+| `webhooks/clerk.ts`    | —                        | Clerk webhook business logic (create/delete user) |
 
 ## User-Scoped Services
 
-Services that operate on user-owned records (e.g. `PaymentMethodsService`) accept `user_external_id: string` (the Clerk `sub` claim) and resolve the internal `user_id` themselves via `db.user.findUnique({ where: { external_id } })`. This keeps the handler unaware of the internal ID mapping and ensures ownership is always enforced at the service layer.
+Services that operate on user-owned records accept `user_external_id: string` (the Clerk `sub` claim) and resolve the internal `user_id` themselves via `db.user.findUnique({ where: { external_id } })`. This keeps handlers unaware of the internal ID mapping and ensures ownership is always enforced at the service layer.
+
+## DocsService
+
+`DocsService.findOrCreateMonthlyTestUser()` manages a synthetic user for Swagger UI testing:
+
+- Returns the existing `docs-test-user-YYYY-MM` user if it exists for the current month
+- Deletes any stale test users from previous months and creates a fresh one otherwise
+- Uses `upsert` to handle concurrent requests safely
 
 ## Caching
 
-Search endpoints are not cached. The filter key space is unbounded (any combination of filters × pages × limits), making per-response caching ineffective. All four search services query the database directly on every request.
-
-`create`, `update`, and `remove` methods no longer call cache invalidation — there is no cache to invalidate.
+Search endpoints are not cached. The filter key space is unbounded (any combination of filters × pages × limits), making per-response caching ineffective. All search services query the database directly on every request.
 
 ## Error Codes
 
-| Prisma error code | Meaning                          | Returned status |
-| ----------------- | -------------------------------- | --------------- |
-| `P2025`           | Record not found                 | 404             |
-| `P2003`           | Foreign key constraint failed    | 404             |
-| (any other)       | Unexpected DB error              | 500             |
+| Prisma error code | Meaning                       | Returned status |
+| ----------------- | ----------------------------- | --------------- |
+| `P2025`           | Record not found              | 404             |
+| `P2003`           | Foreign key constraint failed | 404             |
+| (any other)       | Unexpected DB error           | 500             |

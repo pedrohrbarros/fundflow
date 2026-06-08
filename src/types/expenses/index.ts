@@ -2,7 +2,7 @@ import { t } from 'elysia'
 import type { Static } from '@sinclair/typebox'
 
 export type ExpensePaymentMethodRecord = {
-  payment_method_id: string
+  payment_method_id: number
   partial_amount: number
   name: string
   origin: string
@@ -10,7 +10,7 @@ export type ExpensePaymentMethodRecord = {
 }
 
 export type ExpenseRecord = {
-  id: string
+  id: number
   name: string
   amount: number
   is_paid: boolean

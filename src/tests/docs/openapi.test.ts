@@ -9,16 +9,21 @@ describe('open_api_config', () => {
     expect(info.version).toBe('1.0.0')
   })
 
-  it('defines bearerAuth HTTP security scheme', () => {
+  it('defines apiKey security scheme on X-Api-Key header', () => {
     const schemes = open_api_config.documentation.components?.securitySchemes as Record<
       string,
       unknown
     >
-    expect(schemes?.bearerAuth).toEqual({
-      type: 'http',
-      scheme: 'bearer',
-      description: 'Bearer token authentication (JWT or similar)',
+    expect(schemes?.apiKey).toEqual({
+      type: 'apiKey',
+      in: 'header',
+      name: 'X-Api-Key',
+      description: 'API key for Swagger documentation access',
     })
+  })
+
+  it('applies apiKey security globally', () => {
+    expect(open_api_config.documentation.security).toEqual([{ apiKey: [] }])
   })
 
   it('configures the swagger path as /openapi', () => {

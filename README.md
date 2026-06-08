@@ -9,13 +9,17 @@ A lightweight financial monitoring API that tracks a user's financial state and 
 - **Language:** TypeScript
 - **Database:** PostgreSQL via [Supabase](https://supabase.com/) + [Prisma 7](https://www.prisma.io/)
 - **Cache:** Redis
-- **Documentation:** OpenAPI 3.0 / ReDoc
+- **Auth:** [Clerk](https://clerk.com/) (JWT verification)
+- **Documentation:** OpenAPI 3.0 / Swagger UI
 
 ## Getting Started
 
 ### Prerequisites
 
 - [Bun](https://bun.sh/) v1.0+
+- A [Supabase](https://supabase.com/) project (PostgreSQL)
+- A [Clerk](https://clerk.com/) application
+- A Redis instance
 
 ### Installation
 
@@ -28,16 +32,28 @@ bun install
 Create a `.env` file in the project root:
 
 ```env
-API_KEY=your_secret_key
+PORT=8000
 DATABASE_URL=postgresql://user:password@host:5432/dbname
 REDIS_URL=redis://localhost:6379
+API_TOKEN=your_secret_token
+ALLOWED_ORIGINS=["http://localhost:3000"]
+CLERK_ISSUER=https://<your-clerk-instance>.clerk.accounts.dev
+CLERK_AUTHORIZED_PARTY=http://localhost:3000
+LOG_LEVEL=info
+NODE_ENV=development
 ```
 
-| Variable       | Required | Description                                    |
-| -------------- | -------- | ---------------------------------------------- |
-| `API_KEY`      | Yes      | Bearer token used to authenticate API requests |
-| `DATABASE_URL` | Yes      | PostgreSQL connection string (Supabase)        |
-| `REDIS_URL`    | Yes      | Redis connection string                        |
+| Variable                 | Required | Description                                                               |
+| ------------------------ | -------- | ------------------------------------------------------------------------- |
+| `PORT`                   | No       | Port to listen on (default: `8000`)                                       |
+| `DATABASE_URL`           | Yes      | PostgreSQL connection string (Supabase)                                   |
+| `REDIS_URL`              | Yes      | Redis connection string                                                   |
+| `API_TOKEN`              | Yes      | Static token used to authenticate API requests and Swagger UI access      |
+| `ALLOWED_ORIGINS`        | No       | JSON array of allowed CORS origins (default: `["http://localhost:3000"]`) |
+| `CLERK_ISSUER`           | Yes      | Clerk instance URL, used to fetch the public key for JWT verification     |
+| `CLERK_AUTHORIZED_PARTY` | No       | Expected `azp` claim in Clerk JWTs (rejects tokens from other origins)    |
+| `LOG_LEVEL`              | No       | Minimum log level (default: `info`)                                       |
+| `NODE_ENV`               | No       | Set to `production` for JSON-only log output                              |
 
 ### Running the Server
 
@@ -45,178 +61,169 @@ REDIS_URL=redis://localhost:6379
 bun run dev
 ```
 
-Server starts at `http://localhost:3000`.
+Server starts at `http://localhost:8000`.
 
 ## API Reference
 
-Interactive documentation is available at `http://localhost:3000/docs` (ReDoc UI).
+Interactive documentation is available at `http://localhost:8000/docs` (Swagger UI).
 
-### Endpoints
+To use the docs:
 
-| Method | Path            | Auth | Rate limit | Description                      |
-| ------ | --------------- | ---- | ---------- | -------------------------------- |
-| `GET`  | `/`             | No   | —          | Health check                     |
-| `GET`  | `/openapi/json` | No   | —          | OpenAPI 3.0 specification (JSON) |
-| `GET`  | `/docs`         | No   | —          | Interactive API documentation    |
+1. Open `http://localhost:8000/docs`
+2. Click **Authorize** and enter the value of `API_TOKEN` (without quotes)
+3. The UI will attach `X-Api-Key` to every request and auto-create a monthly test user as the authenticated identity
+
+### System Endpoints
+
+| Method | Path            | Auth | Description                      |
+| ------ | --------------- | ---- | -------------------------------- |
+| `GET`  | `/`             | No   | Health check                     |
+| `GET`  | `/openapi/json` | No   | OpenAPI 3.0 specification (JSON) |
+| `GET`  | `/docs`         | No   | Swagger UI                       |
 
 ### Webhooks
 
-| Method | Path                          | Auth | Rate limit | IP allowlist   | Description                                      |
-| ------ | ----------------------------- | ---- | ---------- | -------------- | ------------------------------------------------ |
-| `POST` | `/v1/webhooks/clerk/register` | Svix | 50 req/min | Clerk IPs only | Clerk `user.created` event → creates user record |
+| Method | Path                              | Auth   | Description                                             |
+| ------ | --------------------------------- | ------ | ------------------------------------------------------- |
+| `POST` | `/api/v1/webhooks/clerk/register` | Bearer | Creates a user record from a Clerk `user.created` event |
+| `POST` | `/api/v1/webhooks/clerk/delete`   | Bearer | Deletes a user record from a Clerk `user.deleted` event |
 
-The rate limit (50 req/min) applies to all `/v1/webhooks/*` routes. Requests from IPs outside Clerk's published ranges are rejected with `403` before reaching the handler. The full allowlist is in `src/constants/api/webhooks/rules/clerk.ts`.
+Webhook endpoints verify the Svix signature and enforce Clerk's IP allowlist. Rate-limited to 50 req/min.
+
+### Protected Endpoints
+
+All endpoints below require `X-Api-Key: <API_TOKEN>` plus a valid Clerk JWT in `Authorization: Bearer <token>`.
+
+#### Categories
+
+| Method   | Path                        | Description                             |
+| -------- | --------------------------- | --------------------------------------- |
+| `POST`   | `/api/v1/categories`        | Create a category                       |
+| `POST`   | `/api/v1/categories/search` | Search categories with optional filters |
+| `PATCH`  | `/api/v1/categories/:id`    | Update a category                       |
+| `DELETE` | `/api/v1/categories/:id`    | Delete a category                       |
+
+#### Sources of Income
+
+| Method   | Path                               | Description                          |
+| -------- | ---------------------------------- | ------------------------------------ |
+| `POST`   | `/api/v1/sources_of_income`        | Create a source of income            |
+| `POST`   | `/api/v1/sources_of_income/search` | Search sources with optional filters |
+| `PATCH`  | `/api/v1/sources_of_income/:id`    | Update a source of income            |
+| `DELETE` | `/api/v1/sources_of_income/:id`    | Delete a source of income            |
+
+#### Payment Methods
+
+| Method   | Path                             | Description             |
+| -------- | -------------------------------- | ----------------------- |
+| `POST`   | `/api/v1/payment_methods`        | Create a payment method |
+| `POST`   | `/api/v1/payment_methods/search` | Search payment methods  |
+| `PATCH`  | `/api/v1/payment_methods/:id`    | Update a payment method |
+| `DELETE` | `/api/v1/payment_methods/:id`    | Delete a payment method |
+
+#### Expenses
+
+| Method   | Path                      | Description                           |
+| -------- | ------------------------- | ------------------------------------- |
+| `POST`   | `/api/v1/expenses`        | Create an expense                     |
+| `POST`   | `/api/v1/expenses/search` | Search expenses with optional filters |
+| `PATCH`  | `/api/v1/expenses/:id`    | Update an expense                     |
+| `DELETE` | `/api/v1/expenses/:id`    | Delete an expense                     |
+
+#### Users
+
+| Method  | Path                    | Description                |
+| ------- | ----------------------- | -------------------------- |
+| `GET`   | `/api/v1/users/me`      | Get the authenticated user |
+| `PATCH` | `/api/v1/users/country` | Update the user's country  |
 
 ### Authentication
 
-Protected routes use Bearer token authentication. Include the `API_KEY` value from your `.env` in the `Authorization` header:
+**Webhook endpoints** use a static Bearer token:
 
 ```
-Authorization: Bearer <API_KEY>
+Authorization: Bearer <API_TOKEN>
 ```
 
-To protect a route, add `requireAuth` as a `beforeHandle` hook:
+**All other endpoints** require both headers:
 
-```typescript
-import { requireAuth } from './middleware/auth'
-
-app.get('/protected', handler, { beforeHandle: requireAuth })
+```
+Authorization: Bearer <CLERK_JWT>
+X-Api-Key: <API_TOKEN>
 ```
 
 ## Logging
 
-Structured logging via [pino](https://github.com/pinojs/pino). In development, output is pretty-printed with color; in production, it is newline-delimited JSON.
-
-### Log levels
-
-Controlled by the `LOG_LEVEL` environment variable (default: `info`).
+Structured logging via [pino](https://github.com/pinojs/pino). In development, output is pretty-printed; in production, newline-delimited JSON.
 
 | Level   | Used for                                          |
 | ------- | ------------------------------------------------- |
 | `error` | Unhandled request errors                          |
-| `warn`  | DB warnings                                       |
+| `warn`  | Auth failures, DB warnings                        |
 | `info`  | Request lifecycle (incoming + completed), DB info |
 | `debug` | DB queries (SQL + duration, params redacted)      |
 
-### Loggers
-
-| Export             | Context field | Where used                                 |
-| ------------------ | ------------- | ------------------------------------------ |
-| `logger`           | —             | App startup (`src/index.ts`)               |
-| `endpoint_logger`  | `endpoint`    | `onRequest`, `onAfterResponse`, `onError`  |
-| `db_logger`        | `db`          | Prisma query/info/warn/error events        |
-| `migration_logger` | `migration`   | Available for TypeScript migration scripts |
-
-### DB query logging
-
-DB queries are logged at `debug` level only. `e.params` (bound values) is intentionally excluded to avoid logging PII. To see queries locally:
+To see DB queries locally:
 
 ```bash
 LOG_LEVEL=debug bun run dev
 ```
 
-### Environment variables
-
-| Variable    | Required | Description                              |
-| ----------- | -------- | ---------------------------------------- |
-| `LOG_LEVEL` | No       | Minimum log level (default: `info`)      |
-| `NODE_ENV`  | No       | Set to `production` for JSON-only output |
-
 ## Development
 
 ### Code Formatting
 
-This project uses [Prettier](https://prettier.io/) for code formatting. Formatting runs automatically on every commit via [Husky](https://typicode.github.io/husky/) + [lint-staged](https://github.com/lint-staged/lint-staged) — only staged files are formatted.
-
-**Config:** `.prettierrc`
-
-| Option          | Value   |
-| --------------- | ------- |
-| `semi`          | `false` |
-| `singleQuote`   | `true`  |
-| `tabWidth`      | `2`     |
-| `trailingComma` | `es5`   |
-| `printWidth`    | `100`   |
-
-To format all files manually:
+Uses [Prettier](https://prettier.io/). Formatting runs automatically on every commit via [Husky](https://typicode.github.io/husky/) + lint-staged.
 
 ```bash
-bunx prettier --write .
+bun run format        # format all files
+bunx prettier --check .  # check without writing
 ```
 
-To check for formatting issues without writing:
-
-```bash
-bunx prettier --check .
-```
-
-Git hooks are installed automatically on `bun install` via the `prepare` script.
+**Config (`.prettierrc`):** no semicolons, single quotes, 2-space indent, trailing commas (ES5), 100-char line width.
 
 ### Running Tests
 
-Run the full test suite:
-
 ```bash
-bun test
+bun test                                        # full suite
+bun test src/tests/api/categories.test.ts       # single file
+bun test --watch                                # re-run on changes
+bun test --bail                                 # stop on first failure
 ```
 
-Run a specific test file:
+**Database tests** connect to your real Supabase database — `DATABASE_URL` must be set.
+
+### Database Migrations
 
 ```bash
-bun test src/tests/middleware/auth.test.ts
-bun test src/tests/api/index.test.ts
-bun test src/tests/docs/openapi.test.ts
-bun test src/tests/db/client.test.ts
-bun test src/tests/db/user.test.ts
+bun run migrate <name>   # generate + apply migration
 ```
 
-Run tests matching a pattern:
-
-```bash
-bun test --watch          # re-run on file changes
-bun test --bail           # stop after first failure
-```
-
-**Database tests** (`src/tests/db/`) connect to your real Supabase database. Make sure `DATABASE_URL` is set in `.env` before running them.
-
-#### Test files
-
-| File                                | What it covers                                    |
-| ----------------------------------- | ------------------------------------------------- |
-| `src/tests/api/index.test.ts`       | OpenAPI JSON spec + ReDoc HTML endpoint           |
-| `src/tests/docs/openapi.test.ts`    | OpenAPI config metadata and security schemes      |
-| `src/tests/middleware/auth.test.ts` | Bearer token middleware (valid, invalid, missing) |
-| `src/tests/db/client.test.ts`       | Prisma client singleton shape                     |
-| `src/tests/db/user.test.ts`         | User model: create and clean up a record          |
+See `prisma/docs/README.md` for the full migration workflow.
 
 ### Project Structure
 
 ```
 src/
-├── index.ts                  # App entry point
-├── config/
-│   ├── db.ts                 # Prisma client singleton
-│   ├── logging.ts            # pino loggers (endpoint_logger, db_logger, migration_logger)
-│   ├── openapi.ts            # OpenAPI metadata and security schemes
-│   └── redis.ts              # Redis client
-├── middleware/
-│   └── auth.ts               # Bearer token authentication middleware
-├── routes/
-│   └── webhooks/
-│       └── clerk.ts          # Clerk webhook handlers
-└── tests/
-    ├── api/
-    │   └── index.test.ts     # Integration tests for API endpoints
-    ├── db/
-    │   ├── client.test.ts    # Prisma client singleton tests
-    │   └── user.test.ts      # User model integration tests
-    ├── docs/
-    │   └── openapi.test.ts   # OpenAPI config tests
-    └── middleware/
-        └── auth.test.ts      # Unit tests for auth middleware
+├── index.ts               # App entry point, CORS, rate limiting, route groups
+├── config/                # DB, logging, OpenAPI, Redis, Clerk config
+├── middleware/            # Auth, cache, error handling
+├── constants/             # Static rules (rate limits, IP allowlists)
+├── helpers/               # Pagination, filter parsing
+├── schemas/               # Zod request body schemas
+├── services/              # Business logic (ServiceResult pattern)
+├── routes/v1/             # Route handlers grouped by resource
+├── types/                 # TypeScript types and TypeBox schemas
+└── tests/                 # Integration, unit, security, and stress tests
 
 prisma/
-├── schema.prisma             # Prisma schema (PostgreSQL / Supabase)
-└── docs/
-    └── README.md             # Schema reference + migration guide
+├── schema.prisma          # Prisma ORM schema
+├── migrations/            # Migration history (generated)
+└── docs/README.md         # Schema reference + migration guide
+
+supabase/
+└── migrations/            # Supabase SQL migration files
+
+scripts/
+└── migrate.sh             # Combined Prisma + Supabase migration script
 ```

@@ -2,9 +2,9 @@ import { t } from 'elysia'
 import type { Static } from '@sinclair/typebox'
 
 export type SourceOfIncomeRecord = {
-  id: string
+  id: number
   name: string
-  category_id: string
+  category_id: number
   income: number
   currency: string
   created_at: string

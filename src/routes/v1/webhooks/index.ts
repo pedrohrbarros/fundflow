@@ -61,6 +61,7 @@ export const webhooks = new Elysia()
   .post('/webhooks/clerk/register', clerkRegisterWebhook, {
     beforeHandle: clerkIpGuard as never,
     detail: {
+      hide: true,
       security: [{ bearerAuth: [] }],
       parameters: svixHeaderDetail,
       requestBody: {
@@ -76,6 +77,7 @@ export const webhooks = new Elysia()
   .post('/webhooks/clerk/delete', clerkDeleteWebhook, {
     beforeHandle: clerkIpGuard as never,
     detail: {
+      hide: true,
       security: [{ bearerAuth: [] }],
       parameters: svixHeaderDetail,
       requestBody: {
