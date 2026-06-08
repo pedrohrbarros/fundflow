@@ -7,6 +7,7 @@ import {
   SourceOfIncomeCreateBody,
   SourceOfIncomeUpdateBody,
 } from '../../../types/sources_of_income'
+import { SourceOfIncomeSearchBody } from '../../../types/search'
 import type { RouteHandler } from '../../../types/routes'
 
 export const sources_of_income = new Elysia()
@@ -25,7 +26,18 @@ export const sources_of_income = new Elysia()
     },
   })
   .post('/sources_of_income/search', searchSourcesOfIncome as RouteHandler, {
-    detail: { tags: ['Sources of Income'], security: [{ apiKey: [] }] },
+    detail: {
+      tags: ['Sources of Income'],
+      security: [{ apiKey: [] }],
+      requestBody: {
+        required: false,
+        content: {
+          'application/json': {
+            schema: SourceOfIncomeSearchBody as unknown as Record<string, unknown>,
+          },
+        },
+      },
+    },
   })
   .patch('/sources_of_income/:id', updateSourceOfIncome as RouteHandler, {
     detail: {

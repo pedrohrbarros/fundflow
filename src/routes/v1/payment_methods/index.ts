@@ -4,6 +4,7 @@ import { searchPaymentMethods } from './search'
 import { updatePaymentMethod } from './update'
 import { deletePaymentMethod } from './delete'
 import { PaymentMethodCreateBody, PaymentMethodUpdateBody } from '../../../types/payment_methods'
+import { PaymentMethodSearchBody } from '../../../types/search'
 import type { RouteHandler } from '../../../types/routes'
 
 export const payment_methods = new Elysia()
@@ -22,7 +23,18 @@ export const payment_methods = new Elysia()
     },
   })
   .post('/payment_methods/search', searchPaymentMethods as RouteHandler, {
-    detail: { tags: ['Payment Methods'], security: [{ apiKey: [] }] },
+    detail: {
+      tags: ['Payment Methods'],
+      security: [{ apiKey: [] }],
+      requestBody: {
+        required: false,
+        content: {
+          'application/json': {
+            schema: PaymentMethodSearchBody as unknown as Record<string, unknown>,
+          },
+        },
+      },
+    },
   })
   .patch('/payment_methods/:id', updatePaymentMethod as RouteHandler, {
     detail: {

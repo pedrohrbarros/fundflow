@@ -4,6 +4,7 @@ import { searchCategories } from './search'
 import { updateCategory } from './update'
 import { deleteCategory } from './delete'
 import { CategoryCreateBody, CategoryUpdateBody } from '../../../types/categories'
+import { CategorySearchBody } from '../../../types/search'
 import type { RouteHandler } from '../../../types/routes'
 
 export const categories = new Elysia()
@@ -22,7 +23,18 @@ export const categories = new Elysia()
     },
   })
   .post('/categories/search', searchCategories as RouteHandler, {
-    detail: { tags: ['Categories'], security: [{ apiKey: [] }] },
+    detail: {
+      tags: ['Categories'],
+      security: [{ apiKey: [] }],
+      requestBody: {
+        required: false,
+        content: {
+          'application/json': {
+            schema: CategorySearchBody as unknown as Record<string, unknown>,
+          },
+        },
+      },
+    },
   })
   .patch('/categories/:id', updateCategory as RouteHandler, {
     detail: {

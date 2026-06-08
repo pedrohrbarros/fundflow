@@ -4,6 +4,7 @@ import { searchExpenses } from './search'
 import { updateExpense } from './update'
 import { deleteExpense } from './delete'
 import { ExpenseCreateBody, ExpenseUpdateBody } from '../../../types/expenses'
+import { ExpenseSearchBody } from '../../../types/search'
 import type { RouteHandler } from '../../../types/routes'
 
 export const expenses = new Elysia()
@@ -22,7 +23,18 @@ export const expenses = new Elysia()
     },
   })
   .post('/expenses/search', searchExpenses as RouteHandler, {
-    detail: { tags: ['Expenses'], security: [{ apiKey: [] }] },
+    detail: {
+      tags: ['Expenses'],
+      security: [{ apiKey: [] }],
+      requestBody: {
+        required: false,
+        content: {
+          'application/json': {
+            schema: ExpenseSearchBody as unknown as Record<string, unknown>,
+          },
+        },
+      },
+    },
   })
   .patch('/expenses/:id', updateExpense as RouteHandler, {
     detail: {
