@@ -42,19 +42,6 @@ export const withClerkAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
     }
   })
 
-export const withClerkAndBearerAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
-  deriveClerkUserId(app).onBeforeHandle(({ request, clerk_user_id, set }) => {
-    const api_key = request.headers.get('X-Api-Key')
-    if (!clerk_user_id || api_key !== process.env.API_TOKEN) {
-      logger.warn(
-        { reason: !clerk_user_id ? 'invalid_jwt' : 'invalid_api_key' },
-        'Unauthorized request rejected'
-      )
-      set.status = 401
-      return { error: 'Unauthorized' }
-    }
-  })
-
 export const withUserAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
   app
     .derive(async ({ request }) => {
