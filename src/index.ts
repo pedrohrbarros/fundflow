@@ -30,7 +30,7 @@ const SWAGGER_UI_HTML = `<!DOCTYPE html>
         dom_id: '#swagger-ui',
         presets: [SwaggerUIBundle.presets.apis],
         layout: 'BaseLayout',
-        persistAuthorization: true,
+
         requestInterceptor: function(req) {
           req.headers['X-Docs-Mode'] = 'true'
           return req
