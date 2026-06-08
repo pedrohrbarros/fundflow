@@ -8,12 +8,14 @@ export const open_api_config = {
     },
     components: {
       securitySchemes: {
-        bearerAuth: {
-          type: 'http' as const,
-          scheme: 'bearer',
-          description: 'Bearer token authentication (JWT or similar)',
+        apiKey: {
+          type: 'apiKey' as const,
+          in: 'header' as const,
+          name: 'X-Api-Key',
+          description: 'API key for Swagger documentation access',
         },
       },
     },
+    security: [{ apiKey: [] }],
   },
 }

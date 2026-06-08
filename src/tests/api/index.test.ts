@@ -11,13 +11,14 @@ describe('Documentation endpoints', () => {
     expect(json.info.version).toBe('1.0.0')
   })
 
-  it('GET /openapi/json spec includes bearerAuth security scheme', async () => {
+  it('GET /openapi/json spec includes apiKey security scheme', async () => {
     const response = await app.handle(new Request('http://localhost/openapi/json'))
     const json = await response.json()
-    const bearerAuth = json.components?.securitySchemes?.bearerAuth
-    expect(bearerAuth).toBeDefined()
-    expect(bearerAuth.type).toBe('http')
-    expect(bearerAuth.scheme).toBe('bearer')
+    const apiKey = json.components?.securitySchemes?.apiKey
+    expect(apiKey).toBeDefined()
+    expect(apiKey.type).toBe('apiKey')
+    expect(apiKey.in).toBe('header')
+    expect(apiKey.name).toBe('X-Api-Key')
   })
 
   it('GET /docs returns an HTML page embedding ReDoc', async () => {
