@@ -12,6 +12,7 @@ const s = (schema: object) => ({
 export const users = new Elysia()
   .get('/users/me', getMe as RouteHandler, {
     detail: {
+      hide: true,
       tags: ['Users'],
       security: [{ apiKey: [] }],
       responses: {
@@ -21,6 +22,7 @@ export const users = new Elysia()
   })
   .patch('/users/country', updateCountry as RouteHandler, {
     detail: {
+      hide: true,
       tags: ['Users'],
       security: [{ apiKey: [] }],
       requestBody: {

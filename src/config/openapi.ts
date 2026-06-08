@@ -22,7 +22,6 @@ export const open_api_config = {
       { name: 'Sources of Income' },
       { name: 'Payment Methods' },
       { name: 'Expenses' },
-      { name: 'Users' },
     ],
   },
 }
