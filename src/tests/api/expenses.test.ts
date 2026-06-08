@@ -39,7 +39,7 @@ const req = async (method: string, path: string, body?: unknown) => {
   )
 }
 
-let pm_id: string
+let pm_id: number
 
 beforeAll(async () => {
   await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })

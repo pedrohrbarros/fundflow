@@ -29,14 +29,14 @@ type ExpenseWithSplits = {
 }
 
 const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
-  id: expense.id.toString(),
+  id: Number(expense.id),
   name: expense.name,
   amount: expense.amount,
   is_paid: expense.is_paid,
   is_saved: expense.is_saved,
   saving_location: expense.saving_location,
   payment_methods: expense.payment_methods.map((split) => ({
-    payment_method_id: split.payment_method_id.toString(),
+    payment_method_id: Number(split.payment_method_id),
     partial_amount: split.partial_amount,
     name: split.payment_method.name,
     origin: split.payment_method.origin,

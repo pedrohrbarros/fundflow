@@ -2,11 +2,11 @@ import { t } from 'elysia'
 import type { Static } from '@sinclair/typebox'
 
 export type PaymentMethodRecord = {
-  id: string
+  id: number
   name: string
   origin: string
   receiver: string | null
-  user_id: string
+  user_id: number
   created_at: string
   updated_at: string
 }

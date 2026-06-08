@@ -5,7 +5,14 @@ import { DocsService, TEST_USER_PREFIX } from '../../services/docs'
 const TEST_PREFIX = TEST_USER_PREFIX
 
 async function cleanupTestUsers() {
-  await db.user.deleteMany({ where: { external_id: { startsWith: TEST_PREFIX } } })
+  const users = await db.user.findMany({
+    where: { external_id: { startsWith: TEST_PREFIX } },
+    select: { id: true },
+  })
+  const ids = users.map((u) => u.id)
+  if (ids.length === 0) return
+  await db.sourceOfIncomeCategory.deleteMany({ where: { user_id: { in: ids } } })
+  await db.user.deleteMany({ where: { id: { in: ids } } })
 }
 
 afterEach(cleanupTestUsers)
