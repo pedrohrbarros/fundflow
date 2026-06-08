@@ -47,7 +47,7 @@ export const withUserAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
     .derive(async ({ request }) => {
       if (request.headers.get('X-Docs-Mode') === 'true') {
         const api_key = request.headers.get('X-Api-Key')
-        if (api_key !== process.env.API_TOKEN) return { clerk_user_id: null }
+        if (api_key?.trim() !== process.env.API_TOKEN?.trim()) return { clerk_user_id: null }
 
         const result = await DocsService.findOrCreateMonthlyTestUser()
         return { clerk_user_id: result.ok ? result.data.external_id : null }
@@ -74,6 +74,9 @@ export const withUserAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
       const is_docs_mode = request.headers.get('X-Docs-Mode') === 'true'
 
       if (!clerk_user_id) {
+        const api_key = request.headers
+        const server_token = process.env.API_TOKEN
+        logger.info({ api_key, server_token }, 'Authentication headers')
         logger.warn(
           { reason: is_docs_mode ? 'invalid_api_key' : 'invalid_jwt' },
           'Unauthorized request rejected'
@@ -84,7 +87,7 @@ export const withUserAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
 
       if (!is_docs_mode) {
         const api_key = request.headers.get('X-Api-Key')
-        if (api_key !== process.env.API_TOKEN) {
+        if (api_key?.trim() !== process.env.API_TOKEN?.trim()) {
           logger.warn({ reason: 'invalid_api_key' }, 'Unauthorized request rejected')
           set.status = 401
           return { error: 'Unauthorized' }

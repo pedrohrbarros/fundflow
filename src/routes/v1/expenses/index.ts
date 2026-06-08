@@ -10,7 +10,7 @@ export const expenses = new Elysia()
   .post('/expenses', createExpense as RouteHandler, {
     detail: {
       tags: ['Expenses'],
-      security: [{ clerkAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {
@@ -22,12 +22,12 @@ export const expenses = new Elysia()
     },
   })
   .post('/expenses/search', searchExpenses as RouteHandler, {
-    detail: { tags: ['Expenses'], security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Expenses'], security: [{ apiKey: [] }] },
   })
   .patch('/expenses/:id', updateExpense as RouteHandler, {
     detail: {
       tags: ['Expenses'],
-      security: [{ clerkAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {
@@ -39,5 +39,5 @@ export const expenses = new Elysia()
     },
   })
   .delete('/expenses/:id', deleteExpense as RouteHandler, {
-    detail: { tags: ['Expenses'], security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Expenses'], security: [{ apiKey: [] }] },
   })

@@ -6,12 +6,12 @@ import type { RouteHandler } from '../../../types/routes'
 
 export const users = new Elysia()
   .get('/users/me', getMe as RouteHandler, {
-    detail: { tags: ['Users'], security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Users'], security: [{ apiKey: [] }] },
   })
   .patch('/users/country', updateCountry as RouteHandler, {
     detail: {
       tags: ['Users'],
-      security: [{ clerkAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {

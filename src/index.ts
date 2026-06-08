@@ -28,7 +28,7 @@ const SWAGGER_UI_HTML = `<!DOCTYPE html>
       SwaggerUIBundle({
         url: '/openapi/json',
         dom_id: '#swagger-ui',
-        presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.SwaggerUIStandalonePreset],
+        presets: [SwaggerUIBundle.presets.apis],
         layout: 'BaseLayout',
         persistAuthorization: true,
         requestInterceptor: function(req) {

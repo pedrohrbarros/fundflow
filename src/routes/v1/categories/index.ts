@@ -10,7 +10,7 @@ export const categories = new Elysia()
   .post('/categories', createCategory as RouteHandler, {
     detail: {
       tags: ['Categories'],
-      security: [{ clerkAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {
@@ -22,12 +22,12 @@ export const categories = new Elysia()
     },
   })
   .post('/categories/search', searchCategories as RouteHandler, {
-    detail: { tags: ['Categories'], security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Categories'], security: [{ apiKey: [] }] },
   })
   .patch('/categories/:id', updateCategory as RouteHandler, {
     detail: {
       tags: ['Categories'],
-      security: [{ clerkAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {
@@ -39,5 +39,5 @@ export const categories = new Elysia()
     },
   })
   .delete('/categories/:id', deleteCategory as RouteHandler, {
-    detail: { tags: ['Categories'], security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Categories'], security: [{ apiKey: [] }] },
   })

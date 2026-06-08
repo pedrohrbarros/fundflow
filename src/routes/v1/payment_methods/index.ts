@@ -10,7 +10,7 @@ export const payment_methods = new Elysia()
   .post('/payment_methods', createPaymentMethod as RouteHandler, {
     detail: {
       tags: ['Payment Methods'],
-      security: [{ bearerAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {
@@ -22,12 +22,12 @@ export const payment_methods = new Elysia()
     },
   })
   .post('/payment_methods/search', searchPaymentMethods as RouteHandler, {
-    detail: { tags: ['Payment Methods'], security: [{ bearerAuth: [] }] },
+    detail: { tags: ['Payment Methods'], security: [{ apiKey: [] }] },
   })
   .patch('/payment_methods/:id', updatePaymentMethod as RouteHandler, {
     detail: {
       tags: ['Payment Methods'],
-      security: [{ bearerAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {
@@ -39,5 +39,5 @@ export const payment_methods = new Elysia()
     },
   })
   .delete('/payment_methods/:id', deletePaymentMethod as RouteHandler, {
-    detail: { tags: ['Payment Methods'], security: [{ bearerAuth: [] }] },
+    detail: { tags: ['Payment Methods'], security: [{ apiKey: [] }] },
   })

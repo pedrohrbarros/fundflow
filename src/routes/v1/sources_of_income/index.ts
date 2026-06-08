@@ -13,7 +13,7 @@ export const sources_of_income = new Elysia()
   .post('/sources_of_income', createSourceOfIncome as RouteHandler, {
     detail: {
       tags: ['Sources of Income'],
-      security: [{ clerkAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {
@@ -25,12 +25,12 @@ export const sources_of_income = new Elysia()
     },
   })
   .post('/sources_of_income/search', searchSourcesOfIncome as RouteHandler, {
-    detail: { tags: ['Sources of Income'], security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Sources of Income'], security: [{ apiKey: [] }] },
   })
   .patch('/sources_of_income/:id', updateSourceOfIncome as RouteHandler, {
     detail: {
       tags: ['Sources of Income'],
-      security: [{ clerkAuth: [] }],
+      security: [{ apiKey: [] }],
       requestBody: {
         required: true,
         content: {
@@ -42,5 +42,5 @@ export const sources_of_income = new Elysia()
     },
   })
   .delete('/sources_of_income/:id', deleteSourceOfIncome as RouteHandler, {
-    detail: { tags: ['Sources of Income'], security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Sources of Income'], security: [{ apiKey: [] }] },
   })
