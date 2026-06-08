@@ -35,9 +35,7 @@ yarn-error.log*
 .vercel
 
 # local documentation
-/docs/
-.docs/
-docs
+docs/
 
 **/*.trace
 **/*.zip
