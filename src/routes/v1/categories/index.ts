@@ -5,7 +5,12 @@ import { updateCategory } from './update'
 import { deleteCategory } from './delete'
 import { CategoryCreateBody, CategoryUpdateBody } from '../../../types/categories'
 import { CategorySearchBody } from '../../../types/search'
+import { CategoryResponse, CategorySearchResponse, DeletedResponse } from '../../../types/responses'
 import type { RouteHandler } from '../../../types/routes'
+
+const s = (schema: object) => ({
+  'application/json': { schema: schema as Record<string, unknown> },
+})
 
 export const categories = new Elysia()
   .post('/categories', createCategory as RouteHandler, {
@@ -14,11 +19,10 @@ export const categories = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: true,
-        content: {
-          'application/json': {
-            schema: CategoryCreateBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(CategoryCreateBody),
+      },
+      responses: {
+        '201': { description: 'Created', content: s(CategoryResponse) },
       },
     },
   })
@@ -28,11 +32,10 @@ export const categories = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: false,
-        content: {
-          'application/json': {
-            schema: CategorySearchBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(CategorySearchBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(CategorySearchResponse) },
       },
     },
   })
@@ -42,14 +45,19 @@ export const categories = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: true,
-        content: {
-          'application/json': {
-            schema: CategoryUpdateBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(CategoryUpdateBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(CategoryResponse) },
       },
     },
   })
   .delete('/categories/:id', deleteCategory as RouteHandler, {
-    detail: { tags: ['Categories'], security: [{ apiKey: [] }] },
+    detail: {
+      tags: ['Categories'],
+      security: [{ apiKey: [] }],
+      responses: {
+        '200': { description: 'OK', content: s(DeletedResponse) },
+      },
+    },
   })

@@ -8,7 +8,16 @@ import {
   SourceOfIncomeUpdateBody,
 } from '../../../types/sources_of_income'
 import { SourceOfIncomeSearchBody } from '../../../types/search'
+import {
+  SourceOfIncomeResponse,
+  SourceOfIncomeSearchResponse,
+  DeletedResponse,
+} from '../../../types/responses'
 import type { RouteHandler } from '../../../types/routes'
+
+const s = (schema: object) => ({
+  'application/json': { schema: schema as Record<string, unknown> },
+})
 
 export const sources_of_income = new Elysia()
   .post('/sources_of_income', createSourceOfIncome as RouteHandler, {
@@ -17,11 +26,10 @@ export const sources_of_income = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: true,
-        content: {
-          'application/json': {
-            schema: SourceOfIncomeCreateBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(SourceOfIncomeCreateBody),
+      },
+      responses: {
+        '201': { description: 'Created', content: s(SourceOfIncomeResponse) },
       },
     },
   })
@@ -31,11 +39,10 @@ export const sources_of_income = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: false,
-        content: {
-          'application/json': {
-            schema: SourceOfIncomeSearchBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(SourceOfIncomeSearchBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(SourceOfIncomeSearchResponse) },
       },
     },
   })
@@ -45,14 +52,19 @@ export const sources_of_income = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: true,
-        content: {
-          'application/json': {
-            schema: SourceOfIncomeUpdateBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(SourceOfIncomeUpdateBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(SourceOfIncomeResponse) },
       },
     },
   })
   .delete('/sources_of_income/:id', deleteSourceOfIncome as RouteHandler, {
-    detail: { tags: ['Sources of Income'], security: [{ apiKey: [] }] },
+    detail: {
+      tags: ['Sources of Income'],
+      security: [{ apiKey: [] }],
+      responses: {
+        '200': { description: 'OK', content: s(DeletedResponse) },
+      },
+    },
   })

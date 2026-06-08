@@ -5,7 +5,12 @@ import { updateExpense } from './update'
 import { deleteExpense } from './delete'
 import { ExpenseCreateBody, ExpenseUpdateBody } from '../../../types/expenses'
 import { ExpenseSearchBody } from '../../../types/search'
+import { ExpenseResponse, ExpenseSearchResponse, DeletedResponse } from '../../../types/responses'
 import type { RouteHandler } from '../../../types/routes'
+
+const s = (schema: object) => ({
+  'application/json': { schema: schema as Record<string, unknown> },
+})
 
 export const expenses = new Elysia()
   .post('/expenses', createExpense as RouteHandler, {
@@ -14,11 +19,10 @@ export const expenses = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: true,
-        content: {
-          'application/json': {
-            schema: ExpenseCreateBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(ExpenseCreateBody),
+      },
+      responses: {
+        '201': { description: 'Created', content: s(ExpenseResponse) },
       },
     },
   })
@@ -28,11 +32,10 @@ export const expenses = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: false,
-        content: {
-          'application/json': {
-            schema: ExpenseSearchBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(ExpenseSearchBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(ExpenseSearchResponse) },
       },
     },
   })
@@ -42,14 +45,19 @@ export const expenses = new Elysia()
       security: [{ apiKey: [] }],
       requestBody: {
         required: true,
-        content: {
-          'application/json': {
-            schema: ExpenseUpdateBody as unknown as Record<string, unknown>,
-          },
-        },
+        content: s(ExpenseUpdateBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(ExpenseResponse) },
       },
     },
   })
   .delete('/expenses/:id', deleteExpense as RouteHandler, {
-    detail: { tags: ['Expenses'], security: [{ apiKey: [] }] },
+    detail: {
+      tags: ['Expenses'],
+      security: [{ apiKey: [] }],
+      responses: {
+        '200': { description: 'OK', content: s(DeletedResponse) },
+      },
+    },
   })
