@@ -1,7 +1,7 @@
 import { db } from '../config/db'
 import type { ServiceResult } from './types'
 
-const TEST_USER_PREFIX = 'test-user-'
+export const TEST_USER_PREFIX = 'docs-test-user-'
 
 function currentMonthKey(): string {
   const now = new Date()
@@ -22,7 +22,11 @@ export const DocsService = {
         where: { external_id: { startsWith: TEST_USER_PREFIX } },
       })
 
-      const user = await db.user.create({ data: { external_id: key } })
+      const user = await db.user.upsert({
+        where: { external_id: key },
+        update: {},
+        create: { external_id: key },
+      })
       return { ok: true, data: { external_id: user.external_id } }
     } catch (err: unknown) {
       return {

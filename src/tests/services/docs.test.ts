@@ -1,8 +1,8 @@
 import { describe, it, expect, afterEach, afterAll } from 'bun:test'
 import { db } from '../../config/db'
-import { DocsService } from '../../services/docs'
+import { DocsService, TEST_USER_PREFIX } from '../../services/docs'
 
-const TEST_PREFIX = 'test-user-'
+const TEST_PREFIX = TEST_USER_PREFIX
 
 async function cleanupTestUsers() {
   await db.user.deleteMany({ where: { external_id: { startsWith: TEST_PREFIX } } })
@@ -35,7 +35,7 @@ describe('DocsService.findOrCreateMonthlyTestUser', () => {
   })
 
   it('deletes old test users when a new month key is needed', async () => {
-    await db.user.create({ data: { external_id: 'test-user-2020-01' } })
+    await db.user.create({ data: { external_id: 'docs-test-user-2020-01' } })
 
     const now = new Date()
     const currentKey = `${TEST_PREFIX}${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
@@ -43,7 +43,7 @@ describe('DocsService.findOrCreateMonthlyTestUser', () => {
 
     await DocsService.findOrCreateMonthlyTestUser()
 
-    const stale = await db.user.findUnique({ where: { external_id: 'test-user-2020-01' } })
+    const stale = await db.user.findUnique({ where: { external_id: 'docs-test-user-2020-01' } })
     expect(stale).toBeNull()
 
     const current = await db.user.findUnique({ where: { external_id: currentKey } })
