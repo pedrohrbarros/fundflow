@@ -17,5 +17,12 @@ export const open_api_config = {
       },
     },
     security: [{ apiKey: [] }],
+    tags: [
+      { name: 'Categories', description: 'Source of income category management' },
+      { name: 'Sources of Income', description: 'Income source management' },
+      { name: 'Payment Methods', description: 'Payment method management' },
+      { name: 'Expenses', description: 'Expense tracking and management' },
+      { name: 'Users', description: 'User profile management' },
+    ],
   },
 }

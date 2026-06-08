@@ -9,6 +9,7 @@ import type { RouteHandler } from '../../../types/routes'
 export const expenses = new Elysia()
   .post('/expenses', createExpense as RouteHandler, {
     detail: {
+      tags: ['Expenses'],
       security: [{ clerkAuth: [] }],
       requestBody: {
         required: true,
@@ -21,10 +22,11 @@ export const expenses = new Elysia()
     },
   })
   .post('/expenses/search', searchExpenses as RouteHandler, {
-    detail: { security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Expenses'], security: [{ clerkAuth: [] }] },
   })
   .patch('/expenses/:id', updateExpense as RouteHandler, {
     detail: {
+      tags: ['Expenses'],
       security: [{ clerkAuth: [] }],
       requestBody: {
         required: true,
@@ -37,5 +39,5 @@ export const expenses = new Elysia()
     },
   })
   .delete('/expenses/:id', deleteExpense as RouteHandler, {
-    detail: { security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Expenses'], security: [{ clerkAuth: [] }] },
   })

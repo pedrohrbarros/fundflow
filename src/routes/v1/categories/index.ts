@@ -9,6 +9,7 @@ import type { RouteHandler } from '../../../types/routes'
 export const categories = new Elysia()
   .post('/categories', createCategory as RouteHandler, {
     detail: {
+      tags: ['Categories'],
       security: [{ clerkAuth: [] }],
       requestBody: {
         required: true,
@@ -21,10 +22,11 @@ export const categories = new Elysia()
     },
   })
   .post('/categories/search', searchCategories as RouteHandler, {
-    detail: { security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Categories'], security: [{ clerkAuth: [] }] },
   })
   .patch('/categories/:id', updateCategory as RouteHandler, {
     detail: {
+      tags: ['Categories'],
       security: [{ clerkAuth: [] }],
       requestBody: {
         required: true,
@@ -37,5 +39,5 @@ export const categories = new Elysia()
     },
   })
   .delete('/categories/:id', deleteCategory as RouteHandler, {
-    detail: { security: [{ clerkAuth: [] }] },
+    detail: { tags: ['Categories'], security: [{ clerkAuth: [] }] },
   })

@@ -9,6 +9,7 @@ import type { RouteHandler } from '../../../types/routes'
 export const payment_methods = new Elysia()
   .post('/payment_methods', createPaymentMethod as RouteHandler, {
     detail: {
+      tags: ['Payment Methods'],
       security: [{ bearerAuth: [] }],
       requestBody: {
         required: true,
@@ -21,10 +22,11 @@ export const payment_methods = new Elysia()
     },
   })
   .post('/payment_methods/search', searchPaymentMethods as RouteHandler, {
-    detail: { security: [{ bearerAuth: [] }] },
+    detail: { tags: ['Payment Methods'], security: [{ bearerAuth: [] }] },
   })
   .patch('/payment_methods/:id', updatePaymentMethod as RouteHandler, {
     detail: {
+      tags: ['Payment Methods'],
       security: [{ bearerAuth: [] }],
       requestBody: {
         required: true,
@@ -37,5 +39,5 @@ export const payment_methods = new Elysia()
     },
   })
   .delete('/payment_methods/:id', deletePaymentMethod as RouteHandler, {
-    detail: { security: [{ bearerAuth: [] }] },
+    detail: { tags: ['Payment Methods'], security: [{ bearerAuth: [] }] },
   })
