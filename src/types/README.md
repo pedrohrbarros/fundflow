@@ -1,49 +1,53 @@
 # Types
 
-Shared TypeScript types used across the application, organised to mirror the route and domain structure.
+Shared TypeScript types and TypeBox schemas used across the application. Organised by domain to mirror the route structure.
 
 ## Directory Structure
 
 ```
 types/
-└── webhooks/
-    └── clerk/
-        └── index.ts   # Payload types for Clerk webhook events
+├── categories/         # CategoryRecord, TypeBox create/update body schemas
+├── expenses/           # ExpenseRecord, ExpensePaymentMethodRecord, TypeBox schemas
+├── payment_methods/    # PaymentMethodRecord, TypeBox schemas
+├── sources_of_income/  # SourceOfIncomeRecord, TypeBox schemas
+├── users/              # UpdateCountryBody TypeBox schema
+├── responses/          # OpenAPI response schemas (plain objects) for Swagger UI
+├── search/             # OpenAPI request body schemas for search endpoints
+├── routes.ts           # RouteHandler type alias
+└── webhooks/clerk/     # Payload types for Clerk webhook events
 ```
 
 ## Conventions
 
-### File layout
+Each domain folder exports:
 
-Types are grouped by **domain** then **provider**, mirroring `src/routes/v1/`:
+- A `*Record` type describing the shape returned by services to handlers
+- TypeBox (`t.Object`) schemas used as the OpenAPI body schema in route `detail`
 
-```
-types/<domain>/<provider>/index.ts
-```
-
-Each `index.ts` exports all types for that provider so consumers import from the directory:
-
-```ts
-import type { ClerkUserCreatedPayload } from '../../types/webhooks/clerk'
+```typescript
+import type { ExpenseRecord } from '../types/expenses'
+import { ExpenseCreateBody } from '../types/expenses'
 ```
 
-### Naming
+Record types use primitive JS types (numbers, strings, booleans) — no `BigInt`. IDs are `number`.
 
-| What          | Pattern                     | Example                    |
-| ------------- | --------------------------- | -------------------------- |
-| Payload type  | `<Provider><Event>Payload`  | `ClerkUserCreatedPayload`  |
-| Response type | `<Provider><Event>Response` | `ClerkUserCreatedResponse` |
+## Special Folders
 
-### Adding new types
+### `responses/`
 
-1. Create `types/<domain>/<provider>/index.ts` (or add to an existing one).
-2. Export every type from that file.
-3. Keep types focused on the shape of external payloads and internal responses — avoid business-logic in type files.
+Plain OpenAPI schema objects (not TypeBox) used as `responses` in route `detail`. One schema per response shape (e.g. `CategoryResponse`, `CategorySearchResponse`, `DeletedResponse`).
+
+### `search/`
+
+Plain OpenAPI schema objects describing the request body for search endpoints. Includes `page`, `limit`, and a `filters` field documented as `oneOf` FilterCondition/FilterGroup with field-specific operator enums.
 
 ## Current Types
 
-### `webhooks/clerk`
-
-| Type                      | Description                                            |
-| ------------------------- | ------------------------------------------------------ |
-| `ClerkUserCreatedPayload` | Shape of the `user.created` webhook body sent by Clerk |
+| Domain              | Record type(s)                                            |
+| ------------------- | --------------------------------------------------------- |
+| `categories`        | `CategoryRecord`                                          |
+| `sources_of_income` | `SourceOfIncomeRecord`, `SourcesOfIncomeByCategoryRecord` |
+| `payment_methods`   | `PaymentMethodRecord`                                     |
+| `expenses`          | `ExpenseRecord`, `ExpensePaymentMethodRecord`             |
+| `users`             | — (record defined in `src/services/users.ts`)             |
+| `webhooks/clerk`    | `ClerkUserCreatedPayload`, `ClerkUserDeletedPayload`      |

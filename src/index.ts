@@ -98,8 +98,10 @@ export const app = new Elysia()
       .use(expenses)
       .use(users)
   )
-  .get('/', () => 'Fundflow API')
-  .get('/docs', () => new Response(SWAGGER_UI_HTML, { headers: { 'Content-Type': 'text/html' } }))
+  .get('/', () => 'Fundflow API', { detail: { hide: true } })
+  .get('/docs', () => new Response(SWAGGER_UI_HTML, { headers: { 'Content-Type': 'text/html' } }), {
+    detail: { hide: true },
+  })
 
 if (import.meta.main) {
   app.listen(Number(process.env.PORT ?? 8000))

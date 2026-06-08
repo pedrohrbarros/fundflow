@@ -30,12 +30,16 @@ routes/
     │   ├── search.ts
     │   ├── update.ts
     │   └── delete.ts
-    └── expenses/
-        ├── index.ts             # Elysia plugin for expenses routes
-        ├── create.ts
-        ├── search.ts
-        ├── update.ts
-        └── delete.ts
+    ├── expenses/
+    │   ├── index.ts             # Elysia plugin for expenses routes
+    │   ├── create.ts
+    │   ├── search.ts
+    │   ├── update.ts
+    │   └── delete.ts
+    └── users/
+        ├── index.ts             # Elysia plugin for users routes
+        ├── get_me.ts
+        └── update_country.ts
 ```
 
 ## Conventions
@@ -44,117 +48,98 @@ routes/
 
 Each route group is a self-contained folder:
 
-- **`<resource>/index.ts`** — the Elysia plugin that declares the route paths and wires handlers together.
+- **`<resource>/index.ts`** — the Elysia plugin that declares route paths, request bodies, response schemas, and wires handlers together.
 - **`<resource>/<action>.ts`** — the handler function for a specific action, exported as a named `const`.
 
 ### Naming
 
-| What           | Pattern                          | Example               |
-| -------------- | -------------------------------- | --------------------- |
+| What           | Pattern                          | Example                    |
+| -------------- | -------------------------------- | -------------------------- |
 | Plugin file    | `<resource>/index.ts`            | `payment_methods/index.ts` |
-| Handler file   | `<action>.ts`                    | `create.ts`           |
-| Handler export | `<action><Resource>` (camelCase) | `createPaymentMethod` |
-
-### Route paths
-
-Standard resource routes follow the shape:
-
-```
-/<resource>
-/<resource>/:id
-```
-
-Webhook routes follow:
-
-```
-/webhooks/<provider>/<event>/listener
-```
+| Handler file   | `<action>.ts`                    | `create.ts`                |
+| Handler export | `<action><Resource>` (camelCase) | `createPaymentMethod`      |
 
 ### Authentication
 
 There are two authentication strategies, applied at the `.group()` level in `src/index.ts`:
 
-| Strategy                  | Middleware                 | Used by                                                              |
-| ------------------------- | -------------------------- | -------------------------------------------------------------------- |
-| Bearer token only         | `withBearerAuth`           | `webhooks`                                                           |
-| Clerk JWT + Bearer token  | `withClerkAndBearerAuth`   | `categories`, `sources_of_income`, `payment_methods`, `expenses`     |
+| Strategy     | Middleware       | Used by                                                                   |
+| ------------ | ---------------- | ------------------------------------------------------------------------- |
+| Bearer token | `withBearerAuth` | `webhooks`                                                                |
+| User auth    | `withUserAuth`   | `categories`, `sources_of_income`, `payment_methods`, `expenses`, `users` |
 
-**Webhook endpoints** (`/api/v1/webhooks/**`) require only a static Bearer token in the `Authorization` header:
+**Webhook endpoints** require `Authorization: Bearer <API_TOKEN>`.
 
-```
-Authorization: Bearer <API_TOKEN>
-```
+**All other endpoints** support two modes:
 
-**All other endpoints** require both:
+- **Normal mode:** `Authorization: Bearer <CLERK_JWT>` + `X-Api-Key: <API_TOKEN>`
+- **Docs mode** (Swagger UI): `X-Docs-Mode: true` + `X-Api-Key: <API_TOKEN>` — injects a monthly test user automatically
 
-1. A valid Clerk JWT in the `Authorization` header:
-   ```
-   Authorization: Bearer <CLERK_JWT>
-   ```
-2. The static API token in the `X-Api-Key` header:
-   ```
-   X-Api-Key: <API_TOKEN>
-   ```
-
-Both headers must be present and valid. If either check fails, the server responds with `401 Unauthorized`.
-
-Handlers on Clerk-authenticated routes receive `clerk_user_id: string` in their context, injected by the middleware derive step.
+See `src/middleware/README.md` for details.
 
 ### Adding a new endpoint
 
 1. Create the handler in `routes/v1/<resource>/<action>.ts`.
-2. Import and register it in `routes/v1/<resource>/index.ts`.
+2. Import and register it in `routes/v1/<resource>/index.ts` with `requestBody`, `responses`, and `security` detail.
 3. Add the corresponding request/response types under `src/types/<resource>/`.
-4. Document the endpoint in this README.
-5. Register the plugin in the appropriate `.group()` call in `src/index.ts` — use `withClerkAndBearerAuth` for user-facing resources, `withBearerAuth` for webhooks.
+4. Add a Zod schema under `src/schemas/<resource>.ts`.
+5. Document the endpoint in the resource's `README.md` and in this file.
+6. Register the plugin in the appropriate `.group()` call in `src/index.ts`.
 
 ### Caching
 
-Search endpoints are not cached. The filter key space is unbounded (any combination of filters × pages × limits), making per-response caching ineffective. All four list/search services query the database directly on every request.
+Search endpoints are not cached. The filter key space is unbounded, making per-response caching ineffective. All search services query the database directly on every request.
 
 ## Current Endpoints
 
 ### Webhooks
 
-| Method | Path                          | Auth         | Description                                              |
-| ------ | ----------------------------- | ------------ | -------------------------------------------------------- |
-| `POST` | `/api/v1/webhooks/clerk/register` | Bearer token | Creates a user record from a Clerk `user.created` event  |
-| `POST` | `/api/v1/webhooks/clerk/delete`   | Bearer token | Deletes a user record from a Clerk `user.deleted` event  |
+| Method | Path                              | Auth         | Description                                             |
+| ------ | --------------------------------- | ------------ | ------------------------------------------------------- |
+| `POST` | `/api/v1/webhooks/clerk/register` | Bearer token | Creates a user record from a Clerk `user.created` event |
+| `POST` | `/api/v1/webhooks/clerk/delete`   | Bearer token | Deletes a user record from a Clerk `user.deleted` event |
 
 Both webhook endpoints additionally verify the Svix signature and enforce Clerk's IP allowlist.
 
 ### Categories
 
-| Method   | Path                          | Auth                      | Description                              |
-| -------- | ----------------------------- | ------------------------- | ---------------------------------------- |
-| `POST`   | `/api/v1/categories`          | Clerk JWT + Bearer token  | Create a new category                    |
-| `POST`   | `/api/v1/categories/search`   | Clerk JWT + Bearer token  | Search categories with optional filters  |
-| `PATCH`  | `/api/v1/categories/:id`      | Clerk JWT + Bearer token  | Update a category by id                  |
-| `DELETE` | `/api/v1/categories/:id`      | Clerk JWT + Bearer token  | Delete a category by id                  |
+| Method   | Path                        | Description                             |
+| -------- | --------------------------- | --------------------------------------- |
+| `POST`   | `/api/v1/categories`        | Create a new category                   |
+| `POST`   | `/api/v1/categories/search` | Search categories with optional filters |
+| `PATCH`  | `/api/v1/categories/:id`    | Update a category by id                 |
+| `DELETE` | `/api/v1/categories/:id`    | Delete a category by id                 |
 
 ### Sources of Income
 
-| Method   | Path                                | Auth                      | Description                                       |
-| -------- | ----------------------------------- | ------------------------- | ------------------------------------------------- |
-| `POST`   | `/api/v1/sources_of_income`         | Clerk JWT + Bearer token  | Create a new source of income                     |
-| `POST`   | `/api/v1/sources_of_income/search`  | Clerk JWT + Bearer token  | Search sources of income with optional filters    |
-| `PATCH`  | `/api/v1/sources_of_income/:id`     | Clerk JWT + Bearer token  | Update a source of income by id                   |
-| `DELETE` | `/api/v1/sources_of_income/:id`     | Clerk JWT + Bearer token  | Delete a source of income by id                   |
+| Method   | Path                               | Description                                    |
+| -------- | ---------------------------------- | ---------------------------------------------- |
+| `POST`   | `/api/v1/sources_of_income`        | Create a new source of income                  |
+| `POST`   | `/api/v1/sources_of_income/search` | Search sources of income with optional filters |
+| `PATCH`  | `/api/v1/sources_of_income/:id`    | Update a source of income by id                |
+| `DELETE` | `/api/v1/sources_of_income/:id`    | Delete a source of income by id                |
 
 ### Payment Methods
 
-| Method   | Path                               | Auth                      | Description                                                     |
-| -------- | ---------------------------------- | ------------------------- | --------------------------------------------------------------- |
-| `POST`   | `/api/v1/payment_methods`          | Clerk JWT + Bearer token  | Create a payment method for the authenticated user              |
-| `POST`   | `/api/v1/payment_methods/search`   | Clerk JWT + Bearer token  | Search payment methods with optional filters                    |
-| `PATCH`  | `/api/v1/payment_methods/:id`      | Clerk JWT + Bearer token  | Update a payment method owned by the authenticated user         |
-| `DELETE` | `/api/v1/payment_methods/:id`      | Clerk JWT + Bearer token  | Delete a payment method owned by the authenticated user         |
+| Method   | Path                             | Description                                             |
+| -------- | -------------------------------- | ------------------------------------------------------- |
+| `POST`   | `/api/v1/payment_methods`        | Create a payment method for the authenticated user      |
+| `POST`   | `/api/v1/payment_methods/search` | Search payment methods with optional filters            |
+| `PATCH`  | `/api/v1/payment_methods/:id`    | Update a payment method owned by the authenticated user |
+| `DELETE` | `/api/v1/payment_methods/:id`    | Delete a payment method owned by the authenticated user |
 
 ### Expenses
 
-| Method   | Path                          | Auth                      | Description                                              |
-| -------- | ----------------------------- | ------------------------- | -------------------------------------------------------- |
-| `POST`   | `/api/v1/expenses`            | Clerk JWT + Bearer token  | Create an expense for the authenticated user             |
-| `POST`   | `/api/v1/expenses/search`     | Clerk JWT + Bearer token  | Search expenses with optional filters and pagination     |
-| `PATCH`  | `/api/v1/expenses/:id`        | Clerk JWT + Bearer token  | Update an expense owned by the authenticated user        |
-| `DELETE` | `/api/v1/expenses/:id`        | Clerk JWT + Bearer token  | Delete an expense owned by the authenticated user        |
+| Method   | Path                      | Description                                          |
+| -------- | ------------------------- | ---------------------------------------------------- |
+| `POST`   | `/api/v1/expenses`        | Create an expense for the authenticated user         |
+| `POST`   | `/api/v1/expenses/search` | Search expenses with optional filters and pagination |
+| `PATCH`  | `/api/v1/expenses/:id`    | Update an expense owned by the authenticated user    |
+| `DELETE` | `/api/v1/expenses/:id`    | Delete an expense owned by the authenticated user    |
+
+### Users
+
+| Method  | Path                    | Description                |
+| ------- | ----------------------- | -------------------------- |
+| `GET`   | `/api/v1/users/me`      | Get the authenticated user |
+| `PATCH` | `/api/v1/users/country` | Update the user's country  |
