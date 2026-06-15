@@ -7,11 +7,11 @@ All routes are prefixed with `/api/v1` and registered in `src/index.ts` via Elys
 ```
 routes/
 └── v1/
-    ├── webhooks/
-    │   ├── index.ts             # Elysia plugin that mounts all webhook routes
-    │   └── clerk/
-    │       ├── register.ts      # Handler for Clerk user.created webhook
-    │       └── delete.ts        # Handler for Clerk user.deleted webhook
+    ├── auth/
+    │   ├── index.ts             # Elysia plugin that mounts auth routes
+    │   ├── google.ts            # Handler for POST /auth/google (Google ID-token → JWT)
+    │   ├── refresh.ts           # Handler for POST /auth/refresh
+    │   └── logout.ts            # Handler for POST /auth/logout
     ├── categories/
     │   ├── index.ts             # Elysia plugin for categories routes
     │   ├── create.ts
@@ -39,7 +39,8 @@ routes/
     └── users/
         ├── index.ts             # Elysia plugin for users routes
         ├── get_me.ts
-        └── update_country.ts
+        ├── update_country.ts
+        └── delete_me.ts
 ```
 
 ## Conventions
@@ -63,16 +64,13 @@ Each route group is a self-contained folder:
 
 There are two authentication strategies, applied at the `.group()` level in `src/index.ts`:
 
-| Strategy     | Middleware       | Used by                                                                   |
-| ------------ | ---------------- | ------------------------------------------------------------------------- |
-| Bearer token | `withBearerAuth` | `webhooks`                                                                |
-| User auth    | `withUserAuth`   | `categories`, `sources_of_income`, `payment_methods`, `expenses`, `users` |
+| Strategy  | Middleware     | Used by                                                                   |
+| --------- | -------------- | ------------------------------------------------------------------------- |
+| User auth | `withUserAuth` | `categories`, `sources_of_income`, `payment_methods`, `expenses`, `users` |
 
-**Webhook endpoints** require `Authorization: Bearer <API_TOKEN>`.
+**Protected endpoints** support two modes:
 
-**All other endpoints** support two modes:
-
-- **Normal mode:** `Authorization: Bearer <CLERK_JWT>` + `X-Api-Key: <API_TOKEN>`
+- **Normal mode:** `Authorization: Bearer <access_token>` (backend JWT signed with `JWT_SECRET`)
 - **Docs mode** (Swagger UI): `X-Docs-Mode: true` + `X-Api-Key: <API_TOKEN>` — injects a monthly test user automatically
 
 See `src/middleware/README.md` for details.
@@ -92,14 +90,13 @@ Search endpoints are not cached. The filter key space is unbounded, making per-r
 
 ## Current Endpoints
 
-### Webhooks
+### Auth
 
-| Method | Path                              | Auth         | Description                                             |
-| ------ | --------------------------------- | ------------ | ------------------------------------------------------- |
-| `POST` | `/api/v1/webhooks/clerk/register` | Bearer token | Creates a user record from a Clerk `user.created` event |
-| `POST` | `/api/v1/webhooks/clerk/delete`   | Bearer token | Deletes a user record from a Clerk `user.deleted` event |
-
-Both webhook endpoints additionally verify the Svix signature and enforce Clerk's IP allowlist.
+| Method | Path                   | Auth | Description                                            |
+| ------ | ---------------------- | ---- | ------------------------------------------------------ |
+| `POST` | `/api/v1/auth/google`  | No   | Exchange a Google ID token for access + refresh tokens |
+| `POST` | `/api/v1/auth/refresh` | No   | Exchange a refresh token for a new access token        |
+| `POST` | `/api/v1/auth/logout`  | No   | Revoke the current refresh token                       |
 
 ### Categories
 
@@ -139,7 +136,8 @@ Both webhook endpoints additionally verify the Svix signature and enforce Clerk'
 
 ### Users
 
-| Method  | Path                    | Description                |
-| ------- | ----------------------- | -------------------------- |
-| `GET`   | `/api/v1/users/me`      | Get the authenticated user |
-| `PATCH` | `/api/v1/users/country` | Update the user's country  |
+| Method   | Path               | Description                |
+| -------- | ------------------ | -------------------------- |
+| `GET`    | `/api/v1/users/me` | Get the authenticated user |
+| `PATCH`  | `/api/v1/users/me` | Update the user's profile  |
+| `DELETE` | `/api/v1/users/me` | Delete the user's account  |

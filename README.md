@@ -9,7 +9,7 @@ A lightweight financial monitoring API that tracks a user's financial state and 
 - **Language:** TypeScript
 - **Database:** PostgreSQL via [Supabase](https://supabase.com/) + [Prisma 7](https://www.prisma.io/)
 - **Cache:** Redis
-- **Auth:** [Clerk](https://clerk.com/) (JWT verification)
+- **Auth:** Google Sign-In (ID-token verification) + custom HS256 JWTs
 - **Documentation:** OpenAPI 3.0 / Swagger UI
 
 ## Getting Started
@@ -18,7 +18,7 @@ A lightweight financial monitoring API that tracks a user's financial state and 
 
 - [Bun](https://bun.sh/) v1.0+
 - A [Supabase](https://supabase.com/) project (PostgreSQL)
-- A [Clerk](https://clerk.com/) application
+- A [Google Cloud](https://console.cloud.google.com/) project with an OAuth 2.0 Web Client ID
 - A Redis instance
 
 ### Installation
@@ -37,23 +37,23 @@ DATABASE_URL=postgresql://user:password@host:5432/dbname
 REDIS_URL=redis://localhost:6379
 API_TOKEN=your_secret_token
 ALLOWED_ORIGINS=["http://localhost:3000"]
-CLERK_ISSUER=https://<your-clerk-instance>.clerk.accounts.dev
-CLERK_AUTHORIZED_PARTY=http://localhost:3000
+GOOGLE_CLIENT_ID=your_google_oauth_web_client_id
+JWT_SECRET=your_hs256_secret_at_least_32_bytes
 LOG_LEVEL=info
 NODE_ENV=development
 ```
 
-| Variable                 | Required | Description                                                               |
-| ------------------------ | -------- | ------------------------------------------------------------------------- |
-| `PORT`                   | No       | Port to listen on (default: `8000`)                                       |
-| `DATABASE_URL`           | Yes      | PostgreSQL connection string (Supabase)                                   |
-| `REDIS_URL`              | Yes      | Redis connection string                                                   |
-| `API_TOKEN`              | Yes      | Static token used to authenticate API requests and Swagger UI access      |
-| `ALLOWED_ORIGINS`        | No       | JSON array of allowed CORS origins (default: `["http://localhost:3000"]`) |
-| `CLERK_ISSUER`           | Yes      | Clerk instance URL, used to fetch the public key for JWT verification     |
-| `CLERK_AUTHORIZED_PARTY` | No       | Expected `azp` claim in Clerk JWTs (rejects tokens from other origins)    |
-| `LOG_LEVEL`              | No       | Minimum log level (default: `info`)                                       |
-| `NODE_ENV`               | No       | Set to `production` for JSON-only log output                              |
+| Variable           | Required | Description                                                               |
+| ------------------ | -------- | ------------------------------------------------------------------------- |
+| `PORT`             | No       | Port to listen on (default: `8000`)                                       |
+| `DATABASE_URL`     | Yes      | PostgreSQL connection string (Supabase)                                   |
+| `REDIS_URL`        | Yes      | Redis connection string                                                   |
+| `API_TOKEN`        | Yes      | Static token used for Swagger UI (docs mode) access                       |
+| `ALLOWED_ORIGINS`  | No       | JSON array of allowed CORS origins (default: `["http://localhost:3000"]`) |
+| `GOOGLE_CLIENT_ID` | Yes      | Google OAuth Web Client ID — audience used to verify Google ID tokens     |
+| `JWT_SECRET`       | Yes      | Secret for signing backend access JWTs (HS256, min 32 bytes)              |
+| `LOG_LEVEL`        | No       | Minimum log level (default: `info`)                                       |
+| `NODE_ENV`         | No       | Set to `production` for JSON-only log output                              |
 
 ### Running the Server
 
@@ -81,18 +81,17 @@ To use the docs:
 | `GET`  | `/openapi/json` | No   | OpenAPI 3.0 specification (JSON) |
 | `GET`  | `/docs`         | No   | Swagger UI                       |
 
-### Webhooks
+### Auth Endpoints
 
-| Method | Path                              | Auth   | Description                                             |
-| ------ | --------------------------------- | ------ | ------------------------------------------------------- |
-| `POST` | `/api/v1/webhooks/clerk/register` | Bearer | Creates a user record from a Clerk `user.created` event |
-| `POST` | `/api/v1/webhooks/clerk/delete`   | Bearer | Deletes a user record from a Clerk `user.deleted` event |
-
-Webhook endpoints verify the Svix signature and enforce Clerk's IP allowlist. Rate-limited to 50 req/min.
+| Method | Path                   | Auth | Description                                            |
+| ------ | ---------------------- | ---- | ------------------------------------------------------ |
+| `POST` | `/api/v1/auth/google`  | No   | Exchange a Google ID token for access + refresh tokens |
+| `POST` | `/api/v1/auth/refresh` | No   | Exchange a refresh token for a new access token        |
+| `POST` | `/api/v1/auth/logout`  | No   | Revoke the current refresh token                       |
 
 ### Protected Endpoints
 
-All endpoints below require `X-Api-Key: <API_TOKEN>` plus a valid Clerk JWT in `Authorization: Bearer <token>`.
+All endpoints below require a valid access token in `Authorization: Bearer <access_token>`.
 
 #### Categories
 
@@ -132,25 +131,41 @@ All endpoints below require `X-Api-Key: <API_TOKEN>` plus a valid Clerk JWT in `
 
 #### Users
 
-| Method  | Path                    | Description                |
-| ------- | ----------------------- | -------------------------- |
-| `GET`   | `/api/v1/users/me`      | Get the authenticated user |
-| `PATCH` | `/api/v1/users/country` | Update the user's country  |
+| Method   | Path               | Description                |
+| -------- | ------------------ | -------------------------- |
+| `GET`    | `/api/v1/users/me` | Get the authenticated user |
+| `PATCH`  | `/api/v1/users/me` | Update the user's profile  |
+| `DELETE` | `/api/v1/users/me` | Delete the user's account  |
 
 ### Authentication
 
-**Webhook endpoints** use a static Bearer token:
+**Sign in** by sending a Google ID token to the auth endpoint:
 
 ```
-Authorization: Bearer <API_TOKEN>
+POST /api/v1/auth/google
+Content-Type: application/json
+
+{ "id_token": "<google_id_token>" }
 ```
 
-**All other endpoints** require both headers:
+Response: `{ access_token, refresh_token, token_type, access_expires_in, user }`
+
+**Protected requests** attach the access token:
 
 ```
-Authorization: Bearer <CLERK_JWT>
-X-Api-Key: <API_TOKEN>
+Authorization: Bearer <access_token>
 ```
+
+**Token refresh** when the access token expires:
+
+```
+POST /api/v1/auth/refresh
+Content-Type: application/json
+
+{ "refresh_token": "<refresh_token>" }
+```
+
+**Docs mode** (Swagger UI only): attach `X-Docs-Mode: true` + `X-Api-Key: <API_TOKEN>` — injects a monthly test user automatically, no Google session required.
 
 ## Logging
 

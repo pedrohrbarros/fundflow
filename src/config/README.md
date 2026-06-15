@@ -38,6 +38,6 @@ Exports `open_api_config` — the configuration object passed to `@elysiajs/swag
 
 Exports the Redis client singleton. Used by the cache middleware.
 
-### `clerk.ts`
+### `google.ts`
 
-Exports `getClerkPublicKey()` — fetches and caches the Clerk instance's RSA public key used to verify JWT signatures. Caches the key in memory to avoid repeated network calls.
+Exports `verifyGoogleIdToken(idToken)` — verifies a Google ID token against Google's public keys and returns the decoded payload. Used by the `POST /api/v1/auth/google` route to authenticate users.
