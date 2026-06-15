@@ -4,6 +4,7 @@ import { rateLimit } from 'elysia-rate-limit'
 import { swagger } from '@elysiajs/swagger'
 import { open_api_config } from './config/openapi'
 import { withBearerAuth, withUserAuth } from './middleware/auth'
+import { auth } from './routes/v1/auth'
 import { webhooks } from './routes/v1/webhooks'
 import { categories } from './routes/v1/categories'
 import { sources_of_income } from './routes/v1/sources_of_income'
@@ -94,6 +95,7 @@ export const app = new Elysia()
   })
   .use(swagger(open_api_config))
   .group('/api/v1', (app) => withBearerAuth(app).use(webhooks))
+  .group('/api/v1', (app) => app.use(auth))
   .group('/api/v1', (app) =>
     withUserAuth(app)
       .use(categories)
