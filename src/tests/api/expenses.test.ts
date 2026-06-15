@@ -314,4 +314,53 @@ describe('Expenses API', () => {
     })
     expect(res.status).toBe(400)
   })
+
+  it('POST /api/v1/expenses/by-category totals expenses per category, sorted desc', async () => {
+    const cat1 = await (
+      await req('POST', '/api/v1/categories', { name: `bycat-first-${TS}`, type: 'EXPENSE' })
+    ).json()
+    const cat2 = await (
+      await req('POST', '/api/v1/categories', { name: `bycat-second-${TS}`, type: 'EXPENSE' })
+    ).json()
+
+    await req('POST', '/api/v1/expenses', {
+      name: `bycat-a-${TS}`,
+      category_id: Number(cat1.id),
+      amount: 30,
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `bycat-b-${TS}`,
+      category_id: Number(cat1.id),
+      amount: 70,
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `bycat-c-${TS}`,
+      category_id: Number(cat2.id),
+      amount: 250,
+    })
+
+    const res = await req('POST', '/api/v1/expenses/by-category', {})
+    expect(res.status).toBe(200)
+    const json = await res.json()
+
+    const row1 = json.by_category.find(
+      (r: { category_id: number }) => r.category_id === Number(cat1.id)
+    )
+    const row2 = json.by_category.find(
+      (r: { category_id: number }) => r.category_id === Number(cat2.id)
+    )
+    expect(row1).toMatchObject({ total: 100, count: 2 })
+    expect(row2).toMatchObject({ total: 250, count: 1 })
+
+    const idx1 = json.by_category.findIndex(
+      (r: { category_id: number }) => r.category_id === Number(cat1.id)
+    )
+    const idx2 = json.by_category.findIndex(
+      (r: { category_id: number }) => r.category_id === Number(cat2.id)
+    )
+    expect(idx2).toBeLessThan(idx1)
+
+    const summed = json.by_category.reduce((acc: number, r: { total: number }) => acc + r.total, 0)
+    expect(json.total).toBe(summed)
+  })
 })

@@ -7,6 +7,8 @@ import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
 
 type Split = { payment_method_id: number; partial_amount: number }
+type ExpenseCategoryTotal = { category_id: number; name: string; total: number; count: number }
+type ExpensesByCategoryData = { by_category: ExpenseCategoryTotal[]; total: number }
 
 type ExpenseWithSplits = {
   id: bigint
@@ -256,6 +258,54 @@ export const ExpensesService = {
         ok: false,
         status: 500,
         message: 'Failed to update expense',
+        meta: { error: (err as Error)?.message },
+      }
+    }
+  },
+
+  async byCategory(
+    user_external_id: string,
+    filters?: FilterNode
+  ): Promise<ServiceResult<ExpensesByCategoryData>> {
+    try {
+      const user = await db.user.findUnique({ where: { external_id: user_external_id } })
+      if (!user) return { ok: false, status: 404, message: 'User not found' }
+
+      const where = {
+        user_id: user.id,
+        ...(filters ? buildWhereClause(filters) : {}),
+      }
+
+      const groups = await db.expense.groupBy({
+        by: ['category_id'],
+        where,
+        _sum: { amount: true },
+        _count: { _all: true },
+      })
+
+      const categories = await db.category.findMany({
+        where: { id: { in: groups.map((g) => g.category_id) } },
+        select: { id: true, name: true },
+      })
+      const nameById = new Map(categories.map((c) => [c.id, c.name]))
+
+      const by_category = groups
+        .map((g) => ({
+          category_id: Number(g.category_id),
+          name: nameById.get(g.category_id) ?? '',
+          total: g._sum.amount ?? 0,
+          count: g._count._all,
+        }))
+        .sort((a, b) => b.total - a.total)
+
+      const total = by_category.reduce((acc, row) => acc + row.total, 0)
+
+      return { ok: true, data: { by_category, total } }
+    } catch (err: unknown) {
+      return {
+        ok: false,
+        status: 500,
+        message: 'Failed to summarize expenses by category',
         meta: { error: (err as Error)?.message },
       }
     }
