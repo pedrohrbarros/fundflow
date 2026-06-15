@@ -131,6 +131,23 @@ describe('Expenses API', () => {
     expect(res.status).toBe(404)
   })
 
+  it('PATCH /api/v1/expenses/:id rejects switching to an INCOME category', async () => {
+    const created = await (
+      await req('POST', '/api/v1/expenses', {
+        name: `exp-${TS}-patch-cat`,
+        category_id: Number(exp_category_id),
+        amount: 20,
+      })
+    ).json()
+    const incomeCat = await (
+      await req('POST', '/api/v1/categories', { name: `exp-patch-inc-${TS}`, type: 'INCOME' })
+    ).json()
+    const res = await req('PATCH', `/api/v1/expenses/${created.id}`, {
+      category_id: Number(incomeCat.id),
+    })
+    expect(res.status).toBe(404)
+  })
+
   it('POST /api/v1/expenses/search returns paginated expenses with full payment method data', async () => {
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-list`,
