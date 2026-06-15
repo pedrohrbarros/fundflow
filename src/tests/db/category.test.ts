@@ -5,7 +5,7 @@ const TS = Date.now()
 const TEST_NAME = `category_test_${TS}`
 const TEST_USER = `user_cat_db_${TS}`
 
-describe('SourceOfIncomeCategory model', () => {
+describe('Category model', () => {
   let userId: bigint
 
   beforeEach(async () => {
@@ -14,13 +14,13 @@ describe('SourceOfIncomeCategory model', () => {
   })
 
   afterEach(async () => {
-    await db.sourceOfIncomeCategory.deleteMany({ where: { name: TEST_NAME } })
+    await db.category.deleteMany({ where: { name: TEST_NAME } })
     await db.user.deleteMany({ where: { external_id: TEST_USER } })
     await db.$disconnect()
   })
 
   it('creates a category with a name and user', async () => {
-    const category = await db.sourceOfIncomeCategory.create({
+    const category = await db.category.create({
       data: { name: TEST_NAME, user_id: userId },
     })
 

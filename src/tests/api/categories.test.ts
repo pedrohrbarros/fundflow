@@ -44,7 +44,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await db.sourceOfIncomeCategory.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
+  await db.category.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
   await db.user.deleteMany({ where: { external_id: TEST_EXTERNAL_ID } })
   await db.$disconnect()
 })
@@ -140,7 +140,7 @@ describe('Categories API', () => {
 
   it('POST /api/v1/categories returns 400 when user has 100 categories', async () => {
     const user = await db.user.findUnique({ where: { external_id: TEST_EXTERNAL_ID } })
-    await db.sourceOfIncomeCategory.createMany({
+    await db.category.createMany({
       data: Array.from({ length: 100 }, (_, i) => ({
         name: `limit-cat-${TS}-${i}`,
         user_id: user!.id,
@@ -148,7 +148,7 @@ describe('Categories API', () => {
     })
     const res = await req('POST', '/api/v1/categories', { name: `test-cat-${TS}-over-limit` })
     expect(res.status).toBe(400)
-    await db.sourceOfIncomeCategory.deleteMany({
+    await db.category.deleteMany({
       where: { name: { startsWith: `limit-cat-${TS}` } },
     })
   })

@@ -50,7 +50,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await db.sourceOfIncome.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
-  await db.sourceOfIncomeCategory.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
+  await db.category.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
   await db.user.deleteMany({ where: { external_id: TEST_EXTERNAL_ID } })
   await db.$disconnect()
 })
@@ -159,7 +159,7 @@ describe('Sources of Income API', () => {
 
   it('POST /api/v1/sources_of_income returns 400 when user has 100 sources', async () => {
     const user = await db.user.findUnique({ where: { external_id: TEST_EXTERNAL_ID } })
-    const cat = await db.sourceOfIncomeCategory.findFirst({ where: { user_id: user!.id } })
+    const cat = await db.category.findFirst({ where: { user_id: user!.id } })
     await db.sourceOfIncome.createMany({
       data: Array.from({ length: 100 }, (_, i) => ({
         name: `limit-soi-${TS}-${i}`,

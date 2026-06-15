@@ -11,7 +11,7 @@ async function cleanupTestUsers() {
   })
   const ids = users.map((u) => u.id)
   if (ids.length === 0) return
-  await db.sourceOfIncomeCategory.deleteMany({ where: { user_id: { in: ids } } })
+  await db.category.deleteMany({ where: { user_id: { in: ids } } })
   await db.user.deleteMany({ where: { id: { in: ids } } })
 }
 

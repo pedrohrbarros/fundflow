@@ -11,7 +11,7 @@ model User {
   id                BigInt                   @id @default(autoincrement())
   external_id       String                   @unique
   country           String                   @default("BR")
-  categories        SourceOfIncomeCategory[]
+  categories        Category[]
   sources_of_income SourceOfIncome[]
   payment_methods   PaymentMethod[]
   expenses          Expense[]
@@ -21,7 +21,7 @@ model User {
   @@map("users")
 }
 
-model SourceOfIncomeCategory {
+model Category {
   id                BigInt           @id @default(autoincrement())
   name              String
   user_id           BigInt
@@ -41,7 +41,7 @@ model SourceOfIncome {
   currency    String                 @default("USD")
   user_id     BigInt
   user        User                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  category    SourceOfIncomeCategory @relation(fields: [category_id], references: [id])
+  category    Category               @relation(fields: [category_id], references: [id])
   created_at  DateTime               @default(now())
   updated_at  DateTime               @updatedAt
 
