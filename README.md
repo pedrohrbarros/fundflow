@@ -242,7 +242,7 @@ See `prisma/docs/README.md` for the full migration workflow.
 ```
 src/
 ├── index.ts               # App entry point, CORS, rate limiting, route groups
-├── config/                # DB, logging, OpenAPI, Redis, Clerk config
+├── config/                # DB, logging, OpenAPI, Redis, Google config
 ├── middleware/            # Auth, cache, error handling
 ├── constants/             # Static rules (rate limits, IP allowlists)
 ├── helpers/               # Pagination, filter parsing
