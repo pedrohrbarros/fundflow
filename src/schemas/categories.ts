@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const CategoryCreateSchema = z.object({
   name: z.string().min(1),
+  type: z.enum(['INCOME', 'EXPENSE']),
 })
 
 export const CategoryUpdateSchema = z.object({

@@ -44,7 +44,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await db.sourceOfIncomeCategory.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
+  await db.category.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
   await db.user.deleteMany({ where: { external_id: TEST_EXTERNAL_ID } })
   await db.$disconnect()
 })

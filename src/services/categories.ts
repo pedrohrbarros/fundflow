@@ -3,7 +3,13 @@ import type { ServiceResult } from './types'
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
 
-type CategoryRecord = { id: number; name: string; created_at: string; updated_at: string }
+type CategoryRecord = {
+  id: number
+  name: string
+  type: 'INCOME' | 'EXPENSE'
+  created_at: string
+  updated_at: string
+}
 
 type CategoryListData = {
   categories: CategoryRecord[]
@@ -11,21 +17,26 @@ type CategoryListData = {
 }
 
 export const CategoriesService = {
-  async create(user_external_id: string, name: string): Promise<ServiceResult<CategoryRecord>> {
+  async create(
+    user_external_id: string,
+    name: string,
+    type: 'INCOME' | 'EXPENSE'
+  ): Promise<ServiceResult<CategoryRecord>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
-      const count = await db.sourceOfIncomeCategory.count({ where: { user_id: user.id } })
+      const count = await db.category.count({ where: { user_id: user.id, type } })
       if (count >= 100)
-        return { ok: false, status: 400, message: 'Category limit reached (100 per user)' }
-      const category = await db.sourceOfIncomeCategory.create({
-        data: { name, user_id: user.id },
+        return { ok: false, status: 400, message: 'Category limit reached (100 per type)' }
+      const category = await db.category.create({
+        data: { name, type, user_id: user.id },
       })
       return {
         ok: true,
         data: {
           id: Number(category.id),
           name: category.name,
+          type: category.type,
           created_at: category.created_at.toISOString(),
           updated_at: category.updated_at.toISOString(),
         },
@@ -54,13 +65,13 @@ export const CategoriesService = {
         ...(filters ? buildWhereClause(filters) : {}),
       }
       const [categories, total] = await db.$transaction([
-        db.sourceOfIncomeCategory.findMany({
+        db.category.findMany({
           where,
           orderBy: { id: 'asc' },
           skip: (page - 1) * limit,
           take: limit,
         }),
-        db.sourceOfIncomeCategory.count({ where }),
+        db.category.count({ where }),
       ])
       return {
         ok: true,
@@ -68,6 +79,7 @@ export const CategoriesService = {
           categories: categories.map((c) => ({
             id: Number(c.id),
             name: c.name,
+            type: c.type,
             created_at: c.created_at.toISOString(),
             updated_at: c.updated_at.toISOString(),
           })),
@@ -92,7 +104,7 @@ export const CategoriesService = {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
-      const category = await db.sourceOfIncomeCategory.update({
+      const category = await db.category.update({
         where: { id, user_id: user.id },
         data: { name },
       })
@@ -101,6 +113,7 @@ export const CategoriesService = {
         data: {
           id: Number(category.id),
           name: category.name,
+          type: category.type,
           created_at: category.created_at.toISOString(),
           updated_at: category.updated_at.toISOString(),
         },
@@ -126,7 +139,7 @@ export const CategoriesService = {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
-      await db.sourceOfIncomeCategory.delete({ where: { id, user_id: user.id } })
+      await db.category.delete({ where: { id, user_id: user.id } })
       return { ok: true, data: { message: 'Category deleted' } }
     } catch (err: unknown) {
       if ((err as { code?: string })?.code === 'P2025')

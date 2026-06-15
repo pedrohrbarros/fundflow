@@ -7,6 +7,7 @@ import type { FieldAllowlist } from '../../../helpers/filters'
 
 const CATEGORY_ALLOWED_FIELDS: FieldAllowlist = {
   name: 'string',
+  type: 'string',
   created_at: 'datetime',
   updated_at: 'datetime',
 }

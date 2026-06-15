@@ -3,6 +3,7 @@ import type { Static } from '@sinclair/typebox'
 
 export const CategoryCreateBody = t.Object({
   name: t.String({ minLength: 1 }),
+  type: t.Union([t.Literal('INCOME'), t.Literal('EXPENSE')]),
 })
 
 export const CategoryUpdateBody = t.Object({

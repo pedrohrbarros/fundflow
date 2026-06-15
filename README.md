@@ -195,8 +195,29 @@ bun test --bail                                 # stop on first failure
 
 ### Database Migrations
 
+Migrations use both **Prisma** (schema + client generation) and the **Supabase CLI** (applying SQL to the database). The `bun run migrate` command runs both in sequence.
+
+#### Supabase CLI (one-time setup per machine)
+
 ```bash
-bun run migrate <name>   # generate + apply migration
+bunx supabase login                                   # authenticate the CLI
+bunx supabase link --project-ref vucwsoyaqjufmkmozoqk # link to the Supabase project
+```
+
+#### Running a migration
+
+```bash
+bunx prisma validate     # validate schema.prisma before migrating
+bun run migrate <name>   # generate + apply migration (Prisma + Supabase)
+```
+
+`bun run migrate <name>` (see `scripts/migrate.sh`) runs the following under the hood:
+
+```bash
+prisma migrate dev --name <name>   # generate SQL, apply to DB, update Prisma's log
+supabase migration new <name>      # create a matching file in supabase/migrations/
+supabase db push                   # register the migration in Supabase
+prisma generate                    # regenerate the Prisma client
 ```
 
 See `prisma/docs/README.md` for the full migration workflow.

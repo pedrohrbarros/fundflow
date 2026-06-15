@@ -12,6 +12,7 @@ export type ExpensePaymentMethodRecord = {
 export type ExpenseRecord = {
   id: number
   name: string
+  category_id: number
   amount: number
   is_paid: boolean
   is_saved: boolean
@@ -28,6 +29,7 @@ const ExpensePaymentMethodInput = t.Object({
 
 export const ExpenseCreateBody = t.Object({
   name: t.String({ minLength: 1 }),
+  category_id: t.Integer(),
   amount: t.Number({ exclusiveMinimum: 0 }),
   is_paid: t.Optional(t.Boolean()),
   is_saved: t.Optional(t.Boolean()),
@@ -37,6 +39,7 @@ export const ExpenseCreateBody = t.Object({
 
 export const ExpenseUpdateBody = t.Object({
   name: t.Optional(t.String({ minLength: 1 })),
+  category_id: t.Optional(t.Integer()),
   amount: t.Optional(t.Number({ exclusiveMinimum: 0 })),
   is_paid: t.Optional(t.Boolean()),
   is_saved: t.Optional(t.Boolean()),

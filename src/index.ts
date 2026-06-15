@@ -69,6 +69,9 @@ export const app = new Elysia()
     rateLimit({
       duration: 60_000,
       max: 100,
+      // The functional test suite fires many requests from one key; skip the
+      // global limiter under test. Dedicated rate-limit tests use their own app.
+      skip: () => process.env.NODE_ENV === 'test',
       generator: (request, server) =>
         request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
         server?.requestIP(request)?.address ??

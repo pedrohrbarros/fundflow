@@ -19,6 +19,7 @@ const category = {
   properties: {
     id: { type: 'number' },
     name: { type: 'string' },
+    type: { type: 'string', enum: ['INCOME', 'EXPENSE'] },
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
   },
@@ -100,6 +101,7 @@ const expense = {
   properties: {
     id: { type: 'number' },
     name: { type: 'string' },
+    category_id: { type: 'number' },
     amount: { type: 'number' },
     is_paid: { type: 'boolean' },
     is_saved: { type: 'boolean' },

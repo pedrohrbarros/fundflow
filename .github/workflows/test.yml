@@ -1,0 +1,66 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: fundflow_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      REDIS_URL: redis://localhost:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1'
+
+      # Compose the throwaway test DB URL from the service password so no
+      # credential-shaped literal is committed (it only targets the local
+      # ephemeral Postgres above, never production). API_TOKEN and
+      # CLERK_AUTHORIZED_PARTY are set by the test files themselves.
+      - name: Configure test database URL
+        run: echo "DATABASE_URL=postgresql://postgres:${PGPASSWORD}@localhost:5432/fundflow_test" >> "$GITHUB_ENV"
+        env:
+          PGPASSWORD: postgres
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
+      - name: Sync schema to the test database
+        run: bunx prisma db push
+
+      - name: Run tests
+        run: bun test

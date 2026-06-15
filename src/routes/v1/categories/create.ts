@@ -16,7 +16,7 @@ export const createCategory = async ({
     set.status = 400
     return { error: parsed.error.flatten().fieldErrors }
   }
-  const result = await CategoriesService.create(clerk_user_id, parsed.data.name)
+  const result = await CategoriesService.create(clerk_user_id, parsed.data.name, parsed.data.type)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201
   return result.data

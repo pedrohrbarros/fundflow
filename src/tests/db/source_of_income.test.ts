@@ -13,15 +13,15 @@ describe('SourceOfIncome model', () => {
   beforeEach(async () => {
     const user = await db.user.create({ data: { external_id: TEST_USER } })
     userId = user.id
-    const category = await db.sourceOfIncomeCategory.create({
-      data: { name: CATEGORY_NAME, user_id: userId },
+    const category = await db.category.create({
+      data: { name: CATEGORY_NAME, type: 'INCOME', user_id: userId },
     })
     categoryId = category.id
   })
 
   afterEach(async () => {
     await db.sourceOfIncome.deleteMany({ where: { name: SOURCE_NAME } })
-    await db.sourceOfIncomeCategory.deleteMany({ where: { name: CATEGORY_NAME } })
+    await db.category.deleteMany({ where: { name: CATEGORY_NAME } })
     await db.user.deleteMany({ where: { external_id: TEST_USER } })
     await db.$disconnect()
   })
