@@ -345,5 +345,8 @@ describe('Expenses API', () => {
 
     const summed = json.by_category.reduce((acc: number, r: { total: number }) => acc + r.total, 0)
     expect(json.total).toBe(summed)
-  })
+    // Per-test timeout: this case makes 6 sequential round-trips to a remote
+    // Supabase DB (~1.2s each), which can exceed bun:test's 5s default under
+    // load or when run outside the `--timeout`-configured `bun run test` script.
+  }, 20000)
 })
