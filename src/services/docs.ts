@@ -25,7 +25,7 @@ export const DocsService = {
       const user = await db.user.upsert({
         where: { external_id: key },
         update: {},
-        create: { external_id: key },
+        create: { external_id: key, email: `${key}@docs.fundflow.local` },
       })
       return { ok: true, data: { external_id: user.external_id } }
     } catch (err: unknown) {

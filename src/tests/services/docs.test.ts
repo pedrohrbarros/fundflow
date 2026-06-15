@@ -42,7 +42,12 @@ describe('DocsService.findOrCreateMonthlyTestUser', () => {
   })
 
   it('deletes old test users when a new month key is needed', async () => {
-    await db.user.create({ data: { external_id: 'docs-test-user-2020-01' } })
+    await db.user.create({
+      data: {
+        external_id: 'docs-test-user-2020-01',
+        email: 'docs-test-user-2020-01@docs.fundflow.local',
+      },
+    })
 
     const now = new Date()
     const currentKey = `${TEST_PREFIX}${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
