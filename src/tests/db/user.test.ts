@@ -11,7 +11,7 @@ describe('User model', () => {
 
   it('creates a user with an external_id', async () => {
     const user = await db.user.create({
-      data: { external_id: TEST_EXTERNAL_ID },
+      data: { external_id: TEST_EXTERNAL_ID, email: `${TEST_EXTERNAL_ID}@test.local` },
     })
 
     expect(user.id).toBeDefined()

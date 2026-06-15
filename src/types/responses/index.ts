@@ -145,6 +145,7 @@ export const UserResponse = {
   type: 'object',
   properties: {
     id: { type: 'number' },
+    email: { type: 'string' },
     country: { type: 'string' },
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },

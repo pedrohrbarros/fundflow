@@ -1,6 +1,7 @@
 import { Elysia } from 'elysia'
 import { getMe } from './get_me'
 import { updateCountry } from './update_country'
+import { deleteMe } from './delete_me'
 import { UpdateCountryBody } from '../../../types/users'
 import { UserResponse } from '../../../types/responses'
 import type { RouteHandler } from '../../../types/routes'
@@ -20,7 +21,7 @@ export const users = new Elysia()
       },
     },
   })
-  .patch('/users/country', updateCountry as RouteHandler, {
+  .patch('/users/me', updateCountry as RouteHandler, {
     detail: {
       hide: true,
       tags: ['Users'],
@@ -31,6 +32,16 @@ export const users = new Elysia()
       },
       responses: {
         '200': { description: 'OK', content: s(UserResponse) },
+      },
+    },
+  })
+  .delete('/users/me', deleteMe as RouteHandler, {
+    detail: {
+      hide: true,
+      tags: ['Users'],
+      security: [{ apiKey: [] }],
+      responses: {
+        '204': { description: 'No Content' },
       },
     },
   })
