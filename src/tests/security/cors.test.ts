@@ -1,12 +1,6 @@
-import { describe, it, expect, mock } from 'bun:test'
-import { generateKeyPair } from 'jose'
+import { describe, it, expect } from 'bun:test'
 
-const { publicKey: test_public_key } = await generateKeyPair('RS256')
-
-mock.module('../../config/clerk', () => ({
-  getClerkPublicKey: async () => test_public_key,
-}))
-
+process.env.JWT_SECRET = 'test-secret-value'
 process.env.ALLOWED_ORIGINS = '["http://localhost:3000"]'
 process.env.API_TOKEN = 'test-api-token'
 
