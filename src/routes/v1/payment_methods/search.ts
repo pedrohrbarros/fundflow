@@ -14,11 +14,11 @@ const PAYMENT_METHOD_ALLOWED_FIELDS: FieldAllowlist = {
 }
 
 export const searchPaymentMethods = async ({
-  clerk_user_id,
+  user_external_id,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   body: { page?: number; limit?: number; filters?: unknown }
   set: { status?: number | string }
 }) => {
@@ -36,7 +36,7 @@ export const searchPaymentMethods = async ({
   }
 
   const result = await PaymentMethodsService.search(
-    clerk_user_id,
+    user_external_id,
     pagination.page,
     pagination.limit,
     filters

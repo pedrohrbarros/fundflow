@@ -3,11 +3,11 @@ import { handleError } from '../../../middleware/error'
 import { SourceOfIncomeCreateSchema } from '../../../schemas/sources_of_income'
 
 export const createSourceOfIncome = async ({
-  clerk_user_id,
+  user_external_id,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   body: unknown
   set: { status?: number | string }
 }) => {
@@ -17,7 +17,7 @@ export const createSourceOfIncome = async ({
     return { error: parsed.error.flatten().fieldErrors }
   }
   const result = await SourcesOfIncomeService.create(
-    clerk_user_id,
+    user_external_id,
     parsed.data.name,
     BigInt(parsed.data.category_id),
     parsed.data.income,

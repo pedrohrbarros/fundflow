@@ -3,12 +3,12 @@ import { handleError } from '../../../middleware/error'
 import { SourceOfIncomeUpdateSchema } from '../../../schemas/sources_of_income'
 
 export const updateSourceOfIncome = async ({
-  clerk_user_id,
+  user_external_id,
   params,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   params: { id: string }
   body: unknown
   set: { status?: number | string }
@@ -24,7 +24,7 @@ export const updateSourceOfIncome = async ({
   if (parsed.data.category_id !== undefined) data.category_id = BigInt(parsed.data.category_id)
   if (parsed.data.income !== undefined) data.income = parsed.data.income
   if (parsed.data.currency !== undefined) data.currency = parsed.data.currency
-  const result = await SourcesOfIncomeService.update(id, clerk_user_id, data)
+  const result = await SourcesOfIncomeService.update(id, user_external_id, data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data
 }

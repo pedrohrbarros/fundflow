@@ -3,12 +3,12 @@ import { handleError } from '../../../middleware/error'
 import { PaymentMethodUpdateSchema } from '../../../schemas/payment_methods'
 
 export const updatePaymentMethod = async ({
-  clerk_user_id,
+  user_external_id,
   params,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   params: { id: string }
   body: unknown
   set: { status?: number | string }
@@ -23,7 +23,7 @@ export const updatePaymentMethod = async ({
   if (parsed.data.name !== undefined) data.name = parsed.data.name
   if (parsed.data.origin !== undefined) data.origin = parsed.data.origin
   if (parsed.data.receiver !== undefined) data.receiver = parsed.data.receiver
-  const result = await PaymentMethodsService.update(id, clerk_user_id, data)
+  const result = await PaymentMethodsService.update(id, user_external_id, data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data
 }

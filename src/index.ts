@@ -3,9 +3,8 @@ import { cors } from '@elysiajs/cors'
 import { rateLimit } from 'elysia-rate-limit'
 import { swagger } from '@elysiajs/swagger'
 import { open_api_config } from './config/openapi'
-import { withBearerAuth, withUserAuth } from './middleware/auth'
+import { withUserAuth } from './middleware/auth'
 import { auth } from './routes/v1/auth'
-import { webhooks } from './routes/v1/webhooks'
 import { categories } from './routes/v1/categories'
 import { sources_of_income } from './routes/v1/sources_of_income'
 import { payment_methods } from './routes/v1/payment_methods'
@@ -94,7 +93,6 @@ export const app = new Elysia()
     endpoint_logger.error({ error: String(error) }, 'Request error')
   })
   .use(swagger(open_api_config))
-  .group('/api/v1', (app) => withBearerAuth(app).use(webhooks))
   .group('/api/v1', (app) => app.use(auth))
   .group('/api/v1', (app) =>
     withUserAuth(app)

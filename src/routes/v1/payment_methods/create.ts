@@ -3,11 +3,11 @@ import { handleError } from '../../../middleware/error'
 import { PaymentMethodCreateSchema } from '../../../schemas/payment_methods'
 
 export const createPaymentMethod = async ({
-  clerk_user_id,
+  user_external_id,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   body: unknown
   set: { status?: number | string }
 }) => {
@@ -17,7 +17,7 @@ export const createPaymentMethod = async ({
     return { error: parsed.error.flatten().fieldErrors }
   }
   const result = await PaymentMethodsService.create(
-    clerk_user_id,
+    user_external_id,
     parsed.data.name,
     parsed.data.origin,
     parsed.data.receiver
