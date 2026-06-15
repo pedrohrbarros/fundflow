@@ -11,6 +11,7 @@ type Split = { payment_method_id: number; partial_amount: number }
 type ExpenseWithSplits = {
   id: bigint
   name: string
+  category_id: bigint
   amount: number
   is_paid: boolean
   is_saved: boolean
@@ -31,6 +32,7 @@ type ExpenseWithSplits = {
 const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
   id: Number(expense.id),
   name: expense.name,
+  category_id: Number(expense.category_id),
   amount: expense.amount,
   is_paid: expense.is_paid,
   is_saved: expense.is_saved,
@@ -82,6 +84,17 @@ export const ExpensesService = {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
 
+      const category = await db.category.findFirst({
+        where: { id: BigInt(input.category_id), user_id: user.id, type: 'EXPENSE' },
+      })
+      if (!category)
+        return {
+          ok: false,
+          status: 404,
+          message: 'Category not found',
+          meta: { category_id: String(input.category_id) },
+        }
+
       const splits = input.payment_methods ?? []
       if (splits.length > 0) {
         const validation = await validateSplits(splits, input.amount, user.id)
@@ -91,6 +104,7 @@ export const ExpensesService = {
       const expense = await db.expense.create({
         data: {
           name: input.name,
+          category_id: BigInt(input.category_id),
           amount: input.amount,
           is_paid: input.is_paid ?? false,
           is_saved: input.is_saved ?? false,
@@ -187,6 +201,19 @@ export const ExpensesService = {
       if (!existing)
         return { ok: false, status: 404, message: 'Expense not found', meta: { id: id.toString() } }
 
+      if (input.category_id !== undefined) {
+        const category = await db.category.findFirst({
+          where: { id: BigInt(input.category_id), user_id: user.id, type: 'EXPENSE' },
+        })
+        if (!category)
+          return {
+            ok: false,
+            status: 404,
+            message: 'Category not found',
+            meta: { category_id: String(input.category_id) },
+          }
+      }
+
       const splits = input.payment_methods
       const newAmount = input.amount ?? existing.amount
 
@@ -212,6 +239,7 @@ export const ExpensesService = {
         where: { id },
         data: {
           ...(input.name !== undefined ? { name: input.name } : {}),
+          ...(input.category_id !== undefined ? { category_id: BigInt(input.category_id) } : {}),
           ...(input.amount !== undefined ? { amount: input.amount } : {}),
           ...(input.is_paid !== undefined ? { is_paid: input.is_paid } : {}),
           ...(input.is_saved !== undefined ? { is_saved: input.is_saved } : {}),

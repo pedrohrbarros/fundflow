@@ -19,6 +19,7 @@ const category = {
   properties: {
     id: { type: 'number' },
     name: { type: 'string' },
+    type: { type: 'string', enum: ['INCOME', 'EXPENSE'] },
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
   },

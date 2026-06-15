@@ -14,7 +14,7 @@ describe('SourceOfIncome model', () => {
     const user = await db.user.create({ data: { external_id: TEST_USER } })
     userId = user.id
     const category = await db.category.create({
-      data: { name: CATEGORY_NAME, user_id: userId },
+      data: { name: CATEGORY_NAME, type: 'INCOME', user_id: userId },
     })
     categoryId = category.id
   })

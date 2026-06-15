@@ -40,6 +40,7 @@ const req = async (method: string, path: string, body?: unknown) => {
 }
 
 let pm_id: number
+let exp_category_id: number
 
 beforeAll(async () => {
   await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
@@ -47,22 +48,32 @@ beforeAll(async () => {
     await req('POST', '/api/v1/payment_methods', { name: `test-pm-${TS}`, origin: 'Test Bank' })
   ).json()
   pm_id = pm.id
+  const cat = await (
+    await req('POST', '/api/v1/categories', { name: `test-exp-cat-${TS}`, type: 'EXPENSE' })
+  ).json()
+  exp_category_id = cat.id
 })
 
 afterAll(async () => {
   await db.expense.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
   await db.paymentMethod.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
+  await db.category.deleteMany({ where: { user: { external_id: TEST_EXTERNAL_ID } } })
   await db.user.deleteMany({ where: { external_id: TEST_EXTERNAL_ID } })
   await db.$disconnect()
 })
 
 describe('Expenses API', () => {
   it('POST /api/v1/expenses creates an expense without splits', async () => {
-    const res = await req('POST', '/api/v1/expenses', { name: `exp-${TS}-no-split`, amount: 100 })
+    const res = await req('POST', '/api/v1/expenses', {
+      name: `exp-${TS}-no-split`,
+      category_id: Number(exp_category_id),
+      amount: 100,
+    })
     expect(res.status).toBe(201)
     const json = await res.json()
     expect(json.id).toBeDefined()
     expect(json.name).toBe(`exp-${TS}-no-split`)
+    expect(json.category_id).toBe(exp_category_id)
     expect(json.amount).toBe(100)
     expect(json.is_paid).toBe(false)
     expect(json.is_saved).toBe(false)
@@ -75,6 +86,7 @@ describe('Expenses API', () => {
   it('POST /api/v1/expenses creates an expense with splits', async () => {
     const res = await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-split`,
+      category_id: Number(exp_category_id),
       amount: 100,
       is_paid: true,
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
@@ -90,6 +102,7 @@ describe('Expenses API', () => {
   it('POST /api/v1/expenses returns 400 when splits do not sum to amount', async () => {
     const res = await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-bad-split`,
+      category_id: Number(exp_category_id),
       amount: 100,
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 50 }],
     })
@@ -99,8 +112,21 @@ describe('Expenses API', () => {
   it('POST /api/v1/expenses returns 404 for unknown payment method', async () => {
     const res = await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-unknown-pm`,
+      category_id: Number(exp_category_id),
       amount: 100,
       payment_methods: [{ payment_method_id: 999999999, partial_amount: 100 }],
+    })
+    expect(res.status).toBe(404)
+  })
+
+  it('rejects an expense that references an INCOME category', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `exp-inc-${TS}`, type: 'INCOME' })
+    ).json()
+    const res = await req('POST', '/api/v1/expenses', {
+      name: `exp-${TS}-inc-cat`,
+      category_id: Number(cat.id),
+      amount: 10,
     })
     expect(res.status).toBe(404)
   })
@@ -108,6 +134,7 @@ describe('Expenses API', () => {
   it('POST /api/v1/expenses/search returns paginated expenses with full payment method data', async () => {
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-list`,
+      category_id: Number(exp_category_id),
       amount: 100,
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
     })
@@ -133,7 +160,11 @@ describe('Expenses API', () => {
 
   it('PATCH /api/v1/expenses/:id updates expense fields', async () => {
     const created = await (
-      await req('POST', '/api/v1/expenses', { name: `exp-${TS}-patch-old`, amount: 50 })
+      await req('POST', '/api/v1/expenses', {
+        name: `exp-${TS}-patch-old`,
+        category_id: Number(exp_category_id),
+        amount: 50,
+      })
     ).json()
     const res = await req('PATCH', `/api/v1/expenses/${created.id}`, {
       name: `exp-${TS}-patch-new`,
@@ -152,6 +183,7 @@ describe('Expenses API', () => {
     const created = await (
       await req('POST', '/api/v1/expenses', {
         name: `exp-${TS}-split-replace`,
+        category_id: Number(exp_category_id),
         amount: 100,
         payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
       })
@@ -164,7 +196,11 @@ describe('Expenses API', () => {
 
   it('PATCH /api/v1/expenses/:id returns 400 when new splits do not sum to amount', async () => {
     const created = await (
-      await req('POST', '/api/v1/expenses', { name: `exp-${TS}-bad-patch`, amount: 100 })
+      await req('POST', '/api/v1/expenses', {
+        name: `exp-${TS}-bad-patch`,
+        category_id: Number(exp_category_id),
+        amount: 100,
+      })
     ).json()
     const res = await req('PATCH', `/api/v1/expenses/${created.id}`, {
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 50 }],
@@ -179,7 +215,11 @@ describe('Expenses API', () => {
 
   it('DELETE /api/v1/expenses/:id deletes an expense', async () => {
     const created = await (
-      await req('POST', '/api/v1/expenses', { name: `exp-${TS}-del`, amount: 10 })
+      await req('POST', '/api/v1/expenses', {
+        name: `exp-${TS}-del`,
+        category_id: Number(exp_category_id),
+        amount: 10,
+      })
     ).json()
     const res = await req('DELETE', `/api/v1/expenses/${created.id}`)
     expect(res.status).toBe(200)
@@ -199,8 +239,16 @@ describe('Expenses API', () => {
 
   it('POST /api/v1/expenses/search with is_equal filter returns only matching expenses', async () => {
     const name = `exp-${TS}-filter-eq`
-    await req('POST', '/api/v1/expenses', { name, amount: 50 })
-    await req('POST', '/api/v1/expenses', { name: `exp-${TS}-filter-other`, amount: 50 })
+    await req('POST', '/api/v1/expenses', {
+      name,
+      category_id: Number(exp_category_id),
+      amount: 50,
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `exp-${TS}-filter-other`,
+      category_id: Number(exp_category_id),
+      amount: 50,
+    })
     const res = await req('POST', '/api/v1/expenses/search', {
       filters: { field: 'name', op: 'is_equal', value: name },
     })
@@ -211,9 +259,21 @@ describe('Expenses API', () => {
   })
 
   it('POST /api/v1/expenses/search with is_between filter returns only in-range expenses', async () => {
-    await req('POST', '/api/v1/expenses', { name: `exp-${TS}-range-low`, amount: 10 })
-    await req('POST', '/api/v1/expenses', { name: `exp-${TS}-range-mid`, amount: 150 })
-    await req('POST', '/api/v1/expenses', { name: `exp-${TS}-range-high`, amount: 500 })
+    await req('POST', '/api/v1/expenses', {
+      name: `exp-${TS}-range-low`,
+      category_id: Number(exp_category_id),
+      amount: 10,
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `exp-${TS}-range-mid`,
+      category_id: Number(exp_category_id),
+      amount: 150,
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `exp-${TS}-range-high`,
+      category_id: Number(exp_category_id),
+      amount: 500,
+    })
     const res = await req('POST', '/api/v1/expenses/search', {
       filters: { field: 'amount', op: 'is_between', value: [100, 200] },
     })

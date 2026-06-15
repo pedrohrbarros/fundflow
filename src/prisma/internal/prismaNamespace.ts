@@ -376,7 +376,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
-  SourceOfIncomeCategory: 'SourceOfIncomeCategory',
+  Category: 'Category',
   SourceOfIncome: 'SourceOfIncome',
   PaymentMethod: 'PaymentMethod',
   Expense: 'Expense',
@@ -402,7 +402,7 @@ export type TypeMap<
   meta: {
     modelProps:
       | 'user'
-      | 'sourceOfIncomeCategory'
+      | 'category'
       | 'sourceOfIncome'
       | 'paymentMethod'
       | 'expense'
@@ -484,79 +484,77 @@ export type TypeMap<
         }
       }
     }
-    SourceOfIncomeCategory: {
-      payload: Prisma.$SourceOfIncomeCategoryPayload<ExtArgs>
-      fields: Prisma.SourceOfIncomeCategoryFieldRefs
+    Category: {
+      payload: Prisma.$CategoryPayload<ExtArgs>
+      fields: Prisma.CategoryFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.SourceOfIncomeCategoryFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload> | null
+          args: Prisma.CategoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.SourceOfIncomeCategoryFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>
+          args: Prisma.CategoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
         }
         findFirst: {
-          args: Prisma.SourceOfIncomeCategoryFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload> | null
+          args: Prisma.CategoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.SourceOfIncomeCategoryFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>
+          args: Prisma.CategoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
         }
         findMany: {
-          args: Prisma.SourceOfIncomeCategoryFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>[]
+          args: Prisma.CategoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
         }
         create: {
-          args: Prisma.SourceOfIncomeCategoryCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>
+          args: Prisma.CategoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
         }
         createMany: {
-          args: Prisma.SourceOfIncomeCategoryCreateManyArgs<ExtArgs>
+          args: Prisma.CategoryCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.SourceOfIncomeCategoryCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>[]
+          args: Prisma.CategoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
         }
         delete: {
-          args: Prisma.SourceOfIncomeCategoryDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>
+          args: Prisma.CategoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
         }
         update: {
-          args: Prisma.SourceOfIncomeCategoryUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>
+          args: Prisma.CategoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
         }
         deleteMany: {
-          args: Prisma.SourceOfIncomeCategoryDeleteManyArgs<ExtArgs>
+          args: Prisma.CategoryDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.SourceOfIncomeCategoryUpdateManyArgs<ExtArgs>
+          args: Prisma.CategoryUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.SourceOfIncomeCategoryUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>[]
+          args: Prisma.CategoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>[]
         }
         upsert: {
-          args: Prisma.SourceOfIncomeCategoryUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$SourceOfIncomeCategoryPayload>
+          args: Prisma.CategoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CategoryPayload>
         }
         aggregate: {
-          args: Prisma.SourceOfIncomeCategoryAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateSourceOfIncomeCategory>
+          args: Prisma.CategoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCategory>
         }
         groupBy: {
-          args: Prisma.SourceOfIncomeCategoryGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.SourceOfIncomeCategoryGroupByOutputType>[]
+          args: Prisma.CategoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryGroupByOutputType>[]
         }
         count: {
-          args: Prisma.SourceOfIncomeCategoryCountArgs<ExtArgs>
-          result:
-            | runtime.Types.Utils.Optional<Prisma.SourceOfIncomeCategoryCountAggregateOutputType>
-            | number
+          args: Prisma.CategoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CategoryCountAggregateOutputType> | number
         }
       }
     }
@@ -911,16 +909,17 @@ export const UserScalarFieldEnum = {
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
-export const SourceOfIncomeCategoryScalarFieldEnum = {
+export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  type: 'type',
   user_id: 'user_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
 } as const
 
-export type SourceOfIncomeCategoryScalarFieldEnum =
-  (typeof SourceOfIncomeCategoryScalarFieldEnum)[keyof typeof SourceOfIncomeCategoryScalarFieldEnum]
+export type CategoryScalarFieldEnum =
+  (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
 
 export const SourceOfIncomeScalarFieldEnum = {
   id: 'id',
@@ -952,6 +951,7 @@ export type PaymentMethodScalarFieldEnum =
 export const ExpenseScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  category_id: 'category_id',
   amount: 'amount',
   is_paid: 'is_paid',
   is_saved: 'is_saved',
@@ -1028,6 +1028,22 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+
+/**
+ * Reference to a field of type 'CategoryType'
+ */
+export type EnumCategoryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
+  $PrismaModel,
+  'CategoryType'
+>
+
+/**
+ * Reference to a field of type 'CategoryType[]'
+ */
+export type ListEnumCategoryTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
+  $PrismaModel,
+  'CategoryType[]'
+>
 
 /**
  * Reference to a field of type 'Float'
@@ -1173,7 +1189,7 @@ export type PrismaClientOptions = (
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
-  sourceOfIncomeCategory?: Prisma.SourceOfIncomeCategoryOmit
+  category?: Prisma.CategoryOmit
   sourceOfIncome?: Prisma.SourceOfIncomeOmit
   paymentMethod?: Prisma.PaymentMethodOmit
   expense?: Prisma.ExpenseOmit

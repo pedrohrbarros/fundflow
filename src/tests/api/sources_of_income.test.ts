@@ -43,7 +43,10 @@ let test_category_id: number
 
 beforeAll(async () => {
   await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
-  const catRes = await req('POST', '/api/v1/categories', { name: `test-soi-cat-${TS}` })
+  const catRes = await req('POST', '/api/v1/categories', {
+    name: `test-soi-cat-${TS}`,
+    type: 'INCOME',
+  })
   const cat = await catRes.json()
   test_category_id = cat.id
 })
@@ -68,6 +71,17 @@ describe('Sources of Income API', () => {
     expect(json.name).toBe(`test-soi-${TS}-create`)
     expect(json.category_id).toBe(test_category_id)
     expect(json.currency).toBe('EUR')
+  })
+
+  it('rejects a source of income that references an EXPENSE category', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `soi-exp-${TS}`, type: 'EXPENSE' })
+    ).json()
+    const res = await req('POST', '/api/v1/sources_of_income', {
+      name: `test-soi-${TS}-exp-cat`,
+      category_id: Number(cat.id),
+    })
+    expect(res.status).toBe(404)
   })
 
   it('POST /api/v1/sources_of_income/search returns sources grouped by category with pagination', async () => {

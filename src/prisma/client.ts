@@ -50,10 +50,10 @@ export { Prisma }
  */
 export type User = Prisma.UserModel
 /**
- * Model SourceOfIncomeCategory
+ * Model Category
  *
  */
-export type SourceOfIncomeCategory = Prisma.SourceOfIncomeCategoryModel
+export type Category = Prisma.CategoryModel
 /**
  * Model SourceOfIncome
  *

@@ -8,7 +8,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User'
-export type * from './models/SourceOfIncomeCategory'
+export type * from './models/Category'
 export type * from './models/SourceOfIncome'
 export type * from './models/PaymentMethod'
 export type * from './models/Expense'

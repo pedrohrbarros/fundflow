@@ -7,6 +7,7 @@ const ExpensePaymentMethodInput = z.object({
 
 export const ExpenseCreateSchema = z.object({
   name: z.string().min(1),
+  category_id: z.number().int(),
   amount: z.number().positive(),
   is_paid: z.boolean().optional(),
   is_saved: z.boolean().optional(),
@@ -16,6 +17,7 @@ export const ExpenseCreateSchema = z.object({
 
 export const ExpenseUpdateSchema = z.object({
   name: z.string().min(1).optional(),
+  category_id: z.number().int().optional(),
   amount: z.number().positive().optional(),
   is_paid: z.boolean().optional(),
   is_saved: z.boolean().optional(),

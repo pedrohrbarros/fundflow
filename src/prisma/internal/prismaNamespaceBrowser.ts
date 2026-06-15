@@ -49,7 +49,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  SourceOfIncomeCategory: 'SourceOfIncomeCategory',
+  Category: 'Category',
   SourceOfIncome: 'SourceOfIncome',
   PaymentMethod: 'PaymentMethod',
   Expense: 'Expense',
@@ -82,16 +82,17 @@ export const UserScalarFieldEnum = {
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
-export const SourceOfIncomeCategoryScalarFieldEnum = {
+export const CategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  type: 'type',
   user_id: 'user_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
 } as const
 
-export type SourceOfIncomeCategoryScalarFieldEnum =
-  (typeof SourceOfIncomeCategoryScalarFieldEnum)[keyof typeof SourceOfIncomeCategoryScalarFieldEnum]
+export type CategoryScalarFieldEnum =
+  (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
 
 export const SourceOfIncomeScalarFieldEnum = {
   id: 'id',
@@ -123,6 +124,7 @@ export type PaymentMethodScalarFieldEnum =
 export const ExpenseScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  category_id: 'category_id',
   amount: 'amount',
   is_paid: 'is_paid',
   is_saved: 'is_saved',

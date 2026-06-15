@@ -37,9 +37,9 @@ export const CategorySearchBody = searchBody({
   properties: {
     field: {
       type: 'string',
-      enum: ['name', 'created_at', 'updated_at'],
+      enum: ['name', 'type', 'created_at', 'updated_at'],
       description:
-        'name → is_equal, is_not_equal, is_contains, is_starts_with, is_ends_with | created_at/updated_at → is_equal, is_before, is_after, is_between',
+        'name → is_equal, is_not_equal, is_contains, is_starts_with, is_ends_with | type → is_equal, is_not_equal (value: INCOME | EXPENSE) | created_at/updated_at → is_equal, is_before, is_after, is_between',
     },
     op: {
       type: 'string',

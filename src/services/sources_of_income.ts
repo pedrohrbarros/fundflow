@@ -48,7 +48,7 @@ export const SourcesOfIncomeService = {
       if (count >= 100)
         return { ok: false, status: 400, message: 'Source of income limit reached (100 per user)' }
       const category = await db.category.findFirst({
-        where: { id: category_id, user_id: user.id },
+        where: { id: category_id, user_id: user.id, type: 'INCOME' },
       })
       if (!category)
         return {
@@ -136,7 +136,7 @@ export const SourcesOfIncomeService = {
       if (!user) return { ok: false, status: 404, message: 'User not found' }
       if (data.category_id) {
         const category = await db.category.findFirst({
-          where: { id: data.category_id, user_id: user.id },
+          where: { id: data.category_id, user_id: user.id, type: 'INCOME' },
         })
         if (!category)
           return {

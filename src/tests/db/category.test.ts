@@ -19,14 +19,15 @@ describe('Category model', () => {
     await db.$disconnect()
   })
 
-  it('creates a category with a name and user', async () => {
+  it('creates a category with a name, type and user', async () => {
     const category = await db.category.create({
-      data: { name: TEST_NAME, user_id: userId },
+      data: { name: TEST_NAME, type: 'INCOME', user_id: userId },
     })
 
     expect(category.id).toBeDefined()
     expect(typeof category.id).toBe('bigint')
     expect(category.name).toBe(TEST_NAME)
+    expect(category.type).toBe('INCOME')
     expect(category.user_id).toBe(userId)
     expect(category.created_at).toBeInstanceOf(Date)
     expect(category.updated_at).toBeInstanceOf(Date)
