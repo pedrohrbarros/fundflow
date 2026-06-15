@@ -44,6 +44,9 @@ export const AuthService = {
     const identity = await verifyGoogleIdToken(id_token)
     if (!identity) return { ok: false, status: 401, message: 'Invalid Google token' }
     try {
+      // Re-sync email from Google on every login: Google is the source of truth,
+      // so a changed account email is reflected here (older access tokens carry the
+      // previous email until they expire — acceptable for a 15-minute access token).
       const user = await db.user.upsert({
         where: { external_id: identity.sub },
         update: { email: identity.email },
@@ -69,14 +72,25 @@ export const AuthService = {
 
   async refresh(refresh_token: string): Promise<ServiceResult<AuthTokens>> {
     try {
-      const existing = await db.refreshToken.findUnique({
-        where: { token_hash: hashRefreshToken(refresh_token) },
-        include: { user: true },
+      const token_hash = hashRefreshToken(refresh_token)
+      // Atomically revoke the token, but only if it is currently valid and unexpired.
+      // Doing the validity check and the revocation in one UPDATE closes a
+      // check-then-act race where two concurrent requests carrying the same
+      // refresh token could each rotate it and mint two valid sessions.
+      const revoked = await db.refreshToken.updateMany({
+        where: { token_hash, revoked: false, expires_at: { gt: new Date() } },
+        data: { revoked: true },
       })
-      if (!existing || existing.revoked || existing.expires_at < new Date()) {
+      if (revoked.count === 0) {
         return { ok: false, status: 401, message: 'Invalid or expired refresh token' }
       }
-      await db.refreshToken.update({ where: { id: existing.id }, data: { revoked: true } })
+      const existing = await db.refreshToken.findUnique({
+        where: { token_hash },
+        include: { user: true },
+      })
+      if (!existing) {
+        return { ok: false, status: 401, message: 'Invalid or expired refresh token' }
+      }
       const tokens = await issueTokens(existing.user)
       return { ok: true, data: tokens }
     } catch (err: unknown) {
