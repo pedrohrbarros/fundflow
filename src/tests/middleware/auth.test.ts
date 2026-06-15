@@ -46,4 +46,14 @@ describe('withUserAuth — docs mode', () => {
     )
     expect(res.status).toBe(401)
   })
+
+  it('rejects docs requests when API_TOKEN is unset', async () => {
+    const prev = process.env.API_TOKEN
+    delete process.env.API_TOKEN
+    const res = await userAuthApp.handle(
+      new Request('http://localhost/protected', { headers: { 'X-Docs-Mode': 'true' } })
+    )
+    expect(res.status).toBe(401)
+    process.env.API_TOKEN = prev
+  })
 })

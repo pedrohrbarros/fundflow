@@ -7,8 +7,10 @@ export const withUserAuth = (app: Elysia<any, any, any, any, any, any, any>) =>
   app
     .derive(async ({ request }) => {
       if (request.headers.get('X-Docs-Mode') === 'true') {
+        const expected_api_key = process.env.API_TOKEN
+        if (!expected_api_key) return { user_external_id: null }
         const api_key = request.headers.get('X-Api-Key')
-        if (api_key?.trim() !== process.env.API_TOKEN?.trim()) return { user_external_id: null }
+        if (api_key?.trim() !== expected_api_key.trim()) return { user_external_id: null }
         const result = await DocsService.findOrCreateMonthlyTestUser()
         return { user_external_id: result.ok ? result.data.external_id : null }
       }
