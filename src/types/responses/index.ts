@@ -122,6 +122,25 @@ export const ExpenseSearchResponse = {
   },
 }
 
+export const ExpenseByCategoryResponse = {
+  type: 'object',
+  properties: {
+    by_category: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          category_id: { type: 'number' },
+          name: { type: 'string' },
+          total: { type: 'number' },
+          count: { type: 'number' },
+        },
+      },
+    },
+    total: { type: 'number' },
+  },
+}
+
 export const UserResponse = {
   type: 'object',
   properties: {

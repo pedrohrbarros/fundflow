@@ -5,7 +5,7 @@ import { parseFilterBody } from '../../../helpers/filters'
 import type { FilterNode } from '../../../helpers/filters'
 import type { FieldAllowlist } from '../../../helpers/filters'
 
-const EXPENSE_ALLOWED_FIELDS: FieldAllowlist = {
+export const EXPENSE_ALLOWED_FIELDS: FieldAllowlist = {
   name: 'string',
   amount: 'float',
   is_paid: 'boolean',

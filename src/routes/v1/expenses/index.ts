@@ -1,11 +1,17 @@
 import { Elysia } from 'elysia'
 import { createExpense } from './create'
 import { searchExpenses } from './search'
+import { expensesByCategory } from './by_category'
 import { updateExpense } from './update'
 import { deleteExpense } from './delete'
 import { ExpenseCreateBody, ExpenseUpdateBody } from '../../../types/expenses'
 import { ExpenseSearchBody } from '../../../types/search'
-import { ExpenseResponse, ExpenseSearchResponse, DeletedResponse } from '../../../types/responses'
+import {
+  ExpenseResponse,
+  ExpenseSearchResponse,
+  ExpenseByCategoryResponse,
+  DeletedResponse,
+} from '../../../types/responses'
 import type { RouteHandler } from '../../../types/routes'
 
 const s = (schema: object) => ({
@@ -36,6 +42,19 @@ export const expenses = new Elysia()
       },
       responses: {
         '200': { description: 'OK', content: s(ExpenseSearchResponse) },
+      },
+    },
+  })
+  .post('/expenses/by-category', expensesByCategory as RouteHandler, {
+    detail: {
+      tags: ['Expenses'],
+      security: [{ apiKey: [] }],
+      requestBody: {
+        required: false,
+        content: s(ExpenseSearchBody),
+      },
+      responses: {
+        '200': { description: 'OK', content: s(ExpenseByCategoryResponse) },
       },
     },
   })
