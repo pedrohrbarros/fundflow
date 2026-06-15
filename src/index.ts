@@ -11,6 +11,7 @@ import { payment_methods } from './routes/v1/payment_methods'
 import { expenses } from './routes/v1/expenses'
 import { users } from './routes/v1/users'
 import { endpoint_logger, logger } from './config/logging'
+import { runStartupHealthChecks } from './config/health'
 
 const SWAGGER_UI_HTML = `<!DOCTYPE html>
 <html>
@@ -107,6 +108,7 @@ export const app = new Elysia()
   })
 
 if (import.meta.main) {
+  await runStartupHealthChecks()
   app.listen(Number(process.env.PORT ?? 8000))
   logger.info(`Fundflow is running at ${app.server?.hostname}:${app.server?.port}`)
 }
