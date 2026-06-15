@@ -69,6 +69,9 @@ export const UserService = {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
+      // Deletion order is load-bearing: Expense and SourceOfIncome reference
+      // Category via a RESTRICT foreign key, so their rows must be removed before
+      // categories. Children are deleted before their parents throughout.
       await db.$transaction([
         db.refreshToken.deleteMany({ where: { user_id: user.id } }),
         db.expensePaymentMethod.deleteMany({ where: { expense: { user_id: user.id } } }),
