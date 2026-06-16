@@ -147,7 +147,12 @@ describe('Expenses API', () => {
       date: '2026-06-15',
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
     })
-    const res = await req('POST', '/api/v1/expenses/search', { page: 1, limit: 20 })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      page: 1,
+      limit: 20,
+      granularity: 'annually',
+      date: '2026-06-15',
+    })
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(Array.isArray(json.expenses)).toBe(true)
@@ -315,6 +320,66 @@ describe('Expenses API', () => {
     })
     expect(res.status).toBe(400)
   })
+
+  it('search scopes to the period and returns period_amount + total', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `per-${TS}`, type: 'EXPENSE' })
+    ).json()
+    await req('POST', '/api/v1/expenses', {
+      name: `one-time-${TS}`,
+      category_id: Number(cat.id),
+      amount: 100,
+      date: '2026-06-10',
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `recur-${TS}`,
+      category_id: Number(cat.id),
+      amount: 1000,
+      date: '2026-06-05',
+      is_recurring: true,
+    })
+
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'annually',
+      date: '2026-09-01',
+      filters: {
+        logic: 'OR',
+        conditions: [
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `one-time-${TS}` },
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `recur-${TS}` },
+        ],
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    const recur = json.expenses.find((e: { name: string }) => e.name === `recur-${TS}`)
+    expect(recur.period_amount).toBe(7000)
+    expect(recur.is_recurring).toBe(true)
+    expect(recur.date).toBe('2026-06-05')
+    expect(json.total).toBe(7100)
+    expect(json.pagination.total).toBe(2)
+  }, 20000)
+
+  it('search excludes records before a recurring anchor / outside the period', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `per2-${TS}`, type: 'EXPENSE' })
+    ).json()
+    await req('POST', '/api/v1/expenses', {
+      name: `future-${TS}`,
+      category_id: Number(cat.id),
+      amount: 100,
+      date: '2026-08-10',
+      is_recurring: true,
+    })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'monthly',
+      date: '2026-07-15',
+      filters: { field: 'name', fieldType: 'string', op: 'is_equal', value: `future-${TS}` },
+    })
+    const json = await res.json()
+    expect(json.expenses.length).toBe(0)
+    expect(json.total).toBe(0)
+  }, 20000)
 
   it('POST /api/v1/expenses/by-category totals expenses per category, sorted desc', async () => {
     const cat1 = await (

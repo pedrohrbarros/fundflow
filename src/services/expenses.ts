@@ -5,6 +5,7 @@ import type { ExpenseRecord } from '../types/expenses'
 import type { ExpenseCreateInput, ExpenseUpdateInput } from '../schemas/expenses'
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
+import { periodRange, periodContribution, type PeriodInput } from '../helpers/period'
 
 type Split = { payment_method_id: number; partial_amount: number }
 type ExpenseCategoryTotal = { category_id: number; name: string; total: number; count: number }
@@ -149,10 +150,12 @@ export const ExpensesService = {
     user_external_id: string,
     page: number,
     limit: number,
+    period: PeriodInput,
     filters?: FilterNode
   ): Promise<
     ServiceResult<{
-      expenses: ExpenseRecord[]
+      expenses: (ExpenseRecord & { period_amount: number })[]
+      total: number
       pagination: { page: number; limit: number; total: number }
     }>
   > {
@@ -160,26 +163,44 @@ export const ExpensesService = {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
 
+      const { start, end } = periodRange(period)
+      const startDate = new Date(Date.UTC(start.year, start.month - 1, start.day))
+      const endDate = new Date(Date.UTC(end.year, end.month - 1, end.day))
+
       const where = {
         user_id: user.id,
-        ...(filters ? buildWhereClause(filters) : {}),
+        AND: [
+          ...(filters ? [buildWhereClause(filters)] : []),
+          { date: { lte: endDate } },
+          { OR: [{ is_recurring: true }, { date: { gte: startDate } }] },
+        ],
       }
-      const [expenses, total] = await db.$transaction([
-        db.expense.findMany({
-          where,
-          orderBy: { id: 'desc' },
-          skip: (page - 1) * limit,
-          take: limit,
-          include: { payment_methods: { include: { payment_method: true } } },
-        }),
-        db.expense.count({ where }),
-      ])
+
+      const rows = await db.expense.findMany({
+        where,
+        orderBy: { id: 'desc' },
+        include: { payment_methods: { include: { payment_method: true } } },
+      })
+
+      const applicable = rows
+        .map((r) => ({
+          r,
+          c: periodContribution(
+            { date: r.date, is_recurring: r.is_recurring, amount: r.amount },
+            period
+          ),
+        }))
+        .filter((x) => x.c.applies)
+
+      const total = applicable.reduce((sum, x) => sum + x.c.period_amount, 0)
+      const paged = applicable.slice((page - 1) * limit, (page - 1) * limit + limit)
 
       return {
         ok: true,
         data: {
-          expenses: expenses.map(toRecord),
-          pagination: { page, limit, total },
+          expenses: paged.map((x) => ({ ...toRecord(x.r), period_amount: x.c.period_amount })),
+          total,
+          pagination: { page, limit, total: applicable.length },
         },
       }
     } catch (err: unknown) {
