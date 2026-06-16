@@ -19,6 +19,8 @@ export const updateSourceOfIncome = async ({
     return { error: parsed.error.flatten().fieldErrors }
   }
   const id = BigInt(params.id)
+  // NOTE: this data shape must stay in sync with SourcesOfIncomeService.update's
+  // param type — category_id needs BigInt() conversion so we can't pass parsed.data directly.
   const data: {
     name?: string
     category_id?: bigint

@@ -63,6 +63,8 @@ describe('Expenses API', () => {
     expect(json.is_saved).toBe(false)
     expect(json.saving_location).toBeNull()
     expect(json.payment_methods).toEqual([])
+    expect(json.date).toBe('2026-06-15')
+    expect(json.is_recurring).toBe(false)
     expect(json.created_at).toBeDefined()
     expect(json.updated_at).toBeDefined()
   })

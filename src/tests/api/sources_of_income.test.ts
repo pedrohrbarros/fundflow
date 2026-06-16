@@ -55,6 +55,8 @@ describe('Sources of Income API', () => {
     expect(json.name).toBe(`test-soi-${TS}-create`)
     expect(json.category_id).toBe(test_category_id)
     expect(json.currency).toBe('EUR')
+    expect(json.date).toBe('2026-06-15')
+    expect(json.is_recurring).toBe(false)
   })
 
   it('rejects a source of income that references an EXPENSE category', async () => {

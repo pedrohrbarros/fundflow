@@ -24,7 +24,7 @@ export const SourceOfIncomeCreateBody = t.Object({
   category_id: t.Integer(),
   income: t.Optional(t.Number({ minimum: 0 })),
   currency: t.Optional(t.String({ minLength: 3, maxLength: 3, pattern: '^[A-Z]{3}$' })),
-  date: t.String(),
+  date: t.String({ format: 'date' }),
   is_recurring: t.Optional(t.Boolean()),
 })
 
@@ -33,7 +33,7 @@ export const SourceOfIncomeUpdateBody = t.Object({
   category_id: t.Optional(t.Integer()),
   income: t.Optional(t.Number({ minimum: 0 })),
   currency: t.Optional(t.String({ minLength: 3, maxLength: 3, pattern: '^[A-Z]{3}$' })),
-  date: t.Optional(t.String()),
+  date: t.Optional(t.String({ format: 'date' })),
   is_recurring: t.Optional(t.Boolean()),
 })
 
