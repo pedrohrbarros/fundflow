@@ -1,17 +1,35 @@
-import { describe, it, expect, afterAll, mock } from 'bun:test'
+import { describe, it, expect, afterAll, beforeEach } from 'bun:test'
+import { generateKeyPair, SignJWT } from 'jose'
+import { __setJwksForTest } from '../../config/google'
+
+// Sign real RS256 Google ID tokens and verify them against a locally injected
+// JWKS (via __setJwksForTest). We deliberately do NOT mock.module the
+// config/google module: bun's module mocks are process-global and leak across
+// test files, which previously broke config/google.test.ts on CI.
+const { privateKey, publicKey } = await generateKeyPair('RS256')
 
 process.env.JWT_SECRET = 'test-secret-value'
 process.env.GOOGLE_CLIENT_ID = 'test-client-id'
 process.env.API_TOKEN = 'test-api-token'
 
 const SUB = `auth_api_${Date.now()}`
-mock.module('../../config/google', () => ({
-  verifyGoogleIdToken: async (t: string) =>
-    t === 'good' ? { sub: SUB, email: 'api@gmail.com' } : null,
-}))
 
 const { app } = await import('../../index')
 const { db } = await import('../../config/db')
+
+const goodIdToken = () =>
+  new SignJWT({ email: 'api@gmail.com', email_verified: true })
+    .setProtectedHeader({ alg: 'RS256' })
+    .setIssuer('https://accounts.google.com')
+    .setAudience('test-client-id')
+    .setSubject(SUB)
+    .setIssuedAt()
+    .setExpirationTime('1h')
+    .sign(privateKey)
+
+beforeEach(() => {
+  __setJwksForTest(async () => publicKey)
+})
 
 const post = (path: string, body: unknown) =>
   app.handle(
@@ -29,7 +47,7 @@ afterAll(async () => {
 
 describe('Auth API', () => {
   it('POST /api/v1/auth/google returns tokens for a valid id_token', async () => {
-    const res = await post('/api/v1/auth/google', { id_token: 'good' })
+    const res = await post('/api/v1/auth/google', { id_token: await goodIdToken() })
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.access_token).toBeDefined()
@@ -43,7 +61,9 @@ describe('Auth API', () => {
   })
 
   it('POST /api/v1/auth/refresh rotates tokens; logout revokes them', async () => {
-    const login = await (await post('/api/v1/auth/google', { id_token: 'good' })).json()
+    const login = await (
+      await post('/api/v1/auth/google', { id_token: await goodIdToken() })
+    ).json()
     const refreshed = await post('/api/v1/auth/refresh', { refresh_token: login.refresh_token })
     expect(refreshed.status).toBe(200)
     const { refresh_token: new_refresh_token } = await refreshed.json()
