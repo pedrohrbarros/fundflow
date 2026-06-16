@@ -167,6 +167,10 @@ export const ExpensesService = {
       const startDate = new Date(Date.UTC(start.year, start.month - 1, start.day))
       const endDate = new Date(Date.UTC(end.year, end.month - 1, end.day))
 
+      // Coarse pre-filter; periodContribution refines below. Recurring rows are
+      // intentionally fetched with NO start-date floor: an anchor from years ago
+      // still recurs into the current period, so bounding them by startDate would
+      // wrongly drop active records. Per-user recurring counts are small.
       const where = {
         user_id: user.id,
         AND: [
