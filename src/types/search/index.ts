@@ -17,11 +17,25 @@ const filterGroup = {
   },
 }
 
-function searchBody(conditionSchema: object) {
+const periodScope = {
+  granularity: {
+    type: 'string',
+    enum: ['daily', 'monthly', 'annually'],
+    description: 'Period granularity. Defaults to "monthly" when omitted.',
+  },
+  date: {
+    type: 'string',
+    format: 'date',
+    description: 'Anchor date (YYYY-MM-DD) for the period. Defaults to today when omitted.',
+  },
+}
+
+function searchBody(conditionSchema: object, includePeriod = false) {
   return {
     type: 'object',
     properties: {
       ...pagination,
+      ...(includePeriod ? periodScope : {}),
       filters: {
         description: 'Optional filter — either a single condition or a group of conditions',
         oneOf: [conditionSchema, filterGroup],
@@ -61,40 +75,43 @@ export const CategorySearchBody = searchBody({
   },
 })
 
-export const SourceOfIncomeSearchBody = searchBody({
-  title: 'FilterCondition',
-  type: 'object',
-  required: ['field', 'op'],
-  properties: {
-    field: {
-      type: 'string',
-      enum: ['name', 'income', 'currency', 'created_at', 'updated_at'],
-      description:
-        'name/currency → is_equal, is_not_equal, is_contains, is_starts_with, is_ends_with | income → is_equal, is_not_equal, is_greater, is_greater_or_equal, is_lower, is_lower_or_equal, is_between | created_at/updated_at → is_equal, is_before, is_after, is_between',
-    },
-    op: {
-      type: 'string',
-      enum: [
-        'is_equal',
-        'is_not_equal',
-        'is_contains',
-        'is_starts_with',
-        'is_ends_with',
-        'is_greater',
-        'is_greater_or_equal',
-        'is_lower',
-        'is_lower_or_equal',
-        'is_between',
-        'is_before',
-        'is_after',
-      ],
-    },
-    value: {
-      description:
-        'string for name/currency; number for income; ISO 8601 string for datetime; [a, b] tuple for is_between',
+export const SourceOfIncomeSearchBody = searchBody(
+  {
+    title: 'FilterCondition',
+    type: 'object',
+    required: ['field', 'op'],
+    properties: {
+      field: {
+        type: 'string',
+        enum: ['name', 'income', 'currency', 'created_at', 'updated_at'],
+        description:
+          'name/currency → is_equal, is_not_equal, is_contains, is_starts_with, is_ends_with | income → is_equal, is_not_equal, is_greater, is_greater_or_equal, is_lower, is_lower_or_equal, is_between | created_at/updated_at → is_equal, is_before, is_after, is_between',
+      },
+      op: {
+        type: 'string',
+        enum: [
+          'is_equal',
+          'is_not_equal',
+          'is_contains',
+          'is_starts_with',
+          'is_ends_with',
+          'is_greater',
+          'is_greater_or_equal',
+          'is_lower',
+          'is_lower_or_equal',
+          'is_between',
+          'is_before',
+          'is_after',
+        ],
+      },
+      value: {
+        description:
+          'string for name/currency; number for income; ISO 8601 string for datetime; [a, b] tuple for is_between',
+      },
     },
   },
-})
+  true
+)
 
 export const PaymentMethodSearchBody = searchBody({
   title: 'FilterCondition',
@@ -129,47 +146,50 @@ export const PaymentMethodSearchBody = searchBody({
   },
 })
 
-export const ExpenseSearchBody = searchBody({
-  title: 'FilterCondition',
-  type: 'object',
-  required: ['field', 'op'],
-  properties: {
-    field: {
-      type: 'string',
-      enum: [
-        'name',
-        'amount',
-        'is_paid',
-        'is_saved',
-        'saving_location',
-        'created_at',
-        'updated_at',
-      ],
-      description:
-        'name → is_equal, is_not_equal, is_contains, is_starts_with, is_ends_with | amount → is_equal, is_not_equal, is_greater, is_greater_or_equal, is_lower, is_lower_or_equal, is_between | is_paid/is_saved → is_equal | saving_location → string ops + is_null, is_not_null | created_at/updated_at → is_equal, is_before, is_after, is_between',
-    },
-    op: {
-      type: 'string',
-      enum: [
-        'is_equal',
-        'is_not_equal',
-        'is_contains',
-        'is_starts_with',
-        'is_ends_with',
-        'is_null',
-        'is_not_null',
-        'is_greater',
-        'is_greater_or_equal',
-        'is_lower',
-        'is_lower_or_equal',
-        'is_between',
-        'is_before',
-        'is_after',
-      ],
-    },
-    value: {
-      description:
-        'string for name/saving_location; number for amount; boolean for is_paid/is_saved; ISO 8601 string for datetime; [a, b] tuple for is_between; omit for is_null/is_not_null',
+export const ExpenseSearchBody = searchBody(
+  {
+    title: 'FilterCondition',
+    type: 'object',
+    required: ['field', 'op'],
+    properties: {
+      field: {
+        type: 'string',
+        enum: [
+          'name',
+          'amount',
+          'is_paid',
+          'is_saved',
+          'saving_location',
+          'created_at',
+          'updated_at',
+        ],
+        description:
+          'name → is_equal, is_not_equal, is_contains, is_starts_with, is_ends_with | amount → is_equal, is_not_equal, is_greater, is_greater_or_equal, is_lower, is_lower_or_equal, is_between | is_paid/is_saved → is_equal | saving_location → string ops + is_null, is_not_null | created_at/updated_at → is_equal, is_before, is_after, is_between',
+      },
+      op: {
+        type: 'string',
+        enum: [
+          'is_equal',
+          'is_not_equal',
+          'is_contains',
+          'is_starts_with',
+          'is_ends_with',
+          'is_null',
+          'is_not_null',
+          'is_greater',
+          'is_greater_or_equal',
+          'is_lower',
+          'is_lower_or_equal',
+          'is_between',
+          'is_before',
+          'is_after',
+        ],
+      },
+      value: {
+        description:
+          'string for name/saving_location; number for amount; boolean for is_paid/is_saved; ISO 8601 string for datetime; [a, b] tuple for is_between; omit for is_null/is_not_null',
+      },
     },
   },
-})
+  true
+)

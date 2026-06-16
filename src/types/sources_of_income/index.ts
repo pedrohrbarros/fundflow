@@ -15,10 +15,6 @@ export type SourceOfIncomeRecord = {
 
 export type SourceOfIncomeSearchRecord = SourceOfIncomeRecord & { period_amount: number }
 
-export type SourcesOfIncomeByCategoryRecord = {
-  [category_name: string]: SourceOfIncomeRecord[]
-}
-
 export const SourceOfIncomeCreateBody = t.Object({
   name: t.String({ minLength: 1 }),
   category_id: t.Integer(),
