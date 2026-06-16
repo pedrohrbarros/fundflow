@@ -2,6 +2,7 @@ import { ExpensesService } from '../../../services/expenses'
 import { handleError } from '../../../middleware/error'
 import { parseFilterBody } from '../../../helpers/filters'
 import type { FilterNode } from '../../../helpers/filters'
+import { resolvePeriod } from '../../../helpers/period'
 import { EXPENSE_ALLOWED_FIELDS } from './search'
 
 export const expensesByCategory = async ({
@@ -10,7 +11,7 @@ export const expensesByCategory = async ({
   set,
 }: {
   user_external_id: string
-  body: { filters?: unknown }
+  body: { filters?: unknown; granularity?: unknown; date?: unknown }
   set: { status?: number | string }
 }) => {
   let filters: FilterNode | undefined
@@ -20,7 +21,10 @@ export const expensesByCategory = async ({
     filters = result.node
   }
 
-  const result = await ExpensesService.byCategory(user_external_id, filters)
+  const period = resolvePeriod(body as { granularity?: unknown; date?: unknown })
+  if (!period.ok) return handleError(set, 400, period.error)
+
+  const result = await ExpensesService.byCategory(user_external_id, period.period, filters)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data
 }

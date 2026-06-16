@@ -109,12 +109,14 @@ Search endpoints are not cached. The filter key space is unbounded, making per-r
 
 ### Sources of Income
 
-| Method   | Path                               | Description                                    |
-| -------- | ---------------------------------- | ---------------------------------------------- |
-| `POST`   | `/api/v1/sources_of_income`        | Create a new source of income                  |
-| `POST`   | `/api/v1/sources_of_income/search` | Search sources of income with optional filters |
-| `PATCH`  | `/api/v1/sources_of_income/:id`    | Update a source of income by id                |
-| `DELETE` | `/api/v1/sources_of_income/:id`    | Delete a source of income by id                |
+| Method   | Path                               | Description                                             |
+| -------- | ---------------------------------- | ------------------------------------------------------- |
+| `POST`   | `/api/v1/sources_of_income`        | Create a new source of income                           |
+| `POST`   | `/api/v1/sources_of_income/search` | Search sources with period scoping and optional filters |
+| `PATCH`  | `/api/v1/sources_of_income/:id`    | Update a source of income by id                         |
+| `DELETE` | `/api/v1/sources_of_income/:id`    | Delete a source of income by id                         |
+
+Search accepts optional `granularity` (`daily|monthly|annually`, default `monthly`) and `date` (`YYYY-MM-DD`, default today) to scope results to a period.
 
 ### Payment Methods
 
@@ -127,12 +129,15 @@ Search endpoints are not cached. The filter key space is unbounded, making per-r
 
 ### Expenses
 
-| Method   | Path                      | Description                                          |
-| -------- | ------------------------- | ---------------------------------------------------- |
-| `POST`   | `/api/v1/expenses`        | Create an expense for the authenticated user         |
-| `POST`   | `/api/v1/expenses/search` | Search expenses with optional filters and pagination |
-| `PATCH`  | `/api/v1/expenses/:id`    | Update an expense owned by the authenticated user    |
-| `DELETE` | `/api/v1/expenses/:id`    | Delete an expense owned by the authenticated user    |
+| Method   | Path                           | Description                                                   |
+| -------- | ------------------------------ | ------------------------------------------------------------- |
+| `POST`   | `/api/v1/expenses`             | Create an expense for the authenticated user                  |
+| `POST`   | `/api/v1/expenses/search`      | Search expenses with period scoping, filters, and pagination  |
+| `POST`   | `/api/v1/expenses/by-category` | Summarise period expenses grouped by category (no pagination) |
+| `PATCH`  | `/api/v1/expenses/:id`         | Update an expense owned by the authenticated user             |
+| `DELETE` | `/api/v1/expenses/:id`         | Delete an expense owned by the authenticated user             |
+
+Search and by-category accept optional `granularity` (`daily|monthly|annually`, default `monthly`) and `date` (`YYYY-MM-DD`, default today) to scope results to a period.
 
 ### Users
 

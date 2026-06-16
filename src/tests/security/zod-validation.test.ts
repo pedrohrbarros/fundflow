@@ -55,12 +55,35 @@ describe('Zod Validation', () => {
 
   describe('expenses', () => {
     it('POST /api/v1/expenses returns 400 when amount is zero', async () => {
-      const res = await req('POST', '/api/v1/expenses', { name: 'test', amount: 0 })
+      const res = await req('POST', '/api/v1/expenses', {
+        name: 'test',
+        amount: 0,
+        date: '2026-06-15',
+      })
       expect(res.status).toBe(400)
     })
 
     it('POST /api/v1/expenses returns 400 when name is missing', async () => {
-      const res = await req('POST', '/api/v1/expenses', { amount: 10 })
+      const res = await req('POST', '/api/v1/expenses', { amount: 10, date: '2026-06-15' })
+      expect(res.status).toBe(400)
+    })
+
+    it('POST /api/v1/expenses returns 400 when date is invalid', async () => {
+      const res = await req('POST', '/api/v1/expenses', {
+        name: 'test',
+        category_id: 1,
+        amount: 10,
+        date: '2026-13-40',
+      })
+      expect(res.status).toBe(400)
+    })
+
+    it('POST /api/v1/expenses returns 400 when date is missing', async () => {
+      const res = await req('POST', '/api/v1/expenses', {
+        name: 'test',
+        category_id: 1,
+        amount: 10,
+      })
       expect(res.status).toBe(400)
     })
   })
@@ -79,12 +102,19 @@ describe('Zod Validation', () => {
 
   describe('sources of income', () => {
     it('POST /api/v1/sources_of_income returns 400 when name is missing', async () => {
-      const res = await req('POST', '/api/v1/sources_of_income', { category_id: 1 })
+      const res = await req('POST', '/api/v1/sources_of_income', {
+        category_id: 1,
+        date: '2026-06-15',
+      })
       expect(res.status).toBe(400)
     })
 
     it('POST /api/v1/sources_of_income returns 400 when category_id is a float', async () => {
-      const res = await req('POST', '/api/v1/sources_of_income', { name: 'test', category_id: 1.5 })
+      const res = await req('POST', '/api/v1/sources_of_income', {
+        name: 'test',
+        category_id: 1.5,
+        date: '2026-06-15',
+      })
       expect(res.status).toBe(400)
     })
   })

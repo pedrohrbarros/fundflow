@@ -43,8 +43,18 @@ const source_of_income = {
     category_id: { type: 'number' },
     income: { type: 'number' },
     currency: { type: 'string' },
+    date: { type: 'string', format: 'date' },
+    is_recurring: { type: 'boolean' },
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
+  },
+}
+
+const source_of_income_search_record = {
+  type: 'object',
+  properties: {
+    ...source_of_income.properties,
+    period_amount: { type: 'number', description: 'Amount applicable in the requested period' },
   },
 }
 
@@ -56,7 +66,12 @@ export const SourceOfIncomeSearchResponse = {
     sources_of_income: {
       type: 'object',
       description: 'Sources of income grouped by category name',
-      additionalProperties: { type: 'array', items: source_of_income },
+      additionalProperties: { type: 'array', items: source_of_income_search_record },
+    },
+    total: {
+      type: 'object',
+      description: 'Sum of period_amount per currency code (e.g. { "USD": 5000, "EUR": 1000 })',
+      additionalProperties: { type: 'number' },
     },
     pagination,
   },
@@ -103,6 +118,8 @@ const expense = {
     name: { type: 'string' },
     category_id: { type: 'number' },
     amount: { type: 'number' },
+    date: { type: 'string', format: 'date' },
+    is_recurring: { type: 'boolean' },
     is_paid: { type: 'boolean' },
     is_saved: { type: 'boolean' },
     saving_location: { type: 'string', nullable: true },
@@ -112,12 +129,21 @@ const expense = {
   },
 }
 
+const expense_search_record = {
+  type: 'object',
+  properties: {
+    ...expense.properties,
+    period_amount: { type: 'number', description: 'Amount applicable in the requested period' },
+  },
+}
+
 export const ExpenseResponse = expense
 
 export const ExpenseSearchResponse = {
   type: 'object',
   properties: {
-    expenses: { type: 'array', items: expense },
+    expenses: { type: 'array', items: expense_search_record },
+    total: { type: 'number', description: 'Sum of period_amount across all applicable expenses' },
     pagination,
   },
 }

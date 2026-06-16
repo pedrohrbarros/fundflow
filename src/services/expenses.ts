@@ -5,6 +5,7 @@ import type { ExpenseRecord } from '../types/expenses'
 import type { ExpenseCreateInput, ExpenseUpdateInput } from '../schemas/expenses'
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
+import { periodRange, periodContribution, type PeriodInput } from '../helpers/period'
 
 type Split = { payment_method_id: number; partial_amount: number }
 type ExpenseCategoryTotal = { category_id: number; name: string; total: number; count: number }
@@ -15,6 +16,8 @@ type ExpenseWithSplits = {
   name: string
   category_id: bigint
   amount: number
+  date: Date
+  is_recurring: boolean
   is_paid: boolean
   is_saved: boolean
   saving_location: string | null
@@ -36,6 +39,8 @@ const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
   name: expense.name,
   category_id: Number(expense.category_id),
   amount: expense.amount,
+  date: expense.date.toISOString().slice(0, 10),
+  is_recurring: expense.is_recurring,
   is_paid: expense.is_paid,
   is_saved: expense.is_saved,
   saving_location: expense.saving_location,
@@ -108,6 +113,8 @@ export const ExpensesService = {
           name: input.name,
           category_id: BigInt(input.category_id),
           amount: input.amount,
+          date: new Date(`${input.date}T00:00:00.000Z`),
+          is_recurring: input.is_recurring ?? false,
           is_paid: input.is_paid ?? false,
           is_saved: input.is_saved ?? false,
           saving_location: input.saving_location ?? null,
@@ -143,10 +150,12 @@ export const ExpensesService = {
     user_external_id: string,
     page: number,
     limit: number,
+    period: PeriodInput,
     filters?: FilterNode
   ): Promise<
     ServiceResult<{
-      expenses: ExpenseRecord[]
+      expenses: (ExpenseRecord & { period_amount: number })[]
+      total: number
       pagination: { page: number; limit: number; total: number }
     }>
   > {
@@ -154,26 +163,48 @@ export const ExpensesService = {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
 
+      const { start, end } = periodRange(period)
+      const startDate = new Date(Date.UTC(start.year, start.month - 1, start.day))
+      const endDate = new Date(Date.UTC(end.year, end.month - 1, end.day))
+
+      // Coarse pre-filter; periodContribution refines below. Recurring rows are
+      // intentionally fetched with NO start-date floor: an anchor from years ago
+      // still recurs into the current period, so bounding them by startDate would
+      // wrongly drop active records. Per-user recurring counts are small.
       const where = {
         user_id: user.id,
-        ...(filters ? buildWhereClause(filters) : {}),
+        AND: [
+          ...(filters ? [buildWhereClause(filters)] : []),
+          { date: { lte: endDate } },
+          { OR: [{ is_recurring: true }, { date: { gte: startDate } }] },
+        ],
       }
-      const [expenses, total] = await db.$transaction([
-        db.expense.findMany({
-          where,
-          orderBy: { id: 'desc' },
-          skip: (page - 1) * limit,
-          take: limit,
-          include: { payment_methods: { include: { payment_method: true } } },
-        }),
-        db.expense.count({ where }),
-      ])
+
+      const rows = await db.expense.findMany({
+        where,
+        orderBy: { id: 'desc' },
+        include: { payment_methods: { include: { payment_method: true } } },
+      })
+
+      const applicable = rows
+        .map((r) => ({
+          r,
+          c: periodContribution(
+            { date: r.date, is_recurring: r.is_recurring, amount: r.amount },
+            period
+          ),
+        }))
+        .filter((x) => x.c.applies)
+
+      const total = applicable.reduce((sum, x) => sum + x.c.period_amount, 0)
+      const paged = applicable.slice((page - 1) * limit, (page - 1) * limit + limit)
 
       return {
         ok: true,
         data: {
-          expenses: expenses.map(toRecord),
-          pagination: { page, limit, total },
+          expenses: paged.map((x) => ({ ...toRecord(x.r), period_amount: x.c.period_amount })),
+          total,
+          pagination: { page, limit, total: applicable.length },
         },
       }
     } catch (err: unknown) {
@@ -243,6 +274,8 @@ export const ExpensesService = {
           ...(input.name !== undefined ? { name: input.name } : {}),
           ...(input.category_id !== undefined ? { category_id: BigInt(input.category_id) } : {}),
           ...(input.amount !== undefined ? { amount: input.amount } : {}),
+          ...(input.date !== undefined ? { date: new Date(`${input.date}T00:00:00.000Z`) } : {}),
+          ...(input.is_recurring !== undefined ? { is_recurring: input.is_recurring } : {}),
           ...(input.is_paid !== undefined ? { is_paid: input.is_paid } : {}),
           ...(input.is_saved !== undefined ? { is_saved: input.is_saved } : {}),
           ...(input.saving_location !== undefined
@@ -265,41 +298,60 @@ export const ExpensesService = {
 
   async byCategory(
     user_external_id: string,
+    period: PeriodInput,
     filters?: FilterNode
   ): Promise<ServiceResult<ExpensesByCategoryData>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
 
+      const { start, end } = periodRange(period)
+      const startDate = new Date(Date.UTC(start.year, start.month - 1, start.day))
+      const endDate = new Date(Date.UTC(end.year, end.month - 1, end.day))
+
       const where = {
         user_id: user.id,
-        ...(filters ? buildWhereClause(filters) : {}),
+        AND: [
+          ...(filters ? [buildWhereClause(filters)] : []),
+          { date: { lte: endDate } },
+          { OR: [{ is_recurring: true }, { date: { gte: startDate } }] },
+        ],
       }
 
-      const groups = await db.expense.groupBy({
-        by: ['category_id'],
+      const rows = await db.expense.findMany({
         where,
-        _sum: { amount: true },
-        _count: { _all: true },
+        select: { category_id: true, amount: true, date: true, is_recurring: true },
       })
 
+      const acc = new Map<bigint, { total: number; count: number }>()
+      for (const r of rows) {
+        const c = periodContribution(
+          { date: r.date, is_recurring: r.is_recurring, amount: r.amount },
+          period
+        )
+        if (!c.applies) continue
+        const cur = acc.get(r.category_id) ?? { total: 0, count: 0 }
+        cur.total += c.period_amount
+        cur.count += 1
+        acc.set(r.category_id, cur)
+      }
+
       const categories = await db.category.findMany({
-        where: { id: { in: groups.map((g) => g.category_id) } },
+        where: { id: { in: [...acc.keys()] } },
         select: { id: true, name: true },
       })
       const nameById = new Map(categories.map((c) => [c.id, c.name]))
 
-      const by_category = groups
-        .map((g) => ({
-          category_id: Number(g.category_id),
-          name: nameById.get(g.category_id) ?? '',
-          total: g._sum.amount ?? 0,
-          count: g._count._all,
+      const by_category = [...acc.entries()]
+        .map(([category_id, v]) => ({
+          category_id: Number(category_id),
+          name: nameById.get(category_id) ?? '',
+          total: v.total,
+          count: v.count,
         }))
         .sort((a, b) => b.total - a.total)
 
-      const total = by_category.reduce((acc, row) => acc + row.total, 0)
-
+      const total = by_category.reduce((s, row) => s + row.total, 0)
       return { ok: true, data: { by_category, total } }
     } catch (err: unknown) {
       return {

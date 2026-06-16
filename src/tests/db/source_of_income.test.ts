@@ -30,7 +30,12 @@ describe('SourceOfIncome model', () => {
 
   it('creates a source of income with name, category, user, and default income', async () => {
     const source = await db.sourceOfIncome.create({
-      data: { name: SOURCE_NAME, category_id: categoryId, user_id: userId },
+      data: {
+        name: SOURCE_NAME,
+        category_id: categoryId,
+        user_id: userId,
+        date: new Date('2026-06-15T00:00:00.000Z'),
+      },
     })
 
     expect(source.id).toBeDefined()
@@ -44,7 +49,13 @@ describe('SourceOfIncome model', () => {
 
   it('creates a source of income with a custom income value', async () => {
     const source = await db.sourceOfIncome.create({
-      data: { name: SOURCE_NAME, category_id: categoryId, user_id: userId, income: 5000.5 },
+      data: {
+        name: SOURCE_NAME,
+        category_id: categoryId,
+        user_id: userId,
+        income: 5000.5,
+        date: new Date('2026-06-15T00:00:00.000Z'),
+      },
     })
 
     expect(source.income).toBe(5000.5)

@@ -42,10 +42,12 @@ Plain OpenAPI schema objects describing the request body for search endpoints. I
 
 ## Current Types
 
-| Domain              | Record type(s)                                            |
-| ------------------- | --------------------------------------------------------- |
-| `categories`        | `CategoryRecord`                                          |
-| `sources_of_income` | `SourceOfIncomeRecord`, `SourcesOfIncomeByCategoryRecord` |
-| `payment_methods`   | `PaymentMethodRecord`                                     |
-| `expenses`          | `ExpenseRecord`, `ExpensePaymentMethodRecord`             |
-| `users`             | — (record defined in `src/services/users.ts`)             |
+| Domain              | Record type(s)                                                       |
+| ------------------- | -------------------------------------------------------------------- |
+| `categories`        | `CategoryRecord`                                                     |
+| `sources_of_income` | `SourceOfIncomeRecord`, `SourceOfIncomeSearchRecord`                 |
+| `payment_methods`   | `PaymentMethodRecord`                                                |
+| `expenses`          | `ExpenseRecord`, `ExpenseSearchRecord`, `ExpensePaymentMethodRecord` |
+| `users`             | — (record defined in `src/services/users.ts`)                        |
+
+`*SearchRecord` types extend the base record with a `period_amount` field added by the period-scoped search service.

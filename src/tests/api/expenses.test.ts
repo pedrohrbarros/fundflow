@@ -51,6 +51,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-no-split`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
     })
     expect(res.status).toBe(201)
     const json = await res.json()
@@ -62,6 +63,8 @@ describe('Expenses API', () => {
     expect(json.is_saved).toBe(false)
     expect(json.saving_location).toBeNull()
     expect(json.payment_methods).toEqual([])
+    expect(json.date).toBe('2026-06-15')
+    expect(json.is_recurring).toBe(false)
     expect(json.created_at).toBeDefined()
     expect(json.updated_at).toBeDefined()
   })
@@ -71,6 +74,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-split`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
       is_paid: true,
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
     })
@@ -87,6 +91,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-bad-split`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 50 }],
     })
     expect(res.status).toBe(400)
@@ -97,6 +102,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-unknown-pm`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
       payment_methods: [{ payment_method_id: 999999999, partial_amount: 100 }],
     })
     expect(res.status).toBe(404)
@@ -110,6 +116,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-inc-cat`,
       category_id: Number(cat.id),
       amount: 10,
+      date: '2026-06-15',
     })
     expect(res.status).toBe(404)
   })
@@ -120,6 +127,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-patch-cat`,
         category_id: Number(exp_category_id),
         amount: 20,
+        date: '2026-06-15',
       })
     ).json()
     const incomeCat = await (
@@ -136,9 +144,15 @@ describe('Expenses API', () => {
       name: `exp-${TS}-list`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
     })
-    const res = await req('POST', '/api/v1/expenses/search', { page: 1, limit: 20 })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      page: 1,
+      limit: 20,
+      granularity: 'annually',
+      date: '2026-06-15',
+    })
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(Array.isArray(json.expenses)).toBe(true)
@@ -164,6 +178,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-patch-old`,
         category_id: Number(exp_category_id),
         amount: 50,
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('PATCH', `/api/v1/expenses/${created.id}`, {
@@ -185,6 +200,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-split-replace`,
         category_id: Number(exp_category_id),
         amount: 100,
+        date: '2026-06-15',
         payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
       })
     ).json()
@@ -200,6 +216,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-bad-patch`,
         category_id: Number(exp_category_id),
         amount: 100,
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('PATCH', `/api/v1/expenses/${created.id}`, {
@@ -219,6 +236,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-del`,
         category_id: Number(exp_category_id),
         amount: 10,
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('DELETE', `/api/v1/expenses/${created.id}`)
@@ -243,11 +261,13 @@ describe('Expenses API', () => {
       name,
       category_id: Number(exp_category_id),
       amount: 50,
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-filter-other`,
       category_id: Number(exp_category_id),
       amount: 50,
+      date: '2026-06-15',
     })
     const res = await req('POST', '/api/v1/expenses/search', {
       filters: { field: 'name', op: 'is_equal', value: name },
@@ -263,16 +283,19 @@ describe('Expenses API', () => {
       name: `exp-${TS}-range-low`,
       category_id: Number(exp_category_id),
       amount: 10,
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-range-mid`,
       category_id: Number(exp_category_id),
       amount: 150,
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-range-high`,
       category_id: Number(exp_category_id),
       amount: 500,
+      date: '2026-06-15',
     })
     const res = await req('POST', '/api/v1/expenses/search', {
       filters: { field: 'amount', op: 'is_between', value: [100, 200] },
@@ -298,55 +321,95 @@ describe('Expenses API', () => {
     expect(res.status).toBe(400)
   })
 
-  it('POST /api/v1/expenses/by-category totals expenses per category, sorted desc', async () => {
-    const cat1 = await (
-      await req('POST', '/api/v1/categories', { name: `bycat-first-${TS}`, type: 'EXPENSE' })
+  it('search scopes to the period and returns period_amount + total', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `per-${TS}`, type: 'EXPENSE' })
     ).json()
-    const cat2 = await (
-      await req('POST', '/api/v1/categories', { name: `bycat-second-${TS}`, type: 'EXPENSE' })
-    ).json()
-
     await req('POST', '/api/v1/expenses', {
-      name: `bycat-a-${TS}`,
-      category_id: Number(cat1.id),
-      amount: 30,
+      name: `one-time-${TS}`,
+      category_id: Number(cat.id),
+      amount: 100,
+      date: '2026-06-10',
     })
     await req('POST', '/api/v1/expenses', {
-      name: `bycat-b-${TS}`,
-      category_id: Number(cat1.id),
-      amount: 70,
-    })
-    await req('POST', '/api/v1/expenses', {
-      name: `bycat-c-${TS}`,
-      category_id: Number(cat2.id),
-      amount: 250,
+      name: `recur-${TS}`,
+      category_id: Number(cat.id),
+      amount: 1000,
+      date: '2026-06-05',
+      is_recurring: true,
     })
 
-    const res = await req('POST', '/api/v1/expenses/by-category', {})
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'annually',
+      date: '2026-09-01',
+      filters: {
+        logic: 'OR',
+        conditions: [
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `one-time-${TS}` },
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `recur-${TS}` },
+        ],
+      },
+    })
     expect(res.status).toBe(200)
     const json = await res.json()
+    const recur = json.expenses.find((e: { name: string }) => e.name === `recur-${TS}`)
+    expect(recur.period_amount).toBe(7000)
+    expect(recur.is_recurring).toBe(true)
+    expect(recur.date).toBe('2026-06-05')
+    expect(json.total).toBe(7100)
+    expect(json.pagination.total).toBe(2)
+  }, 20000)
 
-    const row1 = json.by_category.find(
+  it('search excludes records before a recurring anchor / outside the period', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `per2-${TS}`, type: 'EXPENSE' })
+    ).json()
+    await req('POST', '/api/v1/expenses', {
+      name: `future-${TS}`,
+      category_id: Number(cat.id),
+      amount: 100,
+      date: '2026-08-10',
+      is_recurring: true,
+    })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'monthly',
+      date: '2026-07-15',
+      filters: { field: 'name', fieldType: 'string', op: 'is_equal', value: `future-${TS}` },
+    })
+    const json = await res.json()
+    expect(json.expenses.length).toBe(0)
+    expect(json.total).toBe(0)
+  }, 20000)
+
+  it('by-category totals period_amount per category', async () => {
+    const cat1 = await (
+      await req('POST', '/api/v1/categories', { name: `bc1-${TS}`, type: 'EXPENSE' })
+    ).json()
+    await req('POST', '/api/v1/expenses', {
+      name: `bca-${TS}`,
+      category_id: Number(cat1.id),
+      amount: 30,
+      date: '2026-06-10',
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `bcb-${TS}`,
+      category_id: Number(cat1.id),
+      amount: 1000,
+      date: '2026-06-05',
+      is_recurring: true,
+    })
+
+    // Annual 2026: 30 (one-time) + 1000*7 (recurring Jun..Dec) = 7030 for cat1
+    const res = await req('POST', '/api/v1/expenses/by-category', {
+      granularity: 'annually',
+      date: '2026-09-01',
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    const row = json.by_category.find(
       (r: { category_id: number }) => r.category_id === Number(cat1.id)
     )
-    const row2 = json.by_category.find(
-      (r: { category_id: number }) => r.category_id === Number(cat2.id)
-    )
-    expect(row1).toMatchObject({ total: 100, count: 2 })
-    expect(row2).toMatchObject({ total: 250, count: 1 })
-
-    const idx1 = json.by_category.findIndex(
-      (r: { category_id: number }) => r.category_id === Number(cat1.id)
-    )
-    const idx2 = json.by_category.findIndex(
-      (r: { category_id: number }) => r.category_id === Number(cat2.id)
-    )
-    expect(idx2).toBeLessThan(idx1)
-
-    const summed = json.by_category.reduce((acc: number, r: { total: number }) => acc + r.total, 0)
-    expect(json.total).toBe(summed)
-    // Per-test timeout: this case makes 6 sequential round-trips to a remote
-    // Supabase DB (~1.2s each), which can exceed bun:test's 5s default under
-    // load or when run outside the `--timeout`-configured `bun run test` script.
+    expect(row.total).toBe(7030)
+    expect(row.count).toBe(2)
   }, 20000)
 })
