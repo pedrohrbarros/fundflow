@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import { isValidYMD } from '../helpers/period'
+
+const dateField = z.string().refine(isValidYMD, { message: 'date must be a valid YYYY-MM-DD' })
 
 export const SourceOfIncomeCreateSchema = z.object({
   name: z.string().min(1),
@@ -10,6 +13,8 @@ export const SourceOfIncomeCreateSchema = z.object({
     .toUpperCase()
     .regex(/^[A-Z]{3}$/)
     .optional(),
+  date: dateField,
+  is_recurring: z.boolean().optional(),
 })
 
 export const SourceOfIncomeUpdateSchema = z.object({
@@ -22,6 +27,8 @@ export const SourceOfIncomeUpdateSchema = z.object({
     .toUpperCase()
     .regex(/^[A-Z]{3}$/)
     .optional(),
+  date: dateField.optional(),
+  is_recurring: z.boolean().optional(),
 })
 
 export type SourceOfIncomeCreateInput = z.infer<typeof SourceOfIncomeCreateSchema>

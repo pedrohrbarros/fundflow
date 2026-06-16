@@ -47,6 +47,7 @@ describe('Sources of Income API', () => {
       name: `test-soi-${TS}-create`,
       category_id: Number(test_category_id),
       currency: 'EUR',
+      date: '2026-06-15',
     })
     expect(res.status).toBe(201)
     const json = await res.json()
@@ -63,6 +64,7 @@ describe('Sources of Income API', () => {
     const res = await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-exp-cat`,
       category_id: Number(cat.id),
+      date: '2026-06-15',
     })
     expect(res.status).toBe(404)
   })
@@ -71,6 +73,7 @@ describe('Sources of Income API', () => {
     await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-list`,
       category_id: Number(test_category_id),
+      date: '2026-06-15',
     })
     const res = await req('POST', '/api/v1/sources_of_income/search', {})
     expect(res.status).toBe(200)
@@ -104,6 +107,7 @@ describe('Sources of Income API', () => {
       await req('POST', '/api/v1/sources_of_income', {
         name: `test-soi-${TS}-patch-old`,
         category_id: Number(test_category_id),
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('PATCH', `/api/v1/sources_of_income/${created.id}`, {
@@ -128,6 +132,7 @@ describe('Sources of Income API', () => {
       await req('POST', '/api/v1/sources_of_income', {
         name: `test-soi-${TS}-cat-check`,
         category_id: Number(test_category_id),
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('PATCH', `/api/v1/sources_of_income/${created.id}`, {
@@ -141,6 +146,7 @@ describe('Sources of Income API', () => {
       await req('POST', '/api/v1/sources_of_income', {
         name: `test-soi-${TS}-del`,
         category_id: Number(test_category_id),
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('DELETE', `/api/v1/sources_of_income/${created.id}`)
@@ -162,11 +168,13 @@ describe('Sources of Income API', () => {
         name: `limit-soi-${TS}-${i}`,
         category_id: cat!.id,
         user_id: user!.id,
+        date: new Date('2026-06-15T00:00:00.000Z'),
       })),
     })
     const res = await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-over-limit`,
       category_id: Number(test_category_id),
+      date: '2026-06-15',
     })
     expect(res.status).toBe(400)
     await db.sourceOfIncome.deleteMany({ where: { name: { startsWith: `limit-soi-${TS}` } } })
@@ -192,10 +200,12 @@ describe('Sources of Income API', () => {
     await req('POST', '/api/v1/sources_of_income', {
       name,
       category_id: Number(test_category_id),
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/sources_of_income', {
       name: `test-soi-${TS}-filter-other`,
       category_id: Number(test_category_id),
+      date: '2026-06-15',
     })
     const res = await req('POST', '/api/v1/sources_of_income/search', {
       filters: { field: 'name', op: 'is_equal', value: name },

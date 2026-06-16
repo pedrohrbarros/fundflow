@@ -51,6 +51,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-no-split`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
     })
     expect(res.status).toBe(201)
     const json = await res.json()
@@ -71,6 +72,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-split`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
       is_paid: true,
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
     })
@@ -87,6 +89,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-bad-split`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 50 }],
     })
     expect(res.status).toBe(400)
@@ -97,6 +100,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-unknown-pm`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
       payment_methods: [{ payment_method_id: 999999999, partial_amount: 100 }],
     })
     expect(res.status).toBe(404)
@@ -110,6 +114,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-inc-cat`,
       category_id: Number(cat.id),
       amount: 10,
+      date: '2026-06-15',
     })
     expect(res.status).toBe(404)
   })
@@ -120,6 +125,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-patch-cat`,
         category_id: Number(exp_category_id),
         amount: 20,
+        date: '2026-06-15',
       })
     ).json()
     const incomeCat = await (
@@ -136,6 +142,7 @@ describe('Expenses API', () => {
       name: `exp-${TS}-list`,
       category_id: Number(exp_category_id),
       amount: 100,
+      date: '2026-06-15',
       payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
     })
     const res = await req('POST', '/api/v1/expenses/search', { page: 1, limit: 20 })
@@ -164,6 +171,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-patch-old`,
         category_id: Number(exp_category_id),
         amount: 50,
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('PATCH', `/api/v1/expenses/${created.id}`, {
@@ -185,6 +193,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-split-replace`,
         category_id: Number(exp_category_id),
         amount: 100,
+        date: '2026-06-15',
         payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
       })
     ).json()
@@ -200,6 +209,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-bad-patch`,
         category_id: Number(exp_category_id),
         amount: 100,
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('PATCH', `/api/v1/expenses/${created.id}`, {
@@ -219,6 +229,7 @@ describe('Expenses API', () => {
         name: `exp-${TS}-del`,
         category_id: Number(exp_category_id),
         amount: 10,
+        date: '2026-06-15',
       })
     ).json()
     const res = await req('DELETE', `/api/v1/expenses/${created.id}`)
@@ -243,11 +254,13 @@ describe('Expenses API', () => {
       name,
       category_id: Number(exp_category_id),
       amount: 50,
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-filter-other`,
       category_id: Number(exp_category_id),
       amount: 50,
+      date: '2026-06-15',
     })
     const res = await req('POST', '/api/v1/expenses/search', {
       filters: { field: 'name', op: 'is_equal', value: name },
@@ -263,16 +276,19 @@ describe('Expenses API', () => {
       name: `exp-${TS}-range-low`,
       category_id: Number(exp_category_id),
       amount: 10,
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-range-mid`,
       category_id: Number(exp_category_id),
       amount: 150,
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/expenses', {
       name: `exp-${TS}-range-high`,
       category_id: Number(exp_category_id),
       amount: 500,
+      date: '2026-06-15',
     })
     const res = await req('POST', '/api/v1/expenses/search', {
       filters: { field: 'amount', op: 'is_between', value: [100, 200] },
@@ -310,16 +326,19 @@ describe('Expenses API', () => {
       name: `bycat-a-${TS}`,
       category_id: Number(cat1.id),
       amount: 30,
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/expenses', {
       name: `bycat-b-${TS}`,
       category_id: Number(cat1.id),
       amount: 70,
+      date: '2026-06-15',
     })
     await req('POST', '/api/v1/expenses', {
       name: `bycat-c-${TS}`,
       category_id: Number(cat2.id),
       amount: 250,
+      date: '2026-06-15',
     })
 
     const res = await req('POST', '/api/v1/expenses/by-category', {})

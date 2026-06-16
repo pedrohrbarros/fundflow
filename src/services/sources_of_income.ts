@@ -19,6 +19,8 @@ function toRecord(source: {
   category_id: bigint
   income: number
   currency: string
+  date: Date
+  is_recurring: boolean
   created_at: Date
   updated_at: Date
 }): SourceOfIncomeRecord {
@@ -28,6 +30,8 @@ function toRecord(source: {
     category_id: Number(source.category_id),
     income: source.income,
     currency: source.currency,
+    date: source.date.toISOString().slice(0, 10),
+    is_recurring: source.is_recurring,
     created_at: source.created_at.toISOString(),
     updated_at: source.updated_at.toISOString(),
   }
@@ -36,10 +40,14 @@ function toRecord(source: {
 export const SourcesOfIncomeService = {
   async create(
     user_external_id: string,
-    name: string,
-    category_id: bigint,
-    income?: number,
-    currency?: string
+    input: {
+      name: string
+      category_id: bigint
+      income?: number
+      currency?: string
+      date: string
+      is_recurring?: boolean
+    }
   ): Promise<ServiceResult<SourceOfIncomeRecord>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
@@ -48,22 +56,24 @@ export const SourcesOfIncomeService = {
       if (count >= 100)
         return { ok: false, status: 400, message: 'Source of income limit reached (100 per user)' }
       const category = await db.category.findFirst({
-        where: { id: category_id, user_id: user.id, type: 'INCOME' },
+        where: { id: input.category_id, user_id: user.id, type: 'INCOME' },
       })
       if (!category)
         return {
           ok: false,
           status: 404,
           message: 'Category not found',
-          meta: { category_id: category_id.toString() },
+          meta: { category_id: input.category_id.toString() },
         }
       const source_of_income = await db.sourceOfIncome.create({
         data: {
-          name,
-          category_id,
+          name: input.name,
+          category_id: input.category_id,
           user_id: user.id,
-          ...(income !== undefined ? { income } : {}),
-          ...(currency !== undefined ? { currency } : {}),
+          ...(input.income !== undefined ? { income: input.income } : {}),
+          ...(input.currency !== undefined ? { currency: input.currency } : {}),
+          date: new Date(`${input.date}T00:00:00.000Z`),
+          is_recurring: input.is_recurring ?? false,
         },
       })
       return { ok: true, data: toRecord(source_of_income) }
@@ -127,7 +137,14 @@ export const SourcesOfIncomeService = {
   async update(
     id: bigint,
     user_external_id: string,
-    data: { name?: string; category_id?: bigint; income?: number; currency?: string }
+    data: {
+      name?: string
+      category_id?: bigint
+      income?: number
+      currency?: string
+      date?: string
+      is_recurring?: boolean
+    }
   ): Promise<ServiceResult<SourceOfIncomeRecord>> {
     if (Object.keys(data).length === 0)
       return { ok: false, status: 400, message: 'No fields to update' }
@@ -146,9 +163,14 @@ export const SourcesOfIncomeService = {
             meta: { category_id: data.category_id.toString() },
           }
       }
+      const { date, is_recurring, ...rest } = data
       const source_of_income = await db.sourceOfIncome.update({
         where: { id, user_id: user.id },
-        data,
+        data: {
+          ...rest,
+          ...(date !== undefined ? { date: new Date(`${date}T00:00:00.000Z`) } : {}),
+          ...(is_recurring !== undefined ? { is_recurring } : {}),
+        },
       })
       return { ok: true, data: toRecord(source_of_income) }
     } catch (err: unknown) {

@@ -16,13 +16,14 @@ export const createSourceOfIncome = async ({
     set.status = 400
     return { error: parsed.error.flatten().fieldErrors }
   }
-  const result = await SourcesOfIncomeService.create(
-    user_external_id,
-    parsed.data.name,
-    BigInt(parsed.data.category_id),
-    parsed.data.income,
-    parsed.data.currency
-  )
+  const result = await SourcesOfIncomeService.create(user_external_id, {
+    name: parsed.data.name,
+    category_id: BigInt(parsed.data.category_id),
+    income: parsed.data.income,
+    currency: parsed.data.currency,
+    date: parsed.data.date,
+    is_recurring: parsed.data.is_recurring,
+  })
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201
   return result.data

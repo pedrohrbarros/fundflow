@@ -15,6 +15,8 @@ type ExpenseWithSplits = {
   name: string
   category_id: bigint
   amount: number
+  date: Date
+  is_recurring: boolean
   is_paid: boolean
   is_saved: boolean
   saving_location: string | null
@@ -36,6 +38,8 @@ const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
   name: expense.name,
   category_id: Number(expense.category_id),
   amount: expense.amount,
+  date: expense.date.toISOString().slice(0, 10),
+  is_recurring: expense.is_recurring,
   is_paid: expense.is_paid,
   is_saved: expense.is_saved,
   saving_location: expense.saving_location,
@@ -108,6 +112,8 @@ export const ExpensesService = {
           name: input.name,
           category_id: BigInt(input.category_id),
           amount: input.amount,
+          date: new Date(`${input.date}T00:00:00.000Z`),
+          is_recurring: input.is_recurring ?? false,
           is_paid: input.is_paid ?? false,
           is_saved: input.is_saved ?? false,
           saving_location: input.saving_location ?? null,
@@ -243,6 +249,8 @@ export const ExpensesService = {
           ...(input.name !== undefined ? { name: input.name } : {}),
           ...(input.category_id !== undefined ? { category_id: BigInt(input.category_id) } : {}),
           ...(input.amount !== undefined ? { amount: input.amount } : {}),
+          ...(input.date !== undefined ? { date: new Date(`${input.date}T00:00:00.000Z`) } : {}),
+          ...(input.is_recurring !== undefined ? { is_recurring: input.is_recurring } : {}),
           ...(input.is_paid !== undefined ? { is_paid: input.is_paid } : {}),
           ...(input.is_saved !== undefined ? { is_saved: input.is_saved } : {}),
           ...(input.saving_location !== undefined
