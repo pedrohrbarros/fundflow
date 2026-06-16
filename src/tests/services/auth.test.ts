@@ -1,15 +1,7 @@
 import { describe, it, expect, afterAll, beforeEach } from 'bun:test'
-import { generateKeyPair, SignJWT } from 'jose'
-import { __setJwksForTest } from '../../config/google'
-
-// Sign real RS256 Google ID tokens and verify them against a locally injected
-// JWKS (via __setJwksForTest). We deliberately do NOT mock.module the
-// config/google module: bun's module mocks are process-global and leak across
-// test files, which previously broke config/google.test.ts on CI.
-const { privateKey, publicKey } = await generateKeyPair('RS256')
+import { installGoogleTestJwks, signGoogleIdToken } from '../helpers/google_auth'
 
 process.env.JWT_SECRET = 'test-secret-value'
-process.env.GOOGLE_CLIENT_ID = 'test-client-id'
 
 const SUB = `auth_svc_${Date.now()}`
 
@@ -17,18 +9,8 @@ const { AuthService } = await import('../../services/auth')
 const { db } = await import('../../config/db')
 const { verifyAccessToken, hashRefreshToken } = await import('../../helpers/auth/tokens')
 
-const googleIdToken = (sub = SUB, email = 'svc@gmail.com') =>
-  new SignJWT({ email, email_verified: true })
-    .setProtectedHeader({ alg: 'RS256' })
-    .setIssuer('https://accounts.google.com')
-    .setAudience('test-client-id')
-    .setSubject(sub)
-    .setIssuedAt()
-    .setExpirationTime('1h')
-    .sign(privateKey)
-
 beforeEach(() => {
-  __setJwksForTest(async () => publicKey)
+  installGoogleTestJwks()
 })
 
 afterAll(async () => {
@@ -38,7 +20,9 @@ afterAll(async () => {
 
 describe('AuthService', () => {
   it('loginWithGoogle upserts the user and issues tokens', async () => {
-    const res = await AuthService.loginWithGoogle(await googleIdToken())
+    const res = await AuthService.loginWithGoogle(
+      await signGoogleIdToken({ sub: SUB, email: 'svc@gmail.com' })
+    )
     expect(res.ok).toBe(true)
     if (!res.ok) return
     expect(res.data.user.email).toBe('svc@gmail.com')
@@ -59,7 +43,9 @@ describe('AuthService', () => {
   })
 
   it('refresh rotates the refresh token and revokes the old one', async () => {
-    const login = await AuthService.loginWithGoogle(await googleIdToken())
+    const login = await AuthService.loginWithGoogle(
+      await signGoogleIdToken({ sub: SUB, email: 'svc@gmail.com' })
+    )
     if (!login.ok) throw new Error('login failed')
     const old = login.data.refresh_token
     const res = await AuthService.refresh(old)
@@ -74,7 +60,9 @@ describe('AuthService', () => {
   })
 
   it('logout revokes the refresh token', async () => {
-    const login = await AuthService.loginWithGoogle(await googleIdToken())
+    const login = await AuthService.loginWithGoogle(
+      await signGoogleIdToken({ sub: SUB, email: 'svc@gmail.com' })
+    )
     if (!login.ok) throw new Error('login failed')
     await AuthService.logout(login.data.refresh_token)
     expect((await AuthService.refresh(login.data.refresh_token)).ok).toBe(false)

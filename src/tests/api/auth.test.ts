@@ -1,15 +1,7 @@
 import { describe, it, expect, afterAll, beforeEach } from 'bun:test'
-import { generateKeyPair, SignJWT } from 'jose'
-import { __setJwksForTest } from '../../config/google'
-
-// Sign real RS256 Google ID tokens and verify them against a locally injected
-// JWKS (via __setJwksForTest). We deliberately do NOT mock.module the
-// config/google module: bun's module mocks are process-global and leak across
-// test files, which previously broke config/google.test.ts on CI.
-const { privateKey, publicKey } = await generateKeyPair('RS256')
+import { installGoogleTestJwks, signGoogleIdToken } from '../helpers/google_auth'
 
 process.env.JWT_SECRET = 'test-secret-value'
-process.env.GOOGLE_CLIENT_ID = 'test-client-id'
 process.env.API_TOKEN = 'test-api-token'
 
 const SUB = `auth_api_${Date.now()}`
@@ -17,18 +9,10 @@ const SUB = `auth_api_${Date.now()}`
 const { app } = await import('../../index')
 const { db } = await import('../../config/db')
 
-const goodIdToken = () =>
-  new SignJWT({ email: 'api@gmail.com', email_verified: true })
-    .setProtectedHeader({ alg: 'RS256' })
-    .setIssuer('https://accounts.google.com')
-    .setAudience('test-client-id')
-    .setSubject(SUB)
-    .setIssuedAt()
-    .setExpirationTime('1h')
-    .sign(privateKey)
+const goodIdToken = () => signGoogleIdToken({ sub: SUB, email: 'api@gmail.com' })
 
 beforeEach(() => {
-  __setJwksForTest(async () => publicKey)
+  installGoogleTestJwks()
 })
 
 const post = (path: string, body: unknown) =>
