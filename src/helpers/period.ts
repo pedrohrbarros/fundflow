@@ -54,8 +54,17 @@ export function resolvePeriod(body: {
   return { ok: true, period: { granularity: granularity as Granularity, date } }
 }
 
+// PeriodInput should always come from resolvePeriod (which validates the date).
+// Guard defensively so a caller that bypasses it fails loudly instead of null-derefing.
+function requirePeriodDate(p: PeriodInput): YMD {
+  const ref = parseYMD(p.date)
+  if (!ref)
+    throw new Error(`Invalid period date: ${p.date} (PeriodInput must come from resolvePeriod)`)
+  return ref
+}
+
 export function periodRange(p: PeriodInput): { start: YMD; end: YMD } {
-  const ref = parseYMD(p.date)!
+  const ref = requirePeriodDate(p)
   switch (p.granularity) {
     case 'daily':
       return { start: { ...ref }, end: { ...ref } }
@@ -77,7 +86,7 @@ export function periodContribution(
   p: PeriodInput
 ): { applies: boolean; period_amount: number } {
   const rec = recordYMD(record.date)
-  const ref = parseYMD(p.date)!
+  const ref = requirePeriodDate(p)
 
   if (!record.is_recurring) {
     const { start, end } = periodRange(p)
@@ -91,10 +100,14 @@ export function periodContribution(
       return { applies, period_amount: applies ? record.amount : 0 }
     }
     case 'annually': {
+      // Month-granular per spec: the anchor's start month counts in full, so the
+      // anchor year contributes (12 - rec.month + 1) occurrences.
       const activeMonths = ref.year < rec.year ? 0 : ref.year > rec.year ? 12 : 12 - rec.month + 1
       return { applies: activeMonths > 0, period_amount: record.amount * activeMonths }
     }
     case 'daily': {
+      // A monthly-recurring record contributes to a daily period only on its
+      // (clamped) monthly occurrence day — once per month, not every day.
       const occurrenceDay = Math.min(rec.day, daysInMonth(ref.year, ref.month))
       const applies = cmp(ref, rec) >= 0 && ref.day === occurrenceDay
       return { applies, period_amount: applies ? record.amount : 0 }
