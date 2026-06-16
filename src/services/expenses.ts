@@ -298,41 +298,60 @@ export const ExpensesService = {
 
   async byCategory(
     user_external_id: string,
+    period: PeriodInput,
     filters?: FilterNode
   ): Promise<ServiceResult<ExpensesByCategoryData>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
 
+      const { start, end } = periodRange(period)
+      const startDate = new Date(Date.UTC(start.year, start.month - 1, start.day))
+      const endDate = new Date(Date.UTC(end.year, end.month - 1, end.day))
+
       const where = {
         user_id: user.id,
-        ...(filters ? buildWhereClause(filters) : {}),
+        AND: [
+          ...(filters ? [buildWhereClause(filters)] : []),
+          { date: { lte: endDate } },
+          { OR: [{ is_recurring: true }, { date: { gte: startDate } }] },
+        ],
       }
 
-      const groups = await db.expense.groupBy({
-        by: ['category_id'],
+      const rows = await db.expense.findMany({
         where,
-        _sum: { amount: true },
-        _count: { _all: true },
+        select: { category_id: true, amount: true, date: true, is_recurring: true },
       })
 
+      const acc = new Map<bigint, { total: number; count: number }>()
+      for (const r of rows) {
+        const c = periodContribution(
+          { date: r.date, is_recurring: r.is_recurring, amount: r.amount },
+          period
+        )
+        if (!c.applies) continue
+        const cur = acc.get(r.category_id) ?? { total: 0, count: 0 }
+        cur.total += c.period_amount
+        cur.count += 1
+        acc.set(r.category_id, cur)
+      }
+
       const categories = await db.category.findMany({
-        where: { id: { in: groups.map((g) => g.category_id) } },
+        where: { id: { in: [...acc.keys()] } },
         select: { id: true, name: true },
       })
       const nameById = new Map(categories.map((c) => [c.id, c.name]))
 
-      const by_category = groups
-        .map((g) => ({
-          category_id: Number(g.category_id),
-          name: nameById.get(g.category_id) ?? '',
-          total: g._sum.amount ?? 0,
-          count: g._count._all,
+      const by_category = [...acc.entries()]
+        .map(([category_id, v]) => ({
+          category_id: Number(category_id),
+          name: nameById.get(category_id) ?? '',
+          total: v.total,
+          count: v.count,
         }))
         .sort((a, b) => b.total - a.total)
 
-      const total = by_category.reduce((acc, row) => acc + row.total, 0)
-
+      const total = by_category.reduce((s, row) => s + row.total, 0)
       return { ok: true, data: { by_category, total } }
     } catch (err: unknown) {
       return {

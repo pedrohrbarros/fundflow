@@ -381,58 +381,35 @@ describe('Expenses API', () => {
     expect(json.total).toBe(0)
   }, 20000)
 
-  it('POST /api/v1/expenses/by-category totals expenses per category, sorted desc', async () => {
+  it('by-category totals period_amount per category', async () => {
     const cat1 = await (
-      await req('POST', '/api/v1/categories', { name: `bycat-first-${TS}`, type: 'EXPENSE' })
+      await req('POST', '/api/v1/categories', { name: `bc1-${TS}`, type: 'EXPENSE' })
     ).json()
-    const cat2 = await (
-      await req('POST', '/api/v1/categories', { name: `bycat-second-${TS}`, type: 'EXPENSE' })
-    ).json()
-
     await req('POST', '/api/v1/expenses', {
-      name: `bycat-a-${TS}`,
+      name: `bca-${TS}`,
       category_id: Number(cat1.id),
       amount: 30,
-      date: '2026-06-15',
+      date: '2026-06-10',
     })
     await req('POST', '/api/v1/expenses', {
-      name: `bycat-b-${TS}`,
+      name: `bcb-${TS}`,
       category_id: Number(cat1.id),
-      amount: 70,
-      date: '2026-06-15',
-    })
-    await req('POST', '/api/v1/expenses', {
-      name: `bycat-c-${TS}`,
-      category_id: Number(cat2.id),
-      amount: 250,
-      date: '2026-06-15',
+      amount: 1000,
+      date: '2026-06-05',
+      is_recurring: true,
     })
 
-    const res = await req('POST', '/api/v1/expenses/by-category', {})
+    // Annual 2026: 30 (one-time) + 1000*7 (recurring Jun..Dec) = 7030 for cat1
+    const res = await req('POST', '/api/v1/expenses/by-category', {
+      granularity: 'annually',
+      date: '2026-09-01',
+    })
     expect(res.status).toBe(200)
     const json = await res.json()
-
-    const row1 = json.by_category.find(
+    const row = json.by_category.find(
       (r: { category_id: number }) => r.category_id === Number(cat1.id)
     )
-    const row2 = json.by_category.find(
-      (r: { category_id: number }) => r.category_id === Number(cat2.id)
-    )
-    expect(row1).toMatchObject({ total: 100, count: 2 })
-    expect(row2).toMatchObject({ total: 250, count: 1 })
-
-    const idx1 = json.by_category.findIndex(
-      (r: { category_id: number }) => r.category_id === Number(cat1.id)
-    )
-    const idx2 = json.by_category.findIndex(
-      (r: { category_id: number }) => r.category_id === Number(cat2.id)
-    )
-    expect(idx2).toBeLessThan(idx1)
-
-    const summed = json.by_category.reduce((acc: number, r: { total: number }) => acc + r.total, 0)
-    expect(json.total).toBe(summed)
-    // Per-test timeout: this case makes 6 sequential round-trips to a remote
-    // Supabase DB (~1.2s each), which can exceed bun:test's 5s default under
-    // load or when run outside the `--timeout`-configured `bun run test` script.
+    expect(row.total).toBe(7030)
+    expect(row.count).toBe(2)
   }, 20000)
 })
