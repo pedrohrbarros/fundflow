@@ -46,6 +46,8 @@ export type SourceOfIncomeMinAggregateOutputType = {
   category_id: bigint | null
   income: number | null
   currency: string | null
+  date: Date | null
+  is_recurring: boolean | null
   user_id: bigint | null
   created_at: Date | null
   updated_at: Date | null
@@ -57,6 +59,8 @@ export type SourceOfIncomeMaxAggregateOutputType = {
   category_id: bigint | null
   income: number | null
   currency: string | null
+  date: Date | null
+  is_recurring: boolean | null
   user_id: bigint | null
   created_at: Date | null
   updated_at: Date | null
@@ -68,6 +72,8 @@ export type SourceOfIncomeCountAggregateOutputType = {
   category_id: number
   income: number
   currency: number
+  date: number
+  is_recurring: number
   user_id: number
   created_at: number
   updated_at: number
@@ -94,6 +100,8 @@ export type SourceOfIncomeMinAggregateInputType = {
   category_id?: true
   income?: true
   currency?: true
+  date?: true
+  is_recurring?: true
   user_id?: true
   created_at?: true
   updated_at?: true
@@ -105,6 +113,8 @@ export type SourceOfIncomeMaxAggregateInputType = {
   category_id?: true
   income?: true
   currency?: true
+  date?: true
+  is_recurring?: true
   user_id?: true
   created_at?: true
   updated_at?: true
@@ -116,6 +126,8 @@ export type SourceOfIncomeCountAggregateInputType = {
   category_id?: true
   income?: true
   currency?: true
+  date?: true
+  is_recurring?: true
   user_id?: true
   created_at?: true
   updated_at?: true
@@ -219,6 +231,8 @@ export type SourceOfIncomeGroupByOutputType = {
   category_id: bigint
   income: number
   currency: string
+  date: Date
+  is_recurring: boolean
   user_id: bigint
   created_at: Date
   updated_at: Date
@@ -251,6 +265,8 @@ export type SourceOfIncomeWhereInput = {
   category_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
   income?: Prisma.FloatFilter<'SourceOfIncome'> | number
   currency?: Prisma.StringFilter<'SourceOfIncome'> | string
+  date?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
+  is_recurring?: Prisma.BoolFilter<'SourceOfIncome'> | boolean
   user_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
   created_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
   updated_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
@@ -264,6 +280,8 @@ export type SourceOfIncomeOrderByWithRelationInput = {
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  is_recurring?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -281,6 +299,8 @@ export type SourceOfIncomeWhereUniqueInput = Prisma.AtLeast<
     category_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
     income?: Prisma.FloatFilter<'SourceOfIncome'> | number
     currency?: Prisma.StringFilter<'SourceOfIncome'> | string
+    date?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
+    is_recurring?: Prisma.BoolFilter<'SourceOfIncome'> | boolean
     user_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
     created_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
     updated_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
@@ -296,6 +316,8 @@ export type SourceOfIncomeOrderByWithAggregationInput = {
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  is_recurring?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -319,6 +341,8 @@ export type SourceOfIncomeScalarWhereWithAggregatesInput = {
   category_id?: Prisma.BigIntWithAggregatesFilter<'SourceOfIncome'> | bigint | number
   income?: Prisma.FloatWithAggregatesFilter<'SourceOfIncome'> | number
   currency?: Prisma.StringWithAggregatesFilter<'SourceOfIncome'> | string
+  date?: Prisma.DateTimeWithAggregatesFilter<'SourceOfIncome'> | Date | string
+  is_recurring?: Prisma.BoolWithAggregatesFilter<'SourceOfIncome'> | boolean
   user_id?: Prisma.BigIntWithAggregatesFilter<'SourceOfIncome'> | bigint | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<'SourceOfIncome'> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<'SourceOfIncome'> | Date | string
@@ -329,6 +353,8 @@ export type SourceOfIncomeCreateInput = {
   name: string
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSources_of_incomeInput
@@ -341,6 +367,8 @@ export type SourceOfIncomeUncheckedCreateInput = {
   category_id: bigint | number
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   user_id: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
@@ -351,6 +379,8 @@ export type SourceOfIncomeUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSources_of_incomeNestedInput
@@ -363,6 +393,8 @@ export type SourceOfIncomeUncheckedUpdateInput = {
   category_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -374,6 +406,8 @@ export type SourceOfIncomeCreateManyInput = {
   category_id: bigint | number
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   user_id: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
@@ -384,6 +418,8 @@ export type SourceOfIncomeUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -394,6 +430,8 @@ export type SourceOfIncomeUncheckedUpdateManyInput = {
   category_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -415,6 +453,8 @@ export type SourceOfIncomeCountOrderByAggregateInput = {
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  is_recurring?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -433,6 +473,8 @@ export type SourceOfIncomeMaxOrderByAggregateInput = {
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  is_recurring?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -444,6 +486,8 @@ export type SourceOfIncomeMinOrderByAggregateInput = {
   category_id?: Prisma.SortOrder
   income?: Prisma.SortOrder
   currency?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  is_recurring?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -641,6 +685,8 @@ export type SourceOfIncomeCreateWithoutUserInput = {
   name: string
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   category: Prisma.CategoryCreateNestedOneWithoutSources_of_incomeInput
@@ -652,6 +698,8 @@ export type SourceOfIncomeUncheckedCreateWithoutUserInput = {
   category_id: bigint | number
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -706,6 +754,8 @@ export type SourceOfIncomeScalarWhereInput = {
   category_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
   income?: Prisma.FloatFilter<'SourceOfIncome'> | number
   currency?: Prisma.StringFilter<'SourceOfIncome'> | string
+  date?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
+  is_recurring?: Prisma.BoolFilter<'SourceOfIncome'> | boolean
   user_id?: Prisma.BigIntFilter<'SourceOfIncome'> | bigint | number
   created_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
   updated_at?: Prisma.DateTimeFilter<'SourceOfIncome'> | Date | string
@@ -716,6 +766,8 @@ export type SourceOfIncomeCreateWithoutCategoryInput = {
   name: string
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   created_at?: Date | string
   updated_at?: Date | string
   user: Prisma.UserCreateNestedOneWithoutSources_of_incomeInput
@@ -726,6 +778,8 @@ export type SourceOfIncomeUncheckedCreateWithoutCategoryInput = {
   name: string
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   user_id: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
@@ -780,6 +834,8 @@ export type SourceOfIncomeCreateManyUserInput = {
   category_id: bigint | number
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -789,6 +845,8 @@ export type SourceOfIncomeUpdateWithoutUserInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneRequiredWithoutSources_of_incomeNestedInput
@@ -800,6 +858,8 @@ export type SourceOfIncomeUncheckedUpdateWithoutUserInput = {
   category_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -810,6 +870,8 @@ export type SourceOfIncomeUncheckedUpdateManyWithoutUserInput = {
   category_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -819,6 +881,8 @@ export type SourceOfIncomeCreateManyCategoryInput = {
   name: string
   income?: number
   currency?: string
+  date: Date | string
+  is_recurring?: boolean
   user_id: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
@@ -829,6 +893,8 @@ export type SourceOfIncomeUpdateWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutSources_of_incomeNestedInput
@@ -839,6 +905,8 @@ export type SourceOfIncomeUncheckedUpdateWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -849,6 +917,8 @@ export type SourceOfIncomeUncheckedUpdateManyWithoutCategoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   income?: Prisma.FloatFieldUpdateOperationsInput | number
   currency?: Prisma.StringFieldUpdateOperationsInput | string
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -863,6 +933,8 @@ export type SourceOfIncomeSelect<
     category_id?: boolean
     income?: boolean
     currency?: boolean
+    date?: boolean
+    is_recurring?: boolean
     user_id?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -881,6 +953,8 @@ export type SourceOfIncomeSelectCreateManyAndReturn<
     category_id?: boolean
     income?: boolean
     currency?: boolean
+    date?: boolean
+    is_recurring?: boolean
     user_id?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -899,6 +973,8 @@ export type SourceOfIncomeSelectUpdateManyAndReturn<
     category_id?: boolean
     income?: boolean
     currency?: boolean
+    date?: boolean
+    is_recurring?: boolean
     user_id?: boolean
     created_at?: boolean
     updated_at?: boolean
@@ -914,6 +990,8 @@ export type SourceOfIncomeSelectScalar = {
   category_id?: boolean
   income?: boolean
   currency?: boolean
+  date?: boolean
+  is_recurring?: boolean
   user_id?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -922,7 +1000,16 @@ export type SourceOfIncomeSelectScalar = {
 export type SourceOfIncomeOmit<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = runtime.Types.Extensions.GetOmit<
-  'id' | 'name' | 'category_id' | 'income' | 'currency' | 'user_id' | 'created_at' | 'updated_at',
+  | 'id'
+  | 'name'
+  | 'category_id'
+  | 'income'
+  | 'currency'
+  | 'date'
+  | 'is_recurring'
+  | 'user_id'
+  | 'created_at'
+  | 'updated_at',
   ExtArgs['result']['sourceOfIncome']
 >
 export type SourceOfIncomeInclude<
@@ -959,6 +1046,8 @@ export type $SourceOfIncomePayload<
       category_id: bigint
       income: number
       currency: string
+      date: Date
+      is_recurring: boolean
       user_id: bigint
       created_at: Date
       updated_at: Date
@@ -1565,6 +1654,8 @@ export interface SourceOfIncomeFieldRefs {
   readonly category_id: Prisma.FieldRef<'SourceOfIncome', 'BigInt'>
   readonly income: Prisma.FieldRef<'SourceOfIncome', 'Float'>
   readonly currency: Prisma.FieldRef<'SourceOfIncome', 'String'>
+  readonly date: Prisma.FieldRef<'SourceOfIncome', 'DateTime'>
+  readonly is_recurring: Prisma.FieldRef<'SourceOfIncome', 'Boolean'>
   readonly user_id: Prisma.FieldRef<'SourceOfIncome', 'BigInt'>
   readonly created_at: Prisma.FieldRef<'SourceOfIncome', 'DateTime'>
   readonly updated_at: Prisma.FieldRef<'SourceOfIncome', 'DateTime'>

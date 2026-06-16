@@ -55,16 +55,18 @@ model Category {
 }
 
 model SourceOfIncome {
-  id          BigInt                 @id @default(autoincrement())
-  name        String
-  category_id BigInt
-  income      Float                  @default(0)
-  currency    String                 @default("USD")
-  user_id     BigInt
-  user        User                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  category    Category               @relation(fields: [category_id], references: [id])
-  created_at  DateTime               @default(now())
-  updated_at  DateTime               @updatedAt
+  id           BigInt                 @id @default(autoincrement())
+  name         String
+  category_id  BigInt
+  income       Float                  @default(0)
+  currency     String                 @default("USD")
+  date         DateTime               @db.Date
+  is_recurring Boolean                @default(false)
+  user_id      BigInt
+  user         User                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  category     Category               @relation(fields: [category_id], references: [id])
+  created_at   DateTime               @default(now())
+  updated_at   DateTime               @updatedAt
 
   @@map("sources_of_income")
 }
@@ -89,6 +91,8 @@ model Expense {
   category_id     BigInt
   category        Category               @relation(fields: [category_id], references: [id])
   amount          Float
+  date            DateTime               @db.Date
+  is_recurring    Boolean                @default(false)
   is_paid         Boolean                @default(false)
   is_saved        Boolean                @default(false)
   saving_location String?
