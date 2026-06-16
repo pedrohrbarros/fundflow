@@ -4,6 +4,7 @@ import { parsePagination } from '../../../helpers/pagination'
 import { parseFilterBody } from '../../../helpers/filters'
 import type { FilterNode } from '../../../helpers/filters'
 import type { FieldAllowlist } from '../../../helpers/filters'
+import { resolvePeriod } from '../../../helpers/period'
 
 const SOURCE_OF_INCOME_ALLOWED_FIELDS: FieldAllowlist = {
   name: 'string',
@@ -19,7 +20,7 @@ export const searchSourcesOfIncome = async ({
   set,
 }: {
   user_external_id: string
-  body: { page?: number; limit?: number; filters?: unknown }
+  body: { page?: number; limit?: number; filters?: unknown; granularity?: unknown; date?: unknown }
   set: { status?: number | string }
 }) => {
   const pagination = parsePagination({
@@ -35,10 +36,14 @@ export const searchSourcesOfIncome = async ({
     filters = result.node
   }
 
+  const period = resolvePeriod(body as { granularity?: unknown; date?: unknown })
+  if (!period.ok) return handleError(set, 400, period.error)
+
   const result = await SourcesOfIncomeService.search(
     user_external_id,
     pagination.page,
     pagination.limit,
+    period.period,
     filters
   )
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)

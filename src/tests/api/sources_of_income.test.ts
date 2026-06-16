@@ -77,7 +77,10 @@ describe('Sources of Income API', () => {
       category_id: Number(test_category_id),
       date: '2026-06-15',
     })
-    const res = await req('POST', '/api/v1/sources_of_income/search', {})
+    const res = await req('POST', '/api/v1/sources_of_income/search', {
+      granularity: 'annually',
+      date: '2026-06-15',
+    })
     expect(res.status).toBe(200)
     const json = await res.json()
     expect('sources_of_income' in json).toBe(true)
@@ -93,7 +96,7 @@ describe('Sources of Income API', () => {
     const all_sources = Object.values(
       json.sources_of_income as Record<
         string,
-        { id: number; name: string; income: number; currency: string }[]
+        { id: number; name: string; income: number; currency: string; period_amount: number }[]
       >
     ).flat()
     const first_source = all_sources[0]
@@ -101,8 +104,56 @@ describe('Sources of Income API', () => {
     expect(typeof first_source.name).toBe('string')
     expect(typeof first_source.income).toBe('number')
     expect(typeof first_source.currency).toBe('string')
+    expect(typeof first_source.period_amount).toBe('number')
     expect(all_sources.some((s) => s.name === `test-soi-${TS}-list`)).toBe(true)
   })
+
+  it('income search scopes to the period with period_amount and per-currency total', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `incp-${TS}`, type: 'INCOME' })
+    ).json()
+    await req('POST', '/api/v1/sources_of_income', {
+      name: `salary-${TS}`,
+      category_id: Number(cat.id),
+      income: 1000,
+      currency: 'USD',
+      date: '2026-06-05',
+      is_recurring: true,
+    })
+    await req('POST', '/api/v1/sources_of_income', {
+      name: `bonus-${TS}`,
+      category_id: Number(cat.id),
+      income: 200,
+      currency: 'USD',
+      date: '2026-06-10',
+    })
+
+    const res = await req('POST', '/api/v1/sources_of_income/search', {
+      granularity: 'annually',
+      date: '2026-09-01',
+      filters: {
+        logic: 'OR',
+        conditions: [
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `salary-${TS}` },
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `bonus-${TS}` },
+        ],
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    // salary recurring 1000*7 + bonus one-time 200 = 7200 USD
+    expect(json.total.USD).toBe(7200)
+    const all = Object.values(json.sources_of_income).flat() as Array<{
+      name: string
+      period_amount: number
+      is_recurring: boolean
+      date: string
+    }>
+    const salary = all.find((s) => s.name === `salary-${TS}`)
+    expect(salary?.period_amount).toBe(7000)
+    expect(salary?.is_recurring).toBe(true)
+    expect(salary?.date).toBe('2026-06-05')
+  }, 20000)
 
   it('PATCH /api/v1/sources_of_income/:id updates a source of income', async () => {
     const created = await (
