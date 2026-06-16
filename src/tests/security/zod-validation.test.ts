@@ -1,46 +1,29 @@
-import { describe, it, expect, mock, beforeAll, afterAll } from 'bun:test'
-import { generateKeyPair, SignJWT } from 'jose'
+import { describe, it, expect, beforeAll, afterAll } from 'bun:test'
 import { db } from '../../config/db'
+import { signAccessToken } from '../../helpers/auth/tokens'
 
-const { privateKey: test_private_key, publicKey: test_public_key } = await generateKeyPair('RS256')
-
-mock.module('../../config/clerk', () => ({
-  getClerkPublicKey: async () => test_public_key,
-}))
-
-process.env.CLERK_AUTHORIZED_PARTY = 'http://localhost:3000'
+process.env.JWT_SECRET = 'test-secret-value'
 process.env.API_TOKEN = 'test-api-token'
 process.env.ALLOWED_ORIGINS = '["http://localhost:3000"]'
 
 const { app } = await import('../../index')
 
 const TEST_EXTERNAL_ID = `user_zod_${Date.now()}`
-
-const make_token = () =>
-  new SignJWT({ azp: process.env.CLERK_AUTHORIZED_PARTY })
-    .setProtectedHeader({ alg: 'RS256' })
-    .setSubject(TEST_EXTERNAL_ID)
-    .setIssuedAt()
-    .setExpirationTime('1h')
-    .sign(test_private_key)
+const TEST_EMAIL = `${TEST_EXTERNAL_ID}@test.local`
 
 const req = async (method: string, path: string, body?: unknown) => {
-  const token = await make_token()
+  const token = await signAccessToken({ external_id: TEST_EXTERNAL_ID, email: TEST_EMAIL })
   return app.handle(
     new Request(`http://localhost${path}`, {
       method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'X-Api-Key': process.env.API_TOKEN!,
-      },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     })
   )
 }
 
 beforeAll(async () => {
-  await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
+  await db.user.create({ data: { external_id: TEST_EXTERNAL_ID, email: TEST_EMAIL } })
 })
 
 afterAll(async () => {

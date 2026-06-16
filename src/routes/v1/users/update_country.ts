@@ -3,11 +3,11 @@ import { UserService } from '../../../services/users'
 import { handleError } from '../../../middleware/error'
 
 export const updateCountry = async ({
-  clerk_user_id,
+  user_external_id,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   body: unknown
   set: { status?: number | string }
 }) => {
@@ -16,7 +16,7 @@ export const updateCountry = async ({
     set.status = 400
     return { error: parsed.error.flatten().fieldErrors }
   }
-  const result = await UserService.updateCountry(clerk_user_id, parsed.data.country)
+  const result = await UserService.updateCountry(user_external_id, parsed.data.country)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data
 }

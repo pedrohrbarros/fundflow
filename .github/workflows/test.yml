@@ -46,8 +46,8 @@ jobs:
 
       # Compose the throwaway test DB URL from the service password so no
       # credential-shaped literal is committed (it only targets the local
-      # ephemeral Postgres above, never production). API_TOKEN and
-      # CLERK_AUTHORIZED_PARTY are set by the test files themselves.
+      # ephemeral Postgres above, never production). API_TOKEN,
+      # GOOGLE_CLIENT_ID, and JWT_SECRET are set by the test files themselves.
       - name: Configure test database URL
         run: echo "DATABASE_URL=postgresql://postgres:${PGPASSWORD}@localhost:5432/fundflow_test" >> "$GITHUB_ENV"
         env:

@@ -3,11 +3,11 @@ import { handleError } from '../../../middleware/error'
 import { ExpenseCreateSchema } from '../../../schemas/expenses'
 
 export const createExpense = async ({
-  clerk_user_id,
+  user_external_id,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   body: unknown
   set: { status?: number | string }
 }) => {
@@ -16,7 +16,7 @@ export const createExpense = async ({
     set.status = 400
     return { error: parsed.error.flatten().fieldErrors }
   }
-  const result = await ExpensesService.create(clerk_user_id, parsed.data)
+  const result = await ExpensesService.create(user_external_id, parsed.data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201
   return result.data

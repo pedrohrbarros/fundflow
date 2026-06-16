@@ -49,6 +49,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  RefreshToken: 'RefreshToken',
   Category: 'Category',
   SourceOfIncome: 'SourceOfIncome',
   PaymentMethod: 'PaymentMethod',
@@ -75,12 +76,25 @@ export type TransactionIsolationLevel =
 export const UserScalarFieldEnum = {
   id: 'id',
   external_id: 'external_id',
+  email: 'email',
   country: 'country',
   created_at: 'created_at',
   updated_at: 'updated_at',
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+export const RefreshTokenScalarFieldEnum = {
+  id: 'id',
+  token_hash: 'token_hash',
+  user_id: 'user_id',
+  expires_at: 'expires_at',
+  revoked: 'revoked',
+  created_at: 'created_at',
+} as const
+
+export type RefreshTokenScalarFieldEnum =
+  (typeof RefreshTokenScalarFieldEnum)[keyof typeof RefreshTokenScalarFieldEnum]
 
 export const CategoryScalarFieldEnum = {
   id: 'id',

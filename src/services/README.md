@@ -16,19 +16,18 @@ Handlers call `handleError(set, result.status, result.message, result.meta)` whe
 
 ## Modules
 
-| File                   | Export                   | Responsibility                                    |
-| ---------------------- | ------------------------ | ------------------------------------------------- |
-| `categories.ts`        | `CategoriesService`      | CRUD + `search()` for `SourceOfIncomeCategory`    |
-| `sources_of_income.ts` | `SourcesOfIncomeService` | CRUD + `search()` for `SourceOfIncome`            |
-| `payment_methods.ts`   | `PaymentMethodsService`  | User-scoped CRUD + `search()` for `PaymentMethod` |
-| `expenses.ts`          | `ExpensesService`        | User-scoped CRUD + `search()` for `Expense`       |
-| `users.ts`             | `UserService`            | `getMe()` and `updateCountry()` for `User`        |
-| `docs.ts`              | `DocsService`            | Monthly test user lifecycle for Swagger UI access |
-| `webhooks/clerk.ts`    | —                        | Clerk webhook business logic (create/delete user) |
+| File                   | Export                   | Responsibility                                        |
+| ---------------------- | ------------------------ | ----------------------------------------------------- |
+| `categories.ts`        | `CategoriesService`      | CRUD + `search()` for `SourceOfIncomeCategory`        |
+| `sources_of_income.ts` | `SourcesOfIncomeService` | CRUD + `search()` for `SourceOfIncome`                |
+| `payment_methods.ts`   | `PaymentMethodsService`  | User-scoped CRUD + `search()` for `PaymentMethod`     |
+| `expenses.ts`          | `ExpensesService`        | User-scoped CRUD + `search()` for `Expense`           |
+| `users.ts`             | `UserService`            | `getMe()`, `updateCountry()`, `deleteMe()` for `User` |
+| `docs.ts`              | `DocsService`            | Monthly test user lifecycle for Swagger UI access     |
 
 ## User-Scoped Services
 
-Services that operate on user-owned records accept `user_external_id: string` (the Clerk `sub` claim) and resolve the internal `user_id` themselves via `db.user.findUnique({ where: { external_id } })`. This keeps handlers unaware of the internal ID mapping and ensures ownership is always enforced at the service layer.
+Services that operate on user-owned records accept `user_external_id: string` (the `external_id` claim from the backend JWT) and resolve the internal `user_id` themselves via `db.user.findUnique({ where: { external_id } })`. This keeps handlers unaware of the internal ID mapping and ensures ownership is always enforced at the service layer.
 
 ## DocsService
 

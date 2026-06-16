@@ -1,39 +1,22 @@
-import { describe, it, expect, mock, beforeAll, afterAll } from 'bun:test'
-import { generateKeyPair, SignJWT } from 'jose'
+import { describe, it, expect, beforeAll, afterAll } from 'bun:test'
 import { db } from '../../config/db'
+import { signAccessToken } from '../../helpers/auth/tokens'
 
-const { privateKey: testPrivateKey, publicKey: testPublicKey } = await generateKeyPair('RS256')
-
-mock.module('../../config/clerk', () => ({
-  getClerkPublicKey: async () => testPublicKey,
-}))
-
-process.env.CLERK_AUTHORIZED_PARTY = 'http://localhost:3000'
+process.env.JWT_SECRET = 'test-secret-value'
 process.env.API_TOKEN = 'test-api-token'
 
 const { app } = await import('../../index')
 
 const TEST_EXTERNAL_ID = `user_exp_test_${Date.now()}`
+const TEST_EMAIL = `${TEST_EXTERNAL_ID}@test.local`
 const TS = Date.now()
 
-const makeToken = () =>
-  new SignJWT({ azp: process.env.CLERK_AUTHORIZED_PARTY })
-    .setProtectedHeader({ alg: 'RS256' })
-    .setSubject(TEST_EXTERNAL_ID)
-    .setIssuedAt()
-    .setExpirationTime('1h')
-    .sign(testPrivateKey)
-
 const req = async (method: string, path: string, body?: unknown) => {
-  const token = await makeToken()
+  const token = await signAccessToken({ external_id: TEST_EXTERNAL_ID, email: TEST_EMAIL })
   return app.handle(
     new Request(`http://localhost${path}`, {
       method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'X-Api-Key': process.env.API_TOKEN!,
-      },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     })
   )
@@ -43,7 +26,7 @@ let pm_id: number
 let exp_category_id: number
 
 beforeAll(async () => {
-  await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
+  await db.user.create({ data: { external_id: TEST_EXTERNAL_ID, email: TEST_EMAIL } })
   const pm = await (
     await req('POST', '/api/v1/payment_methods', { name: `test-pm-${TS}`, origin: 'Test Bank' })
   ).json()
@@ -362,5 +345,8 @@ describe('Expenses API', () => {
 
     const summed = json.by_category.reduce((acc: number, r: { total: number }) => acc + r.total, 0)
     expect(json.total).toBe(summed)
-  })
+    // Per-test timeout: this case makes 6 sequential round-trips to a remote
+    // Supabase DB (~1.2s each), which can exceed bun:test's 5s default under
+    // load or when run outside the `--timeout`-configured `bun run test` script.
+  }, 20000)
 })

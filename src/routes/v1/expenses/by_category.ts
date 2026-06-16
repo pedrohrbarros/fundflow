@@ -5,11 +5,11 @@ import type { FilterNode } from '../../../helpers/filters'
 import { EXPENSE_ALLOWED_FIELDS } from './search'
 
 export const expensesByCategory = async ({
-  clerk_user_id,
+  user_external_id,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   body: { filters?: unknown }
   set: { status?: number | string }
 }) => {
@@ -20,7 +20,7 @@ export const expensesByCategory = async ({
     filters = result.node
   }
 
-  const result = await ExpensesService.byCategory(clerk_user_id, filters)
+  const result = await ExpensesService.byCategory(user_external_id, filters)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data
 }

@@ -13,11 +13,11 @@ const CATEGORY_ALLOWED_FIELDS: FieldAllowlist = {
 }
 
 export const searchCategories = async ({
-  clerk_user_id,
+  user_external_id,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   body: { page?: number; limit?: number; filters?: unknown }
   set: { status?: number | string }
 }) => {
@@ -35,7 +35,7 @@ export const searchCategories = async ({
   }
 
   const result = await CategoriesService.search(
-    clerk_user_id,
+    user_external_id,
     pagination.page,
     pagination.limit,
     filters

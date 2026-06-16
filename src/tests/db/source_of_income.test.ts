@@ -11,7 +11,9 @@ describe('SourceOfIncome model', () => {
   let categoryId: bigint
 
   beforeEach(async () => {
-    const user = await db.user.create({ data: { external_id: TEST_USER } })
+    const user = await db.user.create({
+      data: { external_id: TEST_USER, email: `${TEST_USER}@test.local` },
+    })
     userId = user.id
     const category = await db.category.create({
       data: { name: CATEGORY_NAME, type: 'INCOME', user_id: userId },

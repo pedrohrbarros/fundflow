@@ -678,10 +678,6 @@ export type ExpenseUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type ExpenseCreateNestedOneWithoutPayment_methodsInput = {
   create?: Prisma.XOR<
     Prisma.ExpenseCreateWithoutPayment_methodsInput,

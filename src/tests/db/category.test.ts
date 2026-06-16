@@ -9,7 +9,9 @@ describe('Category model', () => {
   let userId: bigint
 
   beforeEach(async () => {
-    const user = await db.user.create({ data: { external_id: TEST_USER } })
+    const user = await db.user.create({
+      data: { external_id: TEST_USER, email: `${TEST_USER}@test.local` },
+    })
     userId = user.id
   })
 

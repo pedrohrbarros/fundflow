@@ -3,12 +3,12 @@ import { handleError } from '../../../middleware/error'
 import { ExpenseUpdateSchema } from '../../../schemas/expenses'
 
 export const updateExpense = async ({
-  clerk_user_id,
+  user_external_id,
   params,
   body,
   set,
 }: {
-  clerk_user_id: string
+  user_external_id: string
   params: { id: string }
   body: unknown
   set: { status?: number | string }
@@ -19,7 +19,7 @@ export const updateExpense = async ({
     return { error: parsed.error.flatten().fieldErrors }
   }
   const id = BigInt(params.id)
-  const result = await ExpensesService.update(id, clerk_user_id, parsed.data)
+  const result = await ExpensesService.update(id, user_external_id, parsed.data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data
 }

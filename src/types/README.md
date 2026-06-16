@@ -13,8 +13,7 @@ types/
 ├── users/              # UpdateCountryBody TypeBox schema
 ├── responses/          # OpenAPI response schemas (plain objects) for Swagger UI
 ├── search/             # OpenAPI request body schemas for search endpoints
-├── routes.ts           # RouteHandler type alias
-└── webhooks/clerk/     # Payload types for Clerk webhook events
+└── routes.ts           # RouteHandler type alias
 ```
 
 ## Conventions
@@ -50,4 +49,3 @@ Plain OpenAPI schema objects describing the request body for search endpoints. I
 | `payment_methods`   | `PaymentMethodRecord`                                     |
 | `expenses`          | `ExpenseRecord`, `ExpensePaymentMethodRecord`             |
 | `users`             | — (record defined in `src/services/users.ts`)             |
-| `webhooks/clerk`    | `ClerkUserCreatedPayload`, `ClerkUserDeletedPayload`      |

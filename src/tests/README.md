@@ -36,8 +36,7 @@ tests/
 | `api/sources_of_income.test.ts`        | Full CRUD + search for sources of income                     |
 | `api/payment_methods.test.ts`          | Full CRUD + search for payment methods                       |
 | `api/expenses.test.ts`                 | Full CRUD + search for expenses (including payment splits)   |
-| `api/users.test.ts`                    | GET /users/me, PATCH /users/country                          |
-| `api/webhooks.test.ts`                 | Clerk webhook registration and deletion                      |
+| `api/users.test.ts`                    | GET /users/me, PATCH /users/me, DELETE /users/me             |
 | `db/client.test.ts`                    | Prisma client singleton shape                                |
 | `db/user.test.ts`                      | User model create/delete                                     |
 | `db/source_of_income_category.test.ts` | Category model constraints                                   |
@@ -45,17 +44,16 @@ tests/
 | `docs/openapi.test.ts`                 | OpenAPI config metadata and security scheme                  |
 | `helpers/pagination.test.ts`           | `parsePagination` edge cases                                 |
 | `helpers/filters.test.ts`              | `parseFilterBody` and `buildWhereClause` for all field types |
-| `middleware/auth.test.ts`              | `withBearerAuth`, `withUserAuth` (docs mode + JWT mode)      |
+| `middleware/auth.test.ts`              | `withUserAuth` (docs mode + JWT mode)                        |
 | `middleware/cache.test.ts`             | Cache middleware behaviour                                   |
 | `security/cors.test.ts`                | CORS allowed origins and headers                             |
 | `security/rate-limit.test.ts`          | Rate limiting enforcement                                    |
 | `security/logging.test.ts`             | Sensitive data not logged                                    |
 | `security/zod-validation.test.ts`      | Zod schema rejects invalid bodies                            |
 | `services/docs.test.ts`                | Monthly test user lifecycle (create, reuse, rotate)          |
-| `stress/webhooks-rate-limit.test.ts`   | Webhook endpoint rate limit under load                       |
 
 ## Conventions
 
-- Each API test file creates its own Clerk JWT keypair via `jose` and mocks `getClerkPublicKey` so tests never depend on a live Clerk instance.
+- Each API test file that needs auth sets `process.env.JWT_SECRET` and uses `signAccessToken` from `src/helpers/auth/tokens` to mint tokens without any external dependency.
 - Test data uses timestamped external IDs (`user_cat_test_<Date.now()>`) to avoid collisions across parallel runs.
 - `beforeAll` creates required DB fixtures; `afterAll` cleans them up in dependency order (children before parents).

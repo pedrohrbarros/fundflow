@@ -1,58 +1,44 @@
 import { describe, it, expect, beforeEach } from 'bun:test'
 import { Elysia } from 'elysia'
-import { withBearerAuth, withUserAuth } from '../../middleware/auth'
+import { withUserAuth } from '../../middleware/auth'
+import { signAccessToken } from '../../helpers/auth/tokens'
 
-const testApp = withBearerAuth(new Elysia()).get('/protected', () => 'secret')
+process.env.JWT_SECRET = 'test-secret-value'
+process.env.API_TOKEN = 'test-key'
 
-const userAuthApp = withUserAuth(new Elysia()).get('/protected', ({ clerk_user_id }) =>
-  JSON.stringify({ clerk_user_id })
+const userAuthApp = withUserAuth(new Elysia()).get('/protected', ({ user_external_id }) =>
+  JSON.stringify({ user_external_id })
 )
 
-describe('withBearerAuth', () => {
-  beforeEach(() => {
-    process.env.API_TOKEN = 'test-key'
-  })
-
-  it('allows requests with the correct bearer token', async () => {
-    const response = await testApp.handle(
-      new Request('http://localhost/protected', {
-        headers: { Authorization: 'Bearer test-key' },
-      })
+describe('withUserAuth — JWT mode', () => {
+  it('allows a request with a valid access token', async () => {
+    const token = await signAccessToken({ external_id: 'sub-1', email: 'a@b.com' })
+    const res = await userAuthApp.handle(
+      new Request('http://localhost/protected', { headers: { Authorization: `Bearer ${token}` } })
     )
-    expect(response.status).toBe(200)
-    expect(await response.text()).toBe('secret')
+    expect(res.status).toBe(200)
+    expect(JSON.parse(await res.text()).user_external_id).toBe('sub-1')
   })
 
-  it('rejects requests with a wrong bearer token', async () => {
-    const response = await testApp.handle(
-      new Request('http://localhost/protected', {
-        headers: { Authorization: 'Bearer wrong-key' },
-      })
+  it('rejects a missing Authorization header', async () => {
+    const res = await userAuthApp.handle(new Request('http://localhost/protected'))
+    expect(res.status).toBe(401)
+  })
+
+  it('rejects an invalid token', async () => {
+    const res = await userAuthApp.handle(
+      new Request('http://localhost/protected', { headers: { Authorization: 'Bearer nope' } })
     )
-    expect(response.status).toBe(401)
-  })
-
-  it('rejects requests with no Authorization header', async () => {
-    const response = await testApp.handle(new Request('http://localhost/protected'))
-    expect(response.status).toBe(401)
-  })
-
-  it('rejects requests with a non-Bearer auth scheme', async () => {
-    const response = await testApp.handle(
-      new Request('http://localhost/protected', {
-        headers: { Authorization: 'Basic dXNlcjpwYXNz' },
-      })
-    )
-    expect(response.status).toBe(401)
+    expect(res.status).toBe(401)
   })
 })
 
-describe('withUserAuth — docs mode (wrong credentials)', () => {
+describe('withUserAuth — docs mode', () => {
   beforeEach(() => {
     process.env.API_TOKEN = 'test-key'
   })
 
-  it('rejects docs requests with wrong API key', async () => {
+  it('rejects docs requests with a wrong API key', async () => {
     const res = await userAuthApp.handle(
       new Request('http://localhost/protected', {
         headers: { 'X-Docs-Mode': 'true', 'X-Api-Key': 'wrong-key' },
@@ -61,36 +47,13 @@ describe('withUserAuth — docs mode (wrong credentials)', () => {
     expect(res.status).toBe(401)
   })
 
-  it('rejects docs requests with no API key', async () => {
+  it('rejects docs requests when API_TOKEN is unset', async () => {
+    const prev = process.env.API_TOKEN
+    delete process.env.API_TOKEN
     const res = await userAuthApp.handle(
-      new Request('http://localhost/protected', {
-        headers: { 'X-Docs-Mode': 'true' },
-      })
+      new Request('http://localhost/protected', { headers: { 'X-Docs-Mode': 'true' } })
     )
     expect(res.status).toBe(401)
-  })
-})
-
-describe('withUserAuth — normal mode', () => {
-  beforeEach(() => {
-    process.env.API_TOKEN = 'test-key'
-  })
-
-  it('rejects requests with no Authorization header', async () => {
-    const res = await userAuthApp.handle(
-      new Request('http://localhost/protected', {
-        headers: { 'X-Api-Key': 'test-key' },
-      })
-    )
-    expect(res.status).toBe(401)
-  })
-
-  it('rejects requests with a non-Bearer auth scheme', async () => {
-    const res = await userAuthApp.handle(
-      new Request('http://localhost/protected', {
-        headers: { Authorization: 'Basic dXNlcjpwYXNz', 'X-Api-Key': 'test-key' },
-      })
-    )
-    expect(res.status).toBe(401)
+    process.env.API_TOKEN = prev
   })
 })

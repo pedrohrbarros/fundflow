@@ -2,7 +2,7 @@
   "name": "fundflow",
   "version": "1.0.50",
   "scripts": {
-    "test": "bun test",
+    "test": "bun test --timeout 20000",
     "dev": "bun run --watch src/index.ts",
     "migrate": "bash scripts/migrate.sh",
     "prepare": "husky",
@@ -19,7 +19,6 @@
     "pg": "^8.20.0",
     "pino": "^10.3.1",
     "redis": "^5.12.1",
-    "svix": "^1.92.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {

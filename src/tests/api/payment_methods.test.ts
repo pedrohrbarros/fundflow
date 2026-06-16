@@ -1,43 +1,28 @@
-import { describe, it, expect, mock, beforeAll, afterAll } from 'bun:test'
-import { generateKeyPair, SignJWT } from 'jose'
+import { describe, it, expect, beforeAll, afterAll } from 'bun:test'
 import { db } from '../../config/db'
+import { signAccessToken } from '../../helpers/auth/tokens'
 
-const { privateKey: testPrivateKey, publicKey: testPublicKey } = await generateKeyPair('RS256')
-
-mock.module('../../config/clerk', () => ({
-  getClerkPublicKey: async () => testPublicKey,
-}))
-
-process.env.CLERK_AUTHORIZED_PARTY = 'http://localhost:3000'
+process.env.JWT_SECRET = 'test-secret-value'
 process.env.API_TOKEN = 'test-api-token'
 
 const { app } = await import('../../index')
 
 const TEST_EXTERNAL_ID = `user_pm_test_${Date.now()}`
+const TEST_EMAIL = `${TEST_EXTERNAL_ID}@test.local`
 
-const makeToken = (user_external_id: string) =>
-  new SignJWT({ azp: process.env.CLERK_AUTHORIZED_PARTY })
-    .setProtectedHeader({ alg: 'RS256' })
-    .setSubject(user_external_id)
-    .setIssuedAt()
-    .setExpirationTime('1h')
-    .sign(testPrivateKey)
-
-const req = (method: string, path: string, token: string, body?: unknown) =>
-  app.handle(
+const req = async (method: string, path: string, body?: unknown) => {
+  const token = await signAccessToken({ external_id: TEST_EXTERNAL_ID, email: TEST_EMAIL })
+  return app.handle(
     new Request(`http://localhost${path}`, {
       method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'X-Api-Key': process.env.API_TOKEN!,
-      },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
     })
   )
+}
 
 beforeAll(async () => {
-  await db.user.create({ data: { external_id: TEST_EXTERNAL_ID } })
+  await db.user.create({ data: { external_id: TEST_EXTERNAL_ID, email: TEST_EMAIL } })
 })
 
 afterAll(async () => {
@@ -59,14 +44,12 @@ describe('Payment Methods API', () => {
   })
 
   it('POST /api/v1/payment_methods returns 400 when origin is missing', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('POST', '/api/v1/payment_methods', token, { name: 'No Origin' })
+    const res = await req('POST', '/api/v1/payment_methods', { name: 'No Origin' })
     expect(res.status).toBe(400)
   })
 
   it('POST /api/v1/payment_methods creates a payment method', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('POST', '/api/v1/payment_methods', token, {
+    const res = await req('POST', '/api/v1/payment_methods', {
       name: 'My Card',
       origin: 'Inter Bank',
       receiver: 'Pedro',
@@ -80,8 +63,7 @@ describe('Payment Methods API', () => {
   })
 
   it('POST /api/v1/payment_methods/search returns the list for the authenticated user', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('POST', '/api/v1/payment_methods/search', token, {})
+    const res = await req('POST', '/api/v1/payment_methods/search', {})
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(Array.isArray(json.payment_methods)).toBe(true)
@@ -92,8 +74,7 @@ describe('Payment Methods API', () => {
   })
 
   it('POST /api/v1/payment_methods/search returns pagination metadata', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('POST', '/api/v1/payment_methods/search', token, {})
+    const res = await req('POST', '/api/v1/payment_methods/search', {})
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.pagination).toBeDefined()
@@ -103,14 +84,12 @@ describe('Payment Methods API', () => {
   })
 
   it('POST /api/v1/payment_methods/search with limit=5001 returns 400', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('POST', '/api/v1/payment_methods/search', token, { limit: 5001 })
+    const res = await req('POST', '/api/v1/payment_methods/search', { limit: 5001 })
     expect(res.status).toBe(400)
   })
 
   it('POST /api/v1/payment_methods/search with is_equal filter on name returns only matching methods', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('POST', '/api/v1/payment_methods/search', token, {
+    const res = await req('POST', '/api/v1/payment_methods/search', {
       filters: { field: 'name', op: 'is_equal', value: 'My Card' },
     })
     expect(res.status).toBe(200)
@@ -120,22 +99,20 @@ describe('Payment Methods API', () => {
   })
 
   it('POST /api/v1/payment_methods/search with unknown field returns 400', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('POST', '/api/v1/payment_methods/search', token, {
+    const res = await req('POST', '/api/v1/payment_methods/search', {
       filters: { field: 'nonexistent', op: 'is_equal', value: 'x' },
     })
     expect(res.status).toBe(400)
   })
 
   it('PATCH /api/v1/payment_methods/:id updates a payment method', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
     const created = await (
-      await req('POST', '/api/v1/payment_methods', token, {
+      await req('POST', '/api/v1/payment_methods', {
         name: 'Old Name',
         origin: 'Old Bank',
       })
     ).json()
-    const res = await req('PATCH', `/api/v1/payment_methods/${created.id}`, token, {
+    const res = await req('PATCH', `/api/v1/payment_methods/${created.id}`, {
       name: 'New Name',
       origin: 'New Bank',
     })
@@ -146,28 +123,25 @@ describe('Payment Methods API', () => {
   })
 
   it('PATCH /api/v1/payment_methods/:id returns 404 for nonexistent id', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('PATCH', '/api/v1/payment_methods/999999999', token, { name: 'X' })
+    const res = await req('PATCH', '/api/v1/payment_methods/999999999', { name: 'X' })
     expect(res.status).toBe(404)
   })
 
   it('DELETE /api/v1/payment_methods/:id deletes a payment method', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
     const created = await (
-      await req('POST', '/api/v1/payment_methods', token, {
+      await req('POST', '/api/v1/payment_methods', {
         name: 'To Delete',
         origin: 'Test Bank',
       })
     ).json()
-    const res = await req('DELETE', `/api/v1/payment_methods/${created.id}`, token)
+    const res = await req('DELETE', `/api/v1/payment_methods/${created.id}`)
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.message).toBeDefined()
   })
 
   it('DELETE /api/v1/payment_methods/:id returns 404 for nonexistent id', async () => {
-    const token = await makeToken(TEST_EXTERNAL_ID)
-    const res = await req('DELETE', '/api/v1/payment_methods/999999999', token)
+    const res = await req('DELETE', '/api/v1/payment_methods/999999999')
     expect(res.status).toBe(404)
   })
 })
