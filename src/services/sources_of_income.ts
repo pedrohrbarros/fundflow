@@ -1,7 +1,7 @@
 import { db } from '../config/db'
 import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
-import type { SourceOfIncomeRecord } from '../types/sources_of_income'
+import type { SourceOfIncomeRecord, SourceOfIncomeCategoryGroup } from '../types/sources_of_income'
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
 import { periodRange, periodContribution, type PeriodInput } from '../helpers/period'
@@ -90,7 +90,7 @@ export const SourcesOfIncomeService = {
     filters?: FilterNode
   ): Promise<
     ServiceResult<{
-      sources_of_income: Record<string, (SourceOfIncomeRecord & { period_amount: number })[]>
+      sources_of_income: SourceOfIncomeCategoryGroup[]
       total: Record<string, number>
       pagination: { page: number; limit: number; total: number }
     }>
@@ -136,15 +136,21 @@ export const SourcesOfIncomeService = {
       }
 
       const paged = applicable.slice((page - 1) * limit, (page - 1) * limit + limit)
-      const sources_of_income: Record<
-        string,
-        (SourceOfIncomeRecord & { period_amount: number })[]
-      > = {}
+      const groups = new Map<bigint | null, SourceOfIncomeCategoryGroup>()
       for (const x of paged) {
-        const name = x.r.category?.name ?? 'Uncategorized'
-        if (!sources_of_income[name]) sources_of_income[name] = []
-        sources_of_income[name].push({ ...toRecord(x.r), period_amount: x.c.period_amount })
+        const key = x.r.category_id // bigint | null
+        let group = groups.get(key)
+        if (!group) {
+          group = {
+            category_id: key != null ? Number(key) : null,
+            category_name: x.r.category?.name ?? null,
+            sources: [],
+          }
+          groups.set(key, group)
+        }
+        group.sources.push({ ...toRecord(x.r), period_amount: x.c.period_amount })
       }
+      const sources_of_income = [...groups.values()]
 
       return {
         ok: true,

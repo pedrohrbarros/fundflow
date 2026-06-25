@@ -37,45 +37,72 @@ When omitted, the endpoint returns sources applicable in the current calendar mo
 
 ### Response shape
 
-Results are grouped by category name. Each record includes a `period_amount` field. A per-currency `total` is included at the top level. Sources without a `category_id` appear under the `"Uncategorized"` key.
+Results are returned as an array of category groups. Each group has a `category_id`, a `category_name`, and a `sources` array. Each source record includes a `period_amount` field. A per-currency `total` is included at the top level. Sources without a `category_id` appear in the group where `category_id` is `null` (and `category_name` is `null`).
 
 ```json
 {
-  "sources_of_income": {
-    "Salary": [
-      {
-        "id": 1,
-        "name": "Job",
-        "income": 5000,
-        "currency": "USD",
-        "date": "2026-01-01",
-        "is_recurring": true,
-        "period_amount": 5000,
-        "category_id": 1,
-        "created_at": "...",
-        "updated_at": "..."
-      }
-    ],
-    "Freelance": [
-      {
-        "id": 2,
-        "name": "Consulting",
-        "income": 1000,
-        "currency": "EUR",
-        "date": "2026-03-15",
-        "is_recurring": false,
-        "period_amount": 1000,
-        "category_id": 2,
-        "created_at": "...",
-        "updated_at": "..."
-      }
-    ]
-  },
-  "total": { "USD": 5000, "EUR": 1000 },
-  "pagination": { "page": 1, "limit": 20, "total": 2 }
+  "sources_of_income": [
+    {
+      "category_id": 1,
+      "category_name": "Salary",
+      "sources": [
+        {
+          "id": 1,
+          "name": "Job",
+          "income": 5000,
+          "currency": "USD",
+          "date": "2026-01-01",
+          "is_recurring": true,
+          "period_amount": 5000,
+          "category_id": 1,
+          "created_at": "...",
+          "updated_at": "..."
+        }
+      ]
+    },
+    {
+      "category_id": 2,
+      "category_name": "Freelance",
+      "sources": [
+        {
+          "id": 2,
+          "name": "Consulting",
+          "income": 1000,
+          "currency": "EUR",
+          "date": "2026-03-15",
+          "is_recurring": false,
+          "period_amount": 1000,
+          "category_id": 2,
+          "created_at": "...",
+          "updated_at": "..."
+        }
+      ]
+    },
+    {
+      "category_id": null,
+      "category_name": null,
+      "sources": [
+        {
+          "id": 3,
+          "name": "Side project",
+          "income": 500,
+          "currency": "USD",
+          "date": "2026-05-10",
+          "is_recurring": false,
+          "period_amount": 500,
+          "category_id": null,
+          "created_at": "...",
+          "updated_at": "..."
+        }
+      ]
+    }
+  ],
+  "total": { "USD": 5500, "EUR": 1000 },
+  "pagination": { "page": 1, "limit": 20, "total": 3 }
 }
 ```
 
+- `sources_of_income` — array of groups, one per distinct category. Groups are ordered by first appearance in the paged results. The group with `category_id: null` contains uncategorized sources.
 - `period_amount` — the amount attributed to the requested period.
 - `total` — per-currency sum of `period_amount` across all applicable sources (before pagination).
 - `pagination.total` — count of applicable sources in the period.

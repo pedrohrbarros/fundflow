@@ -60,13 +60,22 @@ const source_of_income_search_record = {
 
 export const SourceOfIncomeResponse = source_of_income
 
+const source_of_income_category_group = {
+  type: 'object',
+  properties: {
+    category_id: { type: 'number', nullable: true },
+    category_name: { type: 'string', nullable: true },
+    sources: { type: 'array', items: source_of_income_search_record },
+  },
+}
+
 export const SourceOfIncomeSearchResponse = {
   type: 'object',
   properties: {
     sources_of_income: {
-      type: 'object',
-      description: 'Sources of income grouped by category name',
-      additionalProperties: { type: 'array', items: source_of_income_search_record },
+      type: 'array',
+      description: 'Sources of income grouped by category; category_id null = uncategorized',
+      items: source_of_income_category_group,
     },
     total: {
       type: 'object',
