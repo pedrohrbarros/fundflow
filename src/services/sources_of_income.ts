@@ -178,7 +178,7 @@ export const SourcesOfIncomeService = {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
-      if (data.category_id != null && data.category_id !== undefined) {
+      if (data.category_id != null) {
         const category = await db.category.findFirst({
           where: { id: data.category_id, user_id: user.id, type: 'INCOME' },
         })

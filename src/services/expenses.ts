@@ -241,7 +241,7 @@ export const ExpensesService = {
       if (!existing)
         return { ok: false, status: 404, message: 'Expense not found', meta: { id: id.toString() } }
 
-      if (input.category_id != null && input.category_id !== undefined) {
+      if (input.category_id != null) {
         const category = await db.category.findFirst({
           where: { id: BigInt(input.category_id), user_id: user.id, type: 'EXPENSE' },
         })
