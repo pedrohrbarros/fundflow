@@ -13,7 +13,22 @@ Handles payment method management for authenticated users.
 
 ## Search endpoint
 
-`POST /api/v1/payment_methods/search` accepts a JSON body with optional `page`, `limit`, and `filters`.
+`POST /api/v1/payment_methods/search` accepts a JSON body with optional `page`, `limit`, `filters`, and `sort`.
+
+### Sorting
+
+Pass an optional `sort` object to control result order. Omitting it keeps the default DB order.
+
+```json
+{ "sort": { "field": "name", "direction": "asc" } }
+```
+
+| Property    | Type              | Default | Description      |
+| ----------- | ----------------- | ------- | ---------------- |
+| `field`     | String (required) | —       | Field to sort by |
+| `direction` | `asc` \| `desc`   | `asc`   | Sort direction   |
+
+Sortable fields: `id`, `name`, `origin`, `receiver`, `created_at`, `updated_at`.
 
 **Filterable fields:**
 

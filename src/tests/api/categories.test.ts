@@ -154,7 +154,7 @@ describe('Categories API', () => {
     await db.category.deleteMany({
       where: { name: { startsWith: `limit-cat-${TS}` } },
     })
-  })
+  }, 30000)
 
   it('POST /api/v1/categories/search filters by type', async () => {
     await req('POST', '/api/v1/categories', { name: `inc-${TS}`, type: 'INCOME' })

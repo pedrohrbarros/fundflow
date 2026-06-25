@@ -24,7 +24,7 @@ Handles source-of-income management for authenticated users.
 
 ## Search endpoint
 
-`POST /api/v1/sources_of_income/search` accepts a JSON body with optional `page`, `limit`, `granularity`, `date`, and `filters`.
+`POST /api/v1/sources_of_income/search` accepts a JSON body with optional `page`, `limit`, `granularity`, `date`, `filters`, and `sort`.
 
 ### Period scoping
 
@@ -106,6 +106,21 @@ Results are returned as an array of category groups. Each group has a `category_
 - `period_amount` — the amount attributed to the requested period.
 - `total` — per-currency sum of `period_amount` across all applicable sources (before pagination).
 - `pagination.total` — count of applicable sources in the period.
+
+### Sorting
+
+Pass an optional `sort` object to control result order. Omitting it keeps the default DB order.
+
+```json
+{ "sort": { "field": "income", "direction": "desc" } }
+```
+
+| Property    | Type              | Default | Description      |
+| ----------- | ----------------- | ------- | ---------------- |
+| `field`     | String (required) | —       | Field to sort by |
+| `direction` | `asc` \| `desc`   | `asc`   | Sort direction   |
+
+Sortable fields: `id`, `name`, `income`, `period_amount`, `date`, `is_recurring`, `currency`, `created_at`, `updated_at`.
 
 ### Filterable fields
 

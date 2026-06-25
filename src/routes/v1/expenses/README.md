@@ -28,7 +28,7 @@ Handles expense management for authenticated users.
 
 ## Search endpoint
 
-`POST /api/v1/expenses/search` accepts a JSON body with optional `page`, `limit`, `granularity`, `date`, and `filters`.
+`POST /api/v1/expenses/search` accepts a JSON body with optional `page`, `limit`, `granularity`, `date`, `filters`, and `sort`.
 
 ### Period scoping
 
@@ -68,6 +68,21 @@ When omitted, the endpoint returns expenses applicable in the current calendar m
 - `period_amount` — the amount attributed to the requested period (equals `amount` for one-off expenses; prorated for recurrences).
 - `total` — sum of `period_amount` across all applicable expenses (before pagination).
 - `pagination.total` — count of applicable expenses in the period (not total DB rows).
+
+### Sorting
+
+Pass an optional `sort` object to control result order. Omitting it keeps the default DB order.
+
+```json
+{ "sort": { "field": "date", "direction": "desc" } }
+```
+
+| Property    | Type              | Default | Description      |
+| ----------- | ----------------- | ------- | ---------------- |
+| `field`     | String (required) | —       | Field to sort by |
+| `direction` | `asc` \| `desc`   | `asc`   | Sort direction   |
+
+Sortable fields: `id`, `name`, `amount`, `period_amount`, `date`, `is_recurring`, `is_paid`, `is_saved`, `created_at`, `updated_at`.
 
 ### Filterable fields
 

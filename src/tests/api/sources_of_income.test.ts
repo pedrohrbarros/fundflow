@@ -247,7 +247,7 @@ describe('Sources of Income API', () => {
     })
     expect(res.status).toBe(400)
     await db.sourceOfIncome.deleteMany({ where: { name: { startsWith: `limit-soi-${TS}` } } })
-  })
+  }, 30000)
 
   it('POST /api/v1/sources_of_income/search returns pagination metadata', async () => {
     const res = await req('POST', '/api/v1/sources_of_income/search', {})

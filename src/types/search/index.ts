@@ -3,6 +3,19 @@ const pagination = {
   limit: { type: 'integer', minimum: 1, maximum: 100, default: 20, description: 'Items per page' },
 }
 
+const sortField = {
+  sort: {
+    type: 'object',
+    description:
+      'Optional sort. `field` must be a sortable field for the resource; `direction` defaults to asc.',
+    required: ['field'],
+    properties: {
+      field: { type: 'string' },
+      direction: { type: 'string', enum: ['asc', 'desc'], default: 'asc' },
+    },
+  },
+}
+
 const filterGroup = {
   title: 'FilterGroup',
   type: 'object',
@@ -35,6 +48,7 @@ function searchBody(conditionSchema: object, includePeriod = false) {
     type: 'object',
     properties: {
       ...pagination,
+      ...sortField,
       ...(includePeriod ? periodScope : {}),
       filters: {
         description: 'Optional filter — either a single condition or a group of conditions',
