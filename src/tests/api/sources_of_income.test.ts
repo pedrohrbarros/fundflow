@@ -272,6 +272,46 @@ describe('Sources of Income API', () => {
     expect(all_sources.length).toBeGreaterThan(0)
   })
 
+  it('POST /api/v1/sources_of_income creates a source of income without category_id (null)', async () => {
+    const res = await req('POST', '/api/v1/sources_of_income', {
+      name: `test-soi-${TS}-no-cat`,
+      date: '2026-06-20',
+    })
+    expect(res.status).toBe(201)
+    const json = await res.json()
+    expect(json.id).toBeDefined()
+    expect(json.category_id).toBeNull()
+  })
+
+  it('income search groups uncategorized income under Uncategorized key', async () => {
+    await req('POST', '/api/v1/sources_of_income', {
+      name: `soi-${TS}-uncat-search`,
+      income: 300,
+      currency: 'USD',
+      date: '2026-06-20',
+    })
+    const res = await req('POST', '/api/v1/sources_of_income/search', {
+      granularity: 'annually',
+      date: '2026-09-01',
+      filters: {
+        field: 'name',
+        fieldType: 'string',
+        op: 'is_equal',
+        value: `soi-${TS}-uncat-search`,
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect('Uncategorized' in json.sources_of_income).toBe(true)
+    const uncatSources = json.sources_of_income['Uncategorized'] as Array<{
+      name: string
+      period_amount: number
+    }>
+    const found = uncatSources.find((s) => s.name === `soi-${TS}-uncat-search`)
+    expect(found).toBeDefined()
+    expect(found?.period_amount).toBe(300)
+  }, 20000)
+
   it('POST /api/v1/sources_of_income/search with unknown field returns 400', async () => {
     const res = await req('POST', '/api/v1/sources_of_income/search', {
       filters: { field: 'nonexistent', op: 'is_equal', value: 'x' },

@@ -10,7 +10,7 @@ const ExpensePaymentMethodInput = z.object({
 
 export const ExpenseCreateSchema = z.object({
   name: z.string().min(1),
-  category_id: z.number().int(),
+  category_id: z.number().int().nullish(),
   amount: z.number().positive(),
   date: dateField,
   is_recurring: z.boolean().optional(),
@@ -22,7 +22,7 @@ export const ExpenseCreateSchema = z.object({
 
 export const ExpenseUpdateSchema = z.object({
   name: z.string().min(1).optional(),
-  category_id: z.number().int().optional(),
+  category_id: z.number().int().nullish(),
   amount: z.number().positive().optional(),
   date: dateField.optional(),
   is_recurring: z.boolean().optional(),

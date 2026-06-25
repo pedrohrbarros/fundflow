@@ -40,7 +40,7 @@ const source_of_income = {
   properties: {
     id: { type: 'number' },
     name: { type: 'string' },
-    category_id: { type: 'number' },
+    category_id: { type: 'number', nullable: true },
     income: { type: 'number' },
     currency: { type: 'string' },
     date: { type: 'string', format: 'date' },
@@ -116,7 +116,7 @@ const expense = {
   properties: {
     id: { type: 'number' },
     name: { type: 'string' },
-    category_id: { type: 'number' },
+    category_id: { type: 'number', nullable: true },
     amount: { type: 'number' },
     date: { type: 'string', format: 'date' },
     is_recurring: { type: 'boolean' },
@@ -156,7 +156,7 @@ export const ExpenseByCategoryResponse = {
       items: {
         type: 'object',
         properties: {
-          category_id: { type: 'number' },
+          category_id: { type: 'number', nullable: true },
           name: { type: 'string' },
           total: { type: 'number' },
           count: { type: 'number' },

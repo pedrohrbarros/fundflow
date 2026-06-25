@@ -13,14 +13,14 @@ Handles source-of-income management for authenticated users.
 
 ## Create / Update fields
 
-| Field          | Required on create | Description                                           |
-| -------------- | ------------------ | ----------------------------------------------------- |
-| `name`         | Yes                | Source name                                           |
-| `category_id`  | Yes                | ID of an INCOME-type category owned by the user       |
-| `income`       | No (default 0)     | Base income amount (non-negative)                     |
-| `currency`     | No (default "USD") | 3-letter ISO 4217 currency code (uppercase)           |
-| `date`         | Yes                | Anchor date in `YYYY-MM-DD` format                    |
-| `is_recurring` | No (default false) | When true the income recurs monthly on the `date` day |
+| Field          | Required on create | Description                                                                                   |
+| -------------- | ------------------ | --------------------------------------------------------------------------------------------- |
+| `name`         | Yes                | Source name                                                                                   |
+| `category_id`  | No (nullable)      | ID of an INCOME-type category owned by the user; omit or set to `null` to leave uncategorized |
+| `income`       | No (default 0)     | Base income amount (non-negative)                                                             |
+| `currency`     | No (default "USD") | 3-letter ISO 4217 currency code (uppercase)                                                   |
+| `date`         | Yes                | Anchor date in `YYYY-MM-DD` format                                                            |
+| `is_recurring` | No (default false) | When true the income recurs monthly on the `date` day                                         |
 
 ## Search endpoint
 
@@ -37,7 +37,7 @@ When omitted, the endpoint returns sources applicable in the current calendar mo
 
 ### Response shape
 
-Results are grouped by category name. Each record includes a `period_amount` field. A per-currency `total` is included at the top level.
+Results are grouped by category name. Each record includes a `period_amount` field. A per-currency `total` is included at the top level. Sources without a `category_id` appear under the `"Uncategorized"` key.
 
 ```json
 {

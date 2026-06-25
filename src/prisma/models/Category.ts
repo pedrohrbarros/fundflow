@@ -408,9 +408,9 @@ export type CategorySumOrderByAggregateInput = {
   user_id?: Prisma.SortOrder
 }
 
-export type CategoryScalarRelationFilter = {
-  is?: Prisma.CategoryWhereInput
-  isNot?: Prisma.CategoryWhereInput
+export type CategoryNullableScalarRelationFilter = {
+  is?: Prisma.CategoryWhereInput | null
+  isNot?: Prisma.CategoryWhereInput | null
 }
 
 export type CategoryCreateNestedManyWithoutUserInput = {
@@ -512,13 +512,15 @@ export type CategoryCreateNestedOneWithoutSources_of_incomeInput = {
   connect?: Prisma.CategoryWhereUniqueInput
 }
 
-export type CategoryUpdateOneRequiredWithoutSources_of_incomeNestedInput = {
+export type CategoryUpdateOneWithoutSources_of_incomeNestedInput = {
   create?: Prisma.XOR<
     Prisma.CategoryCreateWithoutSources_of_incomeInput,
     Prisma.CategoryUncheckedCreateWithoutSources_of_incomeInput
   >
   connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutSources_of_incomeInput
   upsert?: Prisma.CategoryUpsertWithoutSources_of_incomeInput
+  disconnect?: Prisma.CategoryWhereInput | boolean
+  delete?: Prisma.CategoryWhereInput | boolean
   connect?: Prisma.CategoryWhereUniqueInput
   update?: Prisma.XOR<
     Prisma.XOR<
@@ -538,13 +540,15 @@ export type CategoryCreateNestedOneWithoutExpensesInput = {
   connect?: Prisma.CategoryWhereUniqueInput
 }
 
-export type CategoryUpdateOneRequiredWithoutExpensesNestedInput = {
+export type CategoryUpdateOneWithoutExpensesNestedInput = {
   create?: Prisma.XOR<
     Prisma.CategoryCreateWithoutExpensesInput,
     Prisma.CategoryUncheckedCreateWithoutExpensesInput
   >
   connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutExpensesInput
   upsert?: Prisma.CategoryUpsertWithoutExpensesInput
+  disconnect?: Prisma.CategoryWhereInput | boolean
+  delete?: Prisma.CategoryWhereInput | boolean
   connect?: Prisma.CategoryWhereUniqueInput
   update?: Prisma.XOR<
     Prisma.XOR<

@@ -5,7 +5,7 @@ const dateField = z.string().refine(isValidYMD, { message: 'date must be a valid
 
 export const SourceOfIncomeCreateSchema = z.object({
   name: z.string().min(1),
-  category_id: z.number().int(),
+  category_id: z.number().int().nullish(),
   income: z.number().min(0).optional(),
   currency: z
     .string()
@@ -19,7 +19,7 @@ export const SourceOfIncomeCreateSchema = z.object({
 
 export const SourceOfIncomeUpdateSchema = z.object({
   name: z.string().min(1).optional(),
-  category_id: z.number().int().optional(),
+  category_id: z.number().int().nullish(),
   income: z.number().min(0).optional(),
   currency: z
     .string()
