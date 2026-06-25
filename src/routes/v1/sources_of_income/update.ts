@@ -23,14 +23,15 @@ export const updateSourceOfIncome = async ({
   // param type — category_id needs BigInt() conversion so we can't pass parsed.data directly.
   const data: {
     name?: string
-    category_id?: bigint
+    category_id?: bigint | null
     income?: number
     currency?: string
     date?: string
     is_recurring?: boolean
   } = {}
   if (parsed.data.name !== undefined) data.name = parsed.data.name
-  if (parsed.data.category_id !== undefined) data.category_id = BigInt(parsed.data.category_id)
+  if (parsed.data.category_id !== undefined)
+    data.category_id = parsed.data.category_id === null ? null : BigInt(parsed.data.category_id)
   if (parsed.data.income !== undefined) data.income = parsed.data.income
   if (parsed.data.currency !== undefined) data.currency = parsed.data.currency
   if (parsed.data.date !== undefined) data.date = parsed.data.date

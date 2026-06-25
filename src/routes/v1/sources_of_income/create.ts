@@ -18,7 +18,7 @@ export const createSourceOfIncome = async ({
   }
   const result = await SourcesOfIncomeService.create(user_external_id, {
     name: parsed.data.name,
-    category_id: BigInt(parsed.data.category_id),
+    category_id: parsed.data.category_id != null ? BigInt(parsed.data.category_id) : null,
     income: parsed.data.income,
     currency: parsed.data.currency,
     date: parsed.data.date,

@@ -4,7 +4,7 @@ import type { Static } from '@sinclair/typebox'
 export type SourceOfIncomeRecord = {
   id: number
   name: string
-  category_id: number
+  category_id: number | null
   income: number
   currency: string
   date: string
@@ -15,9 +15,15 @@ export type SourceOfIncomeRecord = {
 
 export type SourceOfIncomeSearchRecord = SourceOfIncomeRecord & { period_amount: number }
 
+export type SourceOfIncomeCategoryGroup = {
+  category_id: number | null
+  category_name: string | null
+  sources: SourceOfIncomeSearchRecord[]
+}
+
 export const SourceOfIncomeCreateBody = t.Object({
   name: t.String({ minLength: 1 }),
-  category_id: t.Integer(),
+  category_id: t.Optional(t.Union([t.Integer(), t.Null()])),
   income: t.Optional(t.Number({ minimum: 0 })),
   currency: t.Optional(t.String({ minLength: 3, maxLength: 3, pattern: '^[A-Z]{3}$' })),
   date: t.String({ format: 'date' }),
@@ -26,7 +32,7 @@ export const SourceOfIncomeCreateBody = t.Object({
 
 export const SourceOfIncomeUpdateBody = t.Object({
   name: t.Optional(t.String({ minLength: 1 })),
-  category_id: t.Optional(t.Integer()),
+  category_id: t.Optional(t.Union([t.Integer(), t.Null()])),
   income: t.Optional(t.Number({ minimum: 0 })),
   currency: t.Optional(t.String({ minLength: 3, maxLength: 3, pattern: '^[A-Z]{3}$' })),
   date: t.Optional(t.String({ format: 'date' })),

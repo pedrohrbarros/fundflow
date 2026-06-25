@@ -381,6 +381,38 @@ describe('Expenses API', () => {
     expect(json.total).toBe(0)
   }, 20000)
 
+  it('POST /api/v1/expenses creates an expense without category_id (null)', async () => {
+    const res = await req('POST', '/api/v1/expenses', {
+      name: `exp-${TS}-no-cat`,
+      amount: 75,
+      date: '2026-06-15',
+    })
+    expect(res.status).toBe(201)
+    const json = await res.json()
+    expect(json.id).toBeDefined()
+    expect(json.category_id).toBeNull()
+  })
+
+  it('by-category includes Uncategorized bucket for expenses without category', async () => {
+    await req('POST', '/api/v1/expenses', {
+      name: `exp-${TS}-uncat-bc`,
+      amount: 42,
+      date: '2026-06-20',
+    })
+    const res = await req('POST', '/api/v1/expenses/by-category', {
+      granularity: 'annually',
+      date: '2026-09-01',
+      filters: { field: 'name', fieldType: 'string', op: 'is_equal', value: `exp-${TS}-uncat-bc` },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    const row = json.by_category.find((r: { category_id: number | null }) => r.category_id === null)
+    expect(row).toBeDefined()
+    expect(row.name).toBe('Uncategorized')
+    expect(row.total).toBe(42)
+    expect(row.count).toBe(1)
+  }, 20000)
+
   it('by-category totals period_amount per category', async () => {
     const cat1 = await (
       await req('POST', '/api/v1/categories', { name: `bc1-${TS}`, type: 'EXPENSE' })

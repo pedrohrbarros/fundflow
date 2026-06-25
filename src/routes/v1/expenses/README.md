@@ -14,17 +14,17 @@ Handles expense management for authenticated users.
 
 ## Create / Update fields
 
-| Field             | Required on create | Description                                             |
-| ----------------- | ------------------ | ------------------------------------------------------- |
-| `name`            | Yes                | Expense name                                            |
-| `category_id`     | Yes                | ID of an EXPENSE-type category owned by the user        |
-| `amount`          | Yes                | Positive number                                         |
-| `date`            | Yes                | Anchor date in `YYYY-MM-DD` format                      |
-| `is_recurring`    | No (default false) | When true the expense recurs monthly on the `date` day  |
-| `is_paid`         | No (default false) |                                                         |
-| `is_saved`        | No (default false) |                                                         |
-| `saving_location` | No                 | Nullable string                                         |
-| `payment_methods` | No                 | Array of `{ payment_method_id, partial_amount }` splits |
+| Field             | Required on create | Description                                                                                    |
+| ----------------- | ------------------ | ---------------------------------------------------------------------------------------------- |
+| `name`            | Yes                | Expense name                                                                                   |
+| `category_id`     | No (nullable)      | ID of an EXPENSE-type category owned by the user; omit or set to `null` to leave uncategorized |
+| `amount`          | Yes                | Positive number                                                                                |
+| `date`            | Yes                | Anchor date in `YYYY-MM-DD` format                                                             |
+| `is_recurring`    | No (default false) | When true the expense recurs monthly on the `date` day                                         |
+| `is_paid`         | No (default false) |                                                                                                |
+| `is_saved`        | No (default false) |                                                                                                |
+| `saving_location` | No                 | Nullable string                                                                                |
+| `payment_methods` | No                 | Array of `{ payment_method_id, partial_amount }` splits                                        |
 
 ## Search endpoint
 
@@ -89,13 +89,17 @@ When omitted, the endpoint returns expenses applicable in the current calendar m
 
 ```json
 {
-  "by_category": [{ "category_id": 3, "name": "Housing", "total": 1200, "count": 1 }],
-  "total": 1200
+  "by_category": [
+    { "category_id": 3, "name": "Housing", "total": 1200, "count": 1 },
+    { "category_id": null, "name": "Uncategorized", "total": 75, "count": 1 }
+  ],
+  "total": 1275
 }
 ```
 
 - `by_category[].total` — period sum for that category.
 - `total` — sum across all categories for the period.
+- Expenses without a `category_id` appear under an `"Uncategorized"` bucket with `category_id: null`.
 
 ## Recurrence rules
 

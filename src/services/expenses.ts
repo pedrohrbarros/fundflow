@@ -8,13 +8,18 @@ import type { FilterNode } from '../helpers/filters'
 import { periodRange, periodContribution, type PeriodInput } from '../helpers/period'
 
 type Split = { payment_method_id: number; partial_amount: number }
-type ExpenseCategoryTotal = { category_id: number; name: string; total: number; count: number }
+type ExpenseCategoryTotal = {
+  category_id: number | null
+  name: string
+  total: number
+  count: number
+}
 type ExpensesByCategoryData = { by_category: ExpenseCategoryTotal[]; total: number }
 
 type ExpenseWithSplits = {
   id: bigint
   name: string
-  category_id: bigint
+  category_id: bigint | null
   amount: number
   date: Date
   is_recurring: boolean
@@ -37,7 +42,7 @@ type ExpenseWithSplits = {
 const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
   id: Number(expense.id),
   name: expense.name,
-  category_id: Number(expense.category_id),
+  category_id: expense.category_id != null ? Number(expense.category_id) : null,
   amount: expense.amount,
   date: expense.date.toISOString().slice(0, 10),
   is_recurring: expense.is_recurring,
@@ -91,16 +96,18 @@ export const ExpensesService = {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
 
-      const category = await db.category.findFirst({
-        where: { id: BigInt(input.category_id), user_id: user.id, type: 'EXPENSE' },
-      })
-      if (!category)
-        return {
-          ok: false,
-          status: 404,
-          message: 'Category not found',
-          meta: { category_id: String(input.category_id) },
-        }
+      if (input.category_id != null) {
+        const category = await db.category.findFirst({
+          where: { id: BigInt(input.category_id), user_id: user.id, type: 'EXPENSE' },
+        })
+        if (!category)
+          return {
+            ok: false,
+            status: 404,
+            message: 'Category not found',
+            meta: { category_id: String(input.category_id) },
+          }
+      }
 
       const splits = input.payment_methods ?? []
       if (splits.length > 0) {
@@ -111,7 +118,7 @@ export const ExpensesService = {
       const expense = await db.expense.create({
         data: {
           name: input.name,
-          category_id: BigInt(input.category_id),
+          category_id: input.category_id != null ? BigInt(input.category_id) : null,
           amount: input.amount,
           date: new Date(`${input.date}T00:00:00.000Z`),
           is_recurring: input.is_recurring ?? false,
@@ -234,7 +241,7 @@ export const ExpensesService = {
       if (!existing)
         return { ok: false, status: 404, message: 'Expense not found', meta: { id: id.toString() } }
 
-      if (input.category_id !== undefined) {
+      if (input.category_id != null) {
         const category = await db.category.findFirst({
           where: { id: BigInt(input.category_id), user_id: user.id, type: 'EXPENSE' },
         })
@@ -272,7 +279,9 @@ export const ExpensesService = {
         where: { id },
         data: {
           ...(input.name !== undefined ? { name: input.name } : {}),
-          ...(input.category_id !== undefined ? { category_id: BigInt(input.category_id) } : {}),
+          ...(input.category_id !== undefined
+            ? { category_id: input.category_id === null ? null : BigInt(input.category_id) }
+            : {}),
           ...(input.amount !== undefined ? { amount: input.amount } : {}),
           ...(input.date !== undefined ? { date: new Date(`${input.date}T00:00:00.000Z`) } : {}),
           ...(input.is_recurring !== undefined ? { is_recurring: input.is_recurring } : {}),
@@ -323,32 +332,38 @@ export const ExpensesService = {
         select: { category_id: true, amount: true, date: true, is_recurring: true },
       })
 
-      const acc = new Map<bigint, { total: number; count: number }>()
+      const acc = new Map<bigint | null, { total: number; count: number }>()
       for (const r of rows) {
         const c = periodContribution(
           { date: r.date, is_recurring: r.is_recurring, amount: r.amount },
           period
         )
         if (!c.applies) continue
-        const cur = acc.get(r.category_id) ?? { total: 0, count: 0 }
+        const key = r.category_id
+        const cur = acc.get(key) ?? { total: 0, count: 0 }
         cur.total += c.period_amount
         cur.count += 1
-        acc.set(r.category_id, cur)
+        acc.set(key, cur)
       }
 
+      const nonNullKeys = [...acc.keys()].filter((k): k is bigint => k !== null)
       const categories = await db.category.findMany({
-        where: { id: { in: [...acc.keys()] } },
+        where: { id: { in: nonNullKeys } },
         select: { id: true, name: true },
       })
       const nameById = new Map(categories.map((c) => [c.id, c.name]))
 
       const by_category = [...acc.entries()]
-        .map(([category_id, v]) => ({
-          category_id: Number(category_id),
-          name: nameById.get(category_id) ?? '',
-          total: v.total,
-          count: v.count,
-        }))
+        .map(([key, v]) =>
+          key === null
+            ? { category_id: null, name: 'Uncategorized', total: v.total, count: v.count }
+            : {
+                category_id: Number(key),
+                name: nameById.get(key) ?? '',
+                total: v.total,
+                count: v.count,
+              }
+        )
         .sort((a, b) => b.total - a.total)
 
       const total = by_category.reduce((s, row) => s + row.total, 0)

@@ -88,17 +88,34 @@ describe('Sources of Income API', () => {
     expect(typeof json.pagination.page).toBe('number')
     expect(typeof json.pagination.limit).toBe('number')
     expect(typeof json.pagination.total).toBe('number')
-    const category_names = Object.keys(json.sources_of_income)
-    expect(category_names.length).toBeGreaterThan(0)
-    for (const key of category_names) {
-      expect(Array.isArray(json.sources_of_income[key])).toBe(true)
+    expect(Array.isArray(json.sources_of_income)).toBe(true)
+    expect(json.sources_of_income.length).toBeGreaterThan(0)
+    for (const group of json.sources_of_income as Array<{
+      category_id: number | null
+      category_name: string | null
+      sources: {
+        id: number
+        name: string
+        income: number
+        currency: string
+        period_amount: number
+      }[]
+    }>) {
+      expect(Array.isArray(group.sources)).toBe(true)
+      expect('category_id' in group).toBe(true)
+      expect('category_name' in group).toBe(true)
     }
-    const all_sources = Object.values(
-      json.sources_of_income as Record<
-        string,
-        { id: number; name: string; income: number; currency: string; period_amount: number }[]
-      >
-    ).flat()
+    const all_sources = (
+      json.sources_of_income as Array<{
+        sources: {
+          id: number
+          name: string
+          income: number
+          currency: string
+          period_amount: number
+        }[]
+      }>
+    ).flatMap((g) => g.sources)
     const first_source = all_sources[0]
     expect(typeof first_source.id).toBe('number')
     expect(typeof first_source.name).toBe('string')
@@ -143,12 +160,11 @@ describe('Sources of Income API', () => {
     const json = await res.json()
     // salary recurring 1000*7 + bonus one-time 200 = 7200 USD
     expect(json.total.USD).toBe(7200)
-    const all = Object.values(json.sources_of_income).flat() as Array<{
-      name: string
-      period_amount: number
-      is_recurring: boolean
-      date: string
-    }>
+    const all = (
+      json.sources_of_income as Array<{
+        sources: { name: string; period_amount: number; is_recurring: boolean; date: string }[]
+      }>
+    ).flatMap((g) => g.sources)
     const salary = all.find((s) => s.name === `salary-${TS}`)
     expect(salary?.period_amount).toBe(7000)
     expect(salary?.is_recurring).toBe(true)
@@ -265,12 +281,56 @@ describe('Sources of Income API', () => {
     })
     expect(res.status).toBe(200)
     const json = await res.json()
-    const all_sources = Object.values(
-      json.sources_of_income as Record<string, { name: string }[]>
-    ).flat()
+    const all_sources = (json.sources_of_income as Array<{ sources: { name: string }[] }>).flatMap(
+      (g) => g.sources
+    )
     expect(all_sources.every((s) => s.name === name)).toBe(true)
     expect(all_sources.length).toBeGreaterThan(0)
   })
+
+  it('POST /api/v1/sources_of_income creates a source of income without category_id (null)', async () => {
+    const res = await req('POST', '/api/v1/sources_of_income', {
+      name: `test-soi-${TS}-no-cat`,
+      date: '2026-06-20',
+    })
+    expect(res.status).toBe(201)
+    const json = await res.json()
+    expect(json.id).toBeDefined()
+    expect(json.category_id).toBeNull()
+  })
+
+  it('income search groups uncategorized income under category_id null group', async () => {
+    await req('POST', '/api/v1/sources_of_income', {
+      name: `soi-${TS}-uncat-search`,
+      income: 300,
+      currency: 'USD',
+      date: '2026-06-20',
+    })
+    const res = await req('POST', '/api/v1/sources_of_income/search', {
+      granularity: 'annually',
+      date: '2026-09-01',
+      filters: {
+        field: 'name',
+        fieldType: 'string',
+        op: 'is_equal',
+        value: `soi-${TS}-uncat-search`,
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    const uncatGroup = (
+      json.sources_of_income as Array<{
+        category_id: number | null
+        category_name: string | null
+        sources: { name: string; period_amount: number }[]
+      }>
+    ).find((g) => g.category_id === null)
+    expect(uncatGroup).toBeDefined()
+    expect(uncatGroup?.category_name).toBeNull()
+    const found = uncatGroup?.sources.find((s) => s.name === `soi-${TS}-uncat-search`)
+    expect(found).toBeDefined()
+    expect(found?.period_amount).toBe(300)
+  }, 20000)
 
   it('POST /api/v1/sources_of_income/search with unknown field returns 400', async () => {
     const res = await req('POST', '/api/v1/sources_of_income/search', {

@@ -1,7 +1,7 @@
 import { db } from '../config/db'
 import { db_logger } from '../config/logging'
 import type { ServiceResult } from './types'
-import type { SourceOfIncomeRecord } from '../types/sources_of_income'
+import type { SourceOfIncomeRecord, SourceOfIncomeCategoryGroup } from '../types/sources_of_income'
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
 import { periodRange, periodContribution, type PeriodInput } from '../helpers/period'
@@ -9,7 +9,7 @@ import { periodRange, periodContribution, type PeriodInput } from '../helpers/pe
 function toRecord(source: {
   id: bigint
   name: string
-  category_id: bigint
+  category_id: bigint | null
   income: number
   currency: string
   date: Date
@@ -20,7 +20,7 @@ function toRecord(source: {
   return {
     id: Number(source.id),
     name: source.name,
-    category_id: Number(source.category_id),
+    category_id: source.category_id != null ? Number(source.category_id) : null,
     income: source.income,
     currency: source.currency,
     date: source.date.toISOString().slice(0, 10),
@@ -35,7 +35,7 @@ export const SourcesOfIncomeService = {
     user_external_id: string,
     input: {
       name: string
-      category_id: bigint
+      category_id: bigint | null
       income?: number
       currency?: string
       date: string
@@ -48,16 +48,18 @@ export const SourcesOfIncomeService = {
       const count = await db.sourceOfIncome.count({ where: { user_id: user.id } })
       if (count >= 100)
         return { ok: false, status: 400, message: 'Source of income limit reached (100 per user)' }
-      const category = await db.category.findFirst({
-        where: { id: input.category_id, user_id: user.id, type: 'INCOME' },
-      })
-      if (!category)
-        return {
-          ok: false,
-          status: 404,
-          message: 'Category not found',
-          meta: { category_id: input.category_id.toString() },
-        }
+      if (input.category_id != null) {
+        const category = await db.category.findFirst({
+          where: { id: input.category_id, user_id: user.id, type: 'INCOME' },
+        })
+        if (!category)
+          return {
+            ok: false,
+            status: 404,
+            message: 'Category not found',
+            meta: { category_id: input.category_id.toString() },
+          }
+      }
       const source_of_income = await db.sourceOfIncome.create({
         data: {
           name: input.name,
@@ -88,7 +90,7 @@ export const SourcesOfIncomeService = {
     filters?: FilterNode
   ): Promise<
     ServiceResult<{
-      sources_of_income: Record<string, (SourceOfIncomeRecord & { period_amount: number })[]>
+      sources_of_income: SourceOfIncomeCategoryGroup[]
       total: Record<string, number>
       pagination: { page: number; limit: number; total: number }
     }>
@@ -134,15 +136,21 @@ export const SourcesOfIncomeService = {
       }
 
       const paged = applicable.slice((page - 1) * limit, (page - 1) * limit + limit)
-      const sources_of_income: Record<
-        string,
-        (SourceOfIncomeRecord & { period_amount: number })[]
-      > = {}
+      const groups = new Map<bigint | null, SourceOfIncomeCategoryGroup>()
       for (const x of paged) {
-        const name = x.r.category.name
-        if (!sources_of_income[name]) sources_of_income[name] = []
-        sources_of_income[name].push({ ...toRecord(x.r), period_amount: x.c.period_amount })
+        const key = x.r.category_id // bigint | null
+        let group = groups.get(key)
+        if (!group) {
+          group = {
+            category_id: key != null ? Number(key) : null,
+            category_name: x.r.category?.name ?? null,
+            sources: [],
+          }
+          groups.set(key, group)
+        }
+        group.sources.push({ ...toRecord(x.r), period_amount: x.c.period_amount })
       }
+      const sources_of_income = [...groups.values()]
 
       return {
         ok: true,
@@ -164,7 +172,7 @@ export const SourcesOfIncomeService = {
     user_external_id: string,
     data: {
       name?: string
-      category_id?: bigint
+      category_id?: bigint | null
       income?: number
       currency?: string
       date?: string
@@ -176,7 +184,7 @@ export const SourcesOfIncomeService = {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
-      if (data.category_id) {
+      if (data.category_id != null) {
         const category = await db.category.findFirst({
           where: { id: data.category_id, user_id: user.id, type: 'INCOME' },
         })
@@ -188,11 +196,12 @@ export const SourcesOfIncomeService = {
             meta: { category_id: data.category_id.toString() },
           }
       }
-      const { date, is_recurring, ...rest } = data
+      const { date, is_recurring, category_id, ...rest } = data
       const source_of_income = await db.sourceOfIncome.update({
         where: { id, user_id: user.id },
         data: {
           ...rest,
+          ...(category_id !== undefined ? { category_id } : {}),
           ...(date !== undefined ? { date: new Date(`${date}T00:00:00.000Z`) } : {}),
           ...(is_recurring !== undefined ? { is_recurring } : {}),
         },
