@@ -5,6 +5,7 @@ import type { SourceOfIncomeRecord, SourceOfIncomeCategoryGroup } from '../types
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
 import { periodRange, periodContribution, type PeriodInput } from '../helpers/period'
+import { applyInAppSort, type SortSpec, type SortableValue } from '../helpers/sort'
 
 function toRecord(source: {
   id: bigint
@@ -87,7 +88,8 @@ export const SourcesOfIncomeService = {
     page: number,
     limit: number,
     period: PeriodInput,
-    filters?: FilterNode
+    filters?: FilterNode,
+    sort?: SortSpec
   ): Promise<
     ServiceResult<{
       sources_of_income: SourceOfIncomeCategoryGroup[]
@@ -129,6 +131,32 @@ export const SourcesOfIncomeService = {
           ),
         }))
         .filter((x) => x.c.applies)
+
+      if (sort) {
+        const value = (x: (typeof applicable)[number]): SortableValue => {
+          switch (sort.field) {
+            case 'period_amount':
+              return x.c.period_amount
+            case 'income':
+              return x.r.income
+            case 'name':
+              return x.r.name
+            case 'currency':
+              return x.r.currency
+            case 'date':
+              return x.r.date.getTime()
+            case 'is_recurring':
+              return x.r.is_recurring
+            case 'created_at':
+              return x.r.created_at.getTime()
+            case 'updated_at':
+              return x.r.updated_at.getTime()
+            default:
+              return Number(x.r.id)
+          }
+        }
+        applyInAppSort(applicable, value, sort.direction)
+      }
 
       const total: Record<string, number> = {}
       for (const x of applicable) {

@@ -5,6 +5,20 @@ import { parseFilterBody } from '../../../helpers/filters'
 import type { FilterNode } from '../../../helpers/filters'
 import type { FieldAllowlist } from '../../../helpers/filters'
 import { resolvePeriod } from '../../../helpers/period'
+import { parseSort } from '../../../helpers/sort'
+
+const EXPENSE_SORT_FIELDS = [
+  'id',
+  'name',
+  'amount',
+  'period_amount',
+  'date',
+  'is_recurring',
+  'is_paid',
+  'is_saved',
+  'created_at',
+  'updated_at',
+] as const
 
 export const EXPENSE_ALLOWED_FIELDS: FieldAllowlist = {
   name: 'string',
@@ -22,7 +36,14 @@ export const searchExpenses = async ({
   set,
 }: {
   user_external_id: string
-  body: { page?: number; limit?: number; filters?: unknown; granularity?: unknown; date?: unknown }
+  body: {
+    page?: number
+    limit?: number
+    filters?: unknown
+    granularity?: unknown
+    date?: unknown
+    sort?: unknown
+  }
   set: { status?: number | string }
 }) => {
   const pagination = parsePagination({
@@ -41,12 +62,16 @@ export const searchExpenses = async ({
   const period = resolvePeriod(body as { granularity?: unknown; date?: unknown })
   if (!period.ok) return handleError(set, 400, period.error)
 
+  const sortResult = parseSort(body.sort, EXPENSE_SORT_FIELDS)
+  if (!sortResult.ok) return handleError(set, 400, sortResult.error)
+
   const result = await ExpensesService.search(
     user_external_id,
     pagination.page,
     pagination.limit,
     period.period,
-    filters
+    filters,
+    sortResult.sort
   )
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data

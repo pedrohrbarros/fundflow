@@ -6,6 +6,7 @@ import type { ExpenseCreateInput, ExpenseUpdateInput } from '../schemas/expenses
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
 import { periodRange, periodContribution, type PeriodInput } from '../helpers/period'
+import { applyInAppSort, type SortSpec, type SortableValue } from '../helpers/sort'
 
 type Split = { payment_method_id: number; partial_amount: number }
 type ExpenseCategoryTotal = {
@@ -158,7 +159,8 @@ export const ExpensesService = {
     page: number,
     limit: number,
     period: PeriodInput,
-    filters?: FilterNode
+    filters?: FilterNode,
+    sort?: SortSpec
   ): Promise<
     ServiceResult<{
       expenses: (ExpenseRecord & { period_amount: number })[]
@@ -202,6 +204,34 @@ export const ExpensesService = {
           ),
         }))
         .filter((x) => x.c.applies)
+
+      if (sort) {
+        const value = (x: (typeof applicable)[number]): SortableValue => {
+          switch (sort.field) {
+            case 'period_amount':
+              return x.c.period_amount
+            case 'amount':
+              return x.r.amount
+            case 'name':
+              return x.r.name
+            case 'date':
+              return x.r.date.getTime()
+            case 'is_recurring':
+              return x.r.is_recurring
+            case 'is_paid':
+              return x.r.is_paid
+            case 'is_saved':
+              return x.r.is_saved
+            case 'created_at':
+              return x.r.created_at.getTime()
+            case 'updated_at':
+              return x.r.updated_at.getTime()
+            default:
+              return Number(x.r.id)
+          }
+        }
+        applyInAppSort(applicable, value, sort.direction)
+      }
 
       const total = applicable.reduce((sum, x) => sum + x.c.period_amount, 0)
       const paged = applicable.slice((page - 1) * limit, (page - 1) * limit + limit)

@@ -413,6 +413,47 @@ describe('Expenses API', () => {
     expect(row.count).toBe(1)
   }, 20000)
 
+  it('search sorts by period_amount desc', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `srt-${TS}`, type: 'EXPENSE' })
+    ).json()
+    await req('POST', '/api/v1/expenses', {
+      name: `srt-small-${TS}`,
+      category_id: Number(cat.id),
+      amount: 10,
+      date: '2026-06-05',
+      is_recurring: true,
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `srt-big-${TS}`,
+      category_id: Number(cat.id),
+      amount: 1000,
+      date: '2026-06-10',
+    })
+    // annual 2026: small recurring 10*7=70 ; big one-time 1000 -> big first when desc
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'annually',
+      date: '2026-09-01',
+      sort: { field: 'period_amount', direction: 'desc' },
+      filters: {
+        logic: 'OR',
+        conditions: [
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `srt-small-${TS}` },
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `srt-big-${TS}` },
+        ],
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses[0].name).toBe(`srt-big-${TS}`)
+    expect(json.expenses[0].period_amount).toBe(1000)
+    expect(json.expenses[1].period_amount).toBe(70)
+  }, 20000)
+  it('search rejects an invalid sort field', async () => {
+    const res = await req('POST', '/api/v1/expenses/search', { sort: { field: 'evil' } })
+    expect(res.status).toBe(400)
+  }, 20000)
+
   it('by-category totals period_amount per category', async () => {
     const cat1 = await (
       await req('POST', '/api/v1/categories', { name: `bc1-${TS}`, type: 'EXPENSE' })

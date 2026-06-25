@@ -332,6 +332,51 @@ describe('Sources of Income API', () => {
     expect(found?.period_amount).toBe(300)
   }, 20000)
 
+  it('income search sorts sources by period_amount desc within a group', async () => {
+    const cat = await (
+      await req('POST', '/api/v1/categories', { name: `isrt-${TS}`, type: 'INCOME' })
+    ).json()
+    await req('POST', '/api/v1/sources_of_income', {
+      name: `isrt-small-${TS}`,
+      category_id: Number(cat.id),
+      income: 10,
+      currency: 'USD',
+      date: '2026-06-05',
+      is_recurring: true,
+    })
+    await req('POST', '/api/v1/sources_of_income', {
+      name: `isrt-big-${TS}`,
+      category_id: Number(cat.id),
+      income: 1000,
+      currency: 'USD',
+      date: '2026-06-10',
+    })
+    const res = await req('POST', '/api/v1/sources_of_income/search', {
+      granularity: 'annually',
+      date: '2026-09-01',
+      sort: { field: 'period_amount', direction: 'desc' },
+      filters: {
+        logic: 'OR',
+        conditions: [
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `isrt-small-${TS}` },
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `isrt-big-${TS}` },
+        ],
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    const group = json.sources_of_income.find(
+      (g: { category_id: number }) => g.category_id === Number(cat.id)
+    )
+    expect(group.sources[0].name).toBe(`isrt-big-${TS}`)
+    expect(group.sources[0].period_amount).toBe(1000)
+    expect(group.sources[1].period_amount).toBe(70)
+  }, 20000)
+  it('income search rejects an invalid sort field', async () => {
+    const res = await req('POST', '/api/v1/sources_of_income/search', { sort: { field: 'evil' } })
+    expect(res.status).toBe(400)
+  }, 20000)
+
   it('POST /api/v1/sources_of_income/search with unknown field returns 400', async () => {
     const res = await req('POST', '/api/v1/sources_of_income/search', {
       filters: { field: 'nonexistent', op: 'is_equal', value: 'x' },
