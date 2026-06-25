@@ -107,6 +107,8 @@ Search endpoints are not cached. The filter key space is unbounded, making per-r
 | `PATCH`  | `/api/v1/categories/:id`    | Update a category by id                 |
 | `DELETE` | `/api/v1/categories/:id`    | Delete a category by id                 |
 
+Search accepts an optional `sort` (`{ field, direction }`, direction defaults to `asc`) to order results.
+
 ### Sources of Income
 
 | Method   | Path                               | Description                                             |
@@ -127,6 +129,8 @@ Search accepts optional `granularity` (`daily|monthly|annually`, default `monthl
 | `PATCH`  | `/api/v1/payment_methods/:id`    | Update a payment method owned by the authenticated user |
 | `DELETE` | `/api/v1/payment_methods/:id`    | Delete a payment method owned by the authenticated user |
 
+Search accepts an optional `sort` (`{ field, direction }`, direction defaults to `asc`) to order results.
+
 ### Expenses
 
 | Method   | Path                           | Description                                                   |
@@ -137,7 +141,7 @@ Search accepts optional `granularity` (`daily|monthly|annually`, default `monthl
 | `PATCH`  | `/api/v1/expenses/:id`         | Update an expense owned by the authenticated user             |
 | `DELETE` | `/api/v1/expenses/:id`         | Delete an expense owned by the authenticated user             |
 
-Search and by-category accept optional `granularity` (`daily|monthly|annually`, default `monthly`), `date` (`YYYY-MM-DD`, default today) to scope results to a period, and `sort` (`{ field, direction }`) to order results.
+Both `search` and `by-category` accept optional `granularity` (`daily|monthly|annually`, default `monthly`) and `date` (`YYYY-MM-DD`, default today) to scope results to a period. `search` additionally accepts `sort` (`{ field, direction }`, direction defaults to `asc`) to order results; `by-category` does not (it is aggregated, not paginated).
 
 ### Users
 
