@@ -167,4 +167,22 @@ describe('Categories API', () => {
     expect(json.categories.length).toBeGreaterThan(0)
     expect(json.categories.every((c: { type: string }) => c.type === 'EXPENSE')).toBe(true)
   })
+
+  it('search sorts by name desc', async () => {
+    await req('POST', '/api/v1/categories', { name: `sortA-${TS}`, type: 'EXPENSE' })
+    await req('POST', '/api/v1/categories', { name: `sortZ-${TS}`, type: 'EXPENSE' })
+    const res = await req('POST', '/api/v1/categories/search', {
+      sort: { field: 'name', direction: 'desc' },
+      filters: { field: 'name', fieldType: 'string', op: 'is_contains', value: 'sort' },
+    })
+    expect(res.status).toBe(200)
+    const names = (await res.json()).categories.map((c: { name: string }) => c.name)
+    const sorted = [...names].sort((a, b) => b.localeCompare(a))
+    expect(names).toEqual(sorted)
+  })
+
+  it('search rejects an invalid sort field', async () => {
+    const res = await req('POST', '/api/v1/categories/search', { sort: { field: 'evil' } })
+    expect(res.status).toBe(400)
+  })
 })

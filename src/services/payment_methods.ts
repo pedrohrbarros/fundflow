@@ -4,6 +4,7 @@ import type { ServiceResult } from './types'
 import type { PaymentMethodRecord } from '../types/payment_methods'
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
+import type { SortSpec } from '../helpers/sort'
 
 type PaymentMethodListData = {
   payment_methods: PaymentMethodRecord[]
@@ -52,7 +53,8 @@ export const PaymentMethodsService = {
     user_external_id: string,
     page: number,
     limit: number,
-    filters?: FilterNode
+    filters?: FilterNode,
+    sort?: SortSpec
   ): Promise<ServiceResult<PaymentMethodListData>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
@@ -64,7 +66,9 @@ export const PaymentMethodsService = {
       const [payment_methods, total] = await db.$transaction([
         db.paymentMethod.findMany({
           where,
-          orderBy: { id: 'asc' },
+          orderBy: sort
+            ? [{ [sort.field]: sort.direction }, { id: 'asc' as const }]
+            : { id: 'asc' as const },
           skip: (page - 1) * limit,
           take: limit,
         }),

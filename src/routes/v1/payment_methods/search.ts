@@ -2,6 +2,7 @@ import { PaymentMethodsService } from '../../../services/payment_methods'
 import { handleError } from '../../../middleware/error'
 import { parsePagination } from '../../../helpers/pagination'
 import { parseFilterBody } from '../../../helpers/filters'
+import { parseSort } from '../../../helpers/sort'
 import type { FilterNode } from '../../../helpers/filters'
 import type { FieldAllowlist } from '../../../helpers/filters'
 
@@ -13,13 +14,22 @@ const PAYMENT_METHOD_ALLOWED_FIELDS: FieldAllowlist = {
   updated_at: 'datetime',
 }
 
+const PAYMENT_METHOD_SORT_FIELDS = [
+  'id',
+  'name',
+  'origin',
+  'receiver',
+  'created_at',
+  'updated_at',
+] as const
+
 export const searchPaymentMethods = async ({
   user_external_id,
   body,
   set,
 }: {
   user_external_id: string
-  body: { page?: number; limit?: number; filters?: unknown }
+  body: { page?: number; limit?: number; filters?: unknown; sort?: unknown }
   set: { status?: number | string }
 }) => {
   const pagination = parsePagination({
@@ -35,11 +45,15 @@ export const searchPaymentMethods = async ({
     filters = result.node
   }
 
+  const sortResult = parseSort(body.sort, PAYMENT_METHOD_SORT_FIELDS)
+  if (!sortResult.ok) return handleError(set, 400, sortResult.error)
+
   const result = await PaymentMethodsService.search(
     user_external_id,
     pagination.page,
     pagination.limit,
-    filters
+    filters,
+    sortResult.sort
   )
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data

@@ -144,4 +144,23 @@ describe('Payment Methods API', () => {
     const res = await req('DELETE', '/api/v1/payment_methods/999999999')
     expect(res.status).toBe(404)
   })
+
+  it('search sorts by name desc', async () => {
+    const TS = Date.now()
+    await req('POST', '/api/v1/payment_methods', { name: `sortA-${TS}`, origin: 'Test Bank' })
+    await req('POST', '/api/v1/payment_methods', { name: `sortZ-${TS}`, origin: 'Test Bank' })
+    const res = await req('POST', '/api/v1/payment_methods/search', {
+      sort: { field: 'name', direction: 'desc' },
+      filters: { field: 'name', fieldType: 'string', op: 'is_contains', value: 'sort' },
+    })
+    expect(res.status).toBe(200)
+    const names = (await res.json()).payment_methods.map((pm: { name: string }) => pm.name)
+    const sorted = [...names].sort((a, b) => b.localeCompare(a))
+    expect(names).toEqual(sorted)
+  })
+
+  it('search rejects an invalid sort field', async () => {
+    const res = await req('POST', '/api/v1/payment_methods/search', { sort: { field: 'evil' } })
+    expect(res.status).toBe(400)
+  })
 })

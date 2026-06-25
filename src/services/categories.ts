@@ -2,6 +2,7 @@ import { db } from '../config/db'
 import type { ServiceResult } from './types'
 import { buildWhereClause } from '../helpers/filters'
 import type { FilterNode } from '../helpers/filters'
+import type { SortSpec } from '../helpers/sort'
 
 type CategoryRecord = {
   id: number
@@ -55,7 +56,8 @@ export const CategoriesService = {
     user_external_id: string,
     page: number,
     limit: number,
-    filters?: FilterNode
+    filters?: FilterNode,
+    sort?: SortSpec
   ): Promise<ServiceResult<CategoryListData>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
@@ -67,7 +69,9 @@ export const CategoriesService = {
       const [categories, total] = await db.$transaction([
         db.category.findMany({
           where,
-          orderBy: { id: 'asc' },
+          orderBy: sort
+            ? [{ [sort.field]: sort.direction }, { id: 'asc' as const }]
+            : { id: 'asc' as const },
           skip: (page - 1) * limit,
           take: limit,
         }),
