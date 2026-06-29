@@ -25,7 +25,7 @@ export async function checkDatabase(): Promise<boolean> {
 export async function checkRedis(): Promise<boolean> {
   try {
     const pong = await client.ping()
-    redis_logger.info({ pong }, 'Redis health check passed')
+    redis_logger.info('Redis health check passed')
     return true
   } catch (err) {
     redis_logger.warn({ err: String(err) }, 'Redis health check failed')
