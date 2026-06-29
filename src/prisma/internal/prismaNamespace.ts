@@ -1046,6 +1046,7 @@ export const ExpenseScalarFieldEnum = {
   amount: 'amount',
   date: 'date',
   is_recurring: 'is_recurring',
+  recurring_months: 'recurring_months',
   is_paid: 'is_paid',
   is_saved: 'is_saved',
   saving_location: 'saving_location',
