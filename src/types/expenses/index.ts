@@ -16,6 +16,7 @@ export type ExpenseRecord = {
   amount: number
   date: string
   is_recurring: boolean
+  recurring_months: number | null
   is_paid: boolean
   is_saved: boolean
   saving_location: string | null
@@ -37,6 +38,7 @@ export const ExpenseCreateBody = t.Object({
   amount: t.Number({ exclusiveMinimum: 0 }),
   date: t.String({ format: 'date' }),
   is_recurring: t.Optional(t.Boolean()),
+  recurring_months: t.Optional(t.Union([t.Integer({ minimum: 1 }), t.Null()])),
   is_paid: t.Optional(t.Boolean()),
   is_saved: t.Optional(t.Boolean()),
   saving_location: t.Optional(t.Union([t.String({ minLength: 1 }), t.Null()])),
@@ -49,6 +51,7 @@ export const ExpenseUpdateBody = t.Object({
   amount: t.Optional(t.Number({ exclusiveMinimum: 0 })),
   date: t.Optional(t.String({ format: 'date' })),
   is_recurring: t.Optional(t.Boolean()),
+  recurring_months: t.Optional(t.Union([t.Integer({ minimum: 1 }), t.Null()])),
   is_paid: t.Optional(t.Boolean()),
   is_saved: t.Optional(t.Boolean()),
   saving_location: t.Optional(t.Union([t.String({ minLength: 1 }), t.Null()])),

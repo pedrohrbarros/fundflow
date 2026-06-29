@@ -29,6 +29,7 @@ export type ExpenseAvgAggregateOutputType = {
   id: number | null
   category_id: number | null
   amount: number | null
+  recurring_months: number | null
   user_id: number | null
 }
 
@@ -36,6 +37,7 @@ export type ExpenseSumAggregateOutputType = {
   id: bigint | null
   category_id: bigint | null
   amount: number | null
+  recurring_months: number | null
   user_id: bigint | null
 }
 
@@ -46,6 +48,7 @@ export type ExpenseMinAggregateOutputType = {
   amount: number | null
   date: Date | null
   is_recurring: boolean | null
+  recurring_months: number | null
   is_paid: boolean | null
   is_saved: boolean | null
   saving_location: string | null
@@ -61,6 +64,7 @@ export type ExpenseMaxAggregateOutputType = {
   amount: number | null
   date: Date | null
   is_recurring: boolean | null
+  recurring_months: number | null
   is_paid: boolean | null
   is_saved: boolean | null
   saving_location: string | null
@@ -76,6 +80,7 @@ export type ExpenseCountAggregateOutputType = {
   amount: number
   date: number
   is_recurring: number
+  recurring_months: number
   is_paid: number
   is_saved: number
   saving_location: number
@@ -89,6 +94,7 @@ export type ExpenseAvgAggregateInputType = {
   id?: true
   category_id?: true
   amount?: true
+  recurring_months?: true
   user_id?: true
 }
 
@@ -96,6 +102,7 @@ export type ExpenseSumAggregateInputType = {
   id?: true
   category_id?: true
   amount?: true
+  recurring_months?: true
   user_id?: true
 }
 
@@ -106,6 +113,7 @@ export type ExpenseMinAggregateInputType = {
   amount?: true
   date?: true
   is_recurring?: true
+  recurring_months?: true
   is_paid?: true
   is_saved?: true
   saving_location?: true
@@ -121,6 +129,7 @@ export type ExpenseMaxAggregateInputType = {
   amount?: true
   date?: true
   is_recurring?: true
+  recurring_months?: true
   is_paid?: true
   is_saved?: true
   saving_location?: true
@@ -136,6 +145,7 @@ export type ExpenseCountAggregateInputType = {
   amount?: true
   date?: true
   is_recurring?: true
+  recurring_months?: true
   is_paid?: true
   is_saved?: true
   saving_location?: true
@@ -239,6 +249,7 @@ export type ExpenseGroupByOutputType = {
   amount: number
   date: Date
   is_recurring: boolean
+  recurring_months: number | null
   is_paid: boolean
   is_saved: boolean
   saving_location: string | null
@@ -274,6 +285,7 @@ export type ExpenseWhereInput = {
   amount?: Prisma.FloatFilter<'Expense'> | number
   date?: Prisma.DateTimeFilter<'Expense'> | Date | string
   is_recurring?: Prisma.BoolFilter<'Expense'> | boolean
+  recurring_months?: Prisma.IntNullableFilter<'Expense'> | number | null
   is_paid?: Prisma.BoolFilter<'Expense'> | boolean
   is_saved?: Prisma.BoolFilter<'Expense'> | boolean
   saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
@@ -295,6 +307,7 @@ export type ExpenseOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   date?: Prisma.SortOrder
   is_recurring?: Prisma.SortOrder
+  recurring_months?: Prisma.SortOrderInput | Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -317,6 +330,7 @@ export type ExpenseWhereUniqueInput = Prisma.AtLeast<
     amount?: Prisma.FloatFilter<'Expense'> | number
     date?: Prisma.DateTimeFilter<'Expense'> | Date | string
     is_recurring?: Prisma.BoolFilter<'Expense'> | boolean
+    recurring_months?: Prisma.IntNullableFilter<'Expense'> | number | null
     is_paid?: Prisma.BoolFilter<'Expense'> | boolean
     is_saved?: Prisma.BoolFilter<'Expense'> | boolean
     saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
@@ -340,6 +354,7 @@ export type ExpenseOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   date?: Prisma.SortOrder
   is_recurring?: Prisma.SortOrder
+  recurring_months?: Prisma.SortOrderInput | Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -367,6 +382,7 @@ export type ExpenseScalarWhereWithAggregatesInput = {
   amount?: Prisma.FloatWithAggregatesFilter<'Expense'> | number
   date?: Prisma.DateTimeWithAggregatesFilter<'Expense'> | Date | string
   is_recurring?: Prisma.BoolWithAggregatesFilter<'Expense'> | boolean
+  recurring_months?: Prisma.IntNullableWithAggregatesFilter<'Expense'> | number | null
   is_paid?: Prisma.BoolWithAggregatesFilter<'Expense'> | boolean
   is_saved?: Prisma.BoolWithAggregatesFilter<'Expense'> | boolean
   saving_location?: Prisma.StringNullableWithAggregatesFilter<'Expense'> | string | null
@@ -381,6 +397,7 @@ export type ExpenseCreateInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -398,6 +415,7 @@ export type ExpenseUncheckedCreateInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -413,6 +431,7 @@ export type ExpenseUpdateInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -430,6 +449,7 @@ export type ExpenseUncheckedUpdateInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -446,6 +466,7 @@ export type ExpenseCreateManyInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -460,6 +481,7 @@ export type ExpenseUpdateManyMutationInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -474,6 +496,7 @@ export type ExpenseUncheckedUpdateManyInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -499,6 +522,7 @@ export type ExpenseCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   date?: Prisma.SortOrder
   is_recurring?: Prisma.SortOrder
+  recurring_months?: Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
@@ -511,6 +535,7 @@ export type ExpenseAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  recurring_months?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
 }
 
@@ -521,6 +546,7 @@ export type ExpenseMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   date?: Prisma.SortOrder
   is_recurring?: Prisma.SortOrder
+  recurring_months?: Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
@@ -536,6 +562,7 @@ export type ExpenseMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   date?: Prisma.SortOrder
   is_recurring?: Prisma.SortOrder
+  recurring_months?: Prisma.SortOrder
   is_paid?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
@@ -548,6 +575,7 @@ export type ExpenseSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   category_id?: Prisma.SortOrder
   amount?: Prisma.SortOrder
+  recurring_months?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
 }
 
@@ -728,6 +756,14 @@ export type ExpenseUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ExpenseCreateNestedOneWithoutPayment_methodsInput = {
   create?: Prisma.XOR<
     Prisma.ExpenseCreateWithoutPayment_methodsInput,
@@ -760,6 +796,7 @@ export type ExpenseCreateWithoutUserInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -776,6 +813,7 @@ export type ExpenseUncheckedCreateWithoutUserInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -835,6 +873,7 @@ export type ExpenseScalarWhereInput = {
   amount?: Prisma.FloatFilter<'Expense'> | number
   date?: Prisma.DateTimeFilter<'Expense'> | Date | string
   is_recurring?: Prisma.BoolFilter<'Expense'> | boolean
+  recurring_months?: Prisma.IntNullableFilter<'Expense'> | number | null
   is_paid?: Prisma.BoolFilter<'Expense'> | boolean
   is_saved?: Prisma.BoolFilter<'Expense'> | boolean
   saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
@@ -849,6 +888,7 @@ export type ExpenseCreateWithoutCategoryInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -864,6 +904,7 @@ export type ExpenseUncheckedCreateWithoutCategoryInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -920,6 +961,7 @@ export type ExpenseCreateWithoutPayment_methodsInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -936,6 +978,7 @@ export type ExpenseUncheckedCreateWithoutPayment_methodsInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -978,6 +1021,7 @@ export type ExpenseUpdateWithoutPayment_methodsInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -994,6 +1038,7 @@ export type ExpenseUncheckedUpdateWithoutPayment_methodsInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1009,6 +1054,7 @@ export type ExpenseCreateManyUserInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -1022,6 +1068,7 @@ export type ExpenseUpdateWithoutUserInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1038,6 +1085,7 @@ export type ExpenseUncheckedUpdateWithoutUserInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1053,6 +1101,7 @@ export type ExpenseUncheckedUpdateManyWithoutUserInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1066,6 +1115,7 @@ export type ExpenseCreateManyCategoryInput = {
   amount: number
   date: Date | string
   is_recurring?: boolean
+  recurring_months?: number | null
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: string | null
@@ -1080,6 +1130,7 @@ export type ExpenseUpdateWithoutCategoryInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1095,6 +1146,7 @@ export type ExpenseUncheckedUpdateWithoutCategoryInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1110,6 +1162,7 @@ export type ExpenseUncheckedUpdateManyWithoutCategoryInput = {
   amount?: Prisma.FloatFieldUpdateOperationsInput | number
   date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1163,6 +1216,7 @@ export type ExpenseSelect<
     amount?: boolean
     date?: boolean
     is_recurring?: boolean
+    recurring_months?: boolean
     is_paid?: boolean
     is_saved?: boolean
     saving_location?: boolean
@@ -1187,6 +1241,7 @@ export type ExpenseSelectCreateManyAndReturn<
     amount?: boolean
     date?: boolean
     is_recurring?: boolean
+    recurring_months?: boolean
     is_paid?: boolean
     is_saved?: boolean
     saving_location?: boolean
@@ -1209,6 +1264,7 @@ export type ExpenseSelectUpdateManyAndReturn<
     amount?: boolean
     date?: boolean
     is_recurring?: boolean
+    recurring_months?: boolean
     is_paid?: boolean
     is_saved?: boolean
     saving_location?: boolean
@@ -1228,6 +1284,7 @@ export type ExpenseSelectScalar = {
   amount?: boolean
   date?: boolean
   is_recurring?: boolean
+  recurring_months?: boolean
   is_paid?: boolean
   is_saved?: boolean
   saving_location?: boolean
@@ -1245,6 +1302,7 @@ export type ExpenseOmit<
   | 'amount'
   | 'date'
   | 'is_recurring'
+  | 'recurring_months'
   | 'is_paid'
   | 'is_saved'
   | 'saving_location'
@@ -1291,6 +1349,7 @@ export type $ExpensePayload<
       amount: number
       date: Date
       is_recurring: boolean
+      recurring_months: number | null
       is_paid: boolean
       is_saved: boolean
       saving_location: string | null
@@ -1887,6 +1946,7 @@ export interface ExpenseFieldRefs {
   readonly amount: Prisma.FieldRef<'Expense', 'Float'>
   readonly date: Prisma.FieldRef<'Expense', 'DateTime'>
   readonly is_recurring: Prisma.FieldRef<'Expense', 'Boolean'>
+  readonly recurring_months: Prisma.FieldRef<'Expense', 'Int'>
   readonly is_paid: Prisma.FieldRef<'Expense', 'Boolean'>
   readonly is_saved: Prisma.FieldRef<'Expense', 'Boolean'>
   readonly saving_location: Prisma.FieldRef<'Expense', 'String'>

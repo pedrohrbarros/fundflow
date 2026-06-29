@@ -82,7 +82,12 @@ export function periodRange(p: PeriodInput): { start: YMD; end: YMD } {
 }
 
 export function periodContribution(
-  record: { date: string | Date; is_recurring: boolean; amount: number },
+  record: {
+    date: string | Date
+    is_recurring: boolean
+    amount: number
+    recurring_months?: number | null
+  },
   p: PeriodInput
 ): { applies: boolean; period_amount: number } {
   const rec = recordYMD(record.date)
@@ -94,22 +99,33 @@ export function periodContribution(
     return { applies, period_amount: applies ? record.amount : 0 }
   }
 
+  const rm = record.recurring_months ?? null
+
   switch (p.granularity) {
     case 'monthly': {
-      const applies = ref.year > rec.year || (ref.year === rec.year && ref.month >= rec.month)
+      const monthsDiff = (ref.year - rec.year) * 12 + (ref.month - rec.month)
+      const applies = monthsDiff >= 0 && (rm == null || monthsDiff < rm)
       return { applies, period_amount: applies ? record.amount : 0 }
     }
     case 'annually': {
-      // Month-granular per spec: the anchor's start month counts in full, so the
-      // anchor year contributes (12 - rec.month + 1) occurrences.
-      const activeMonths = ref.year < rec.year ? 0 : ref.year > rec.year ? 12 : 12 - rec.month + 1
+      // Compute exact intersection of the expense's active month range with the query year.
+      const startOffset = rec.year * 12 + rec.month
+      const endOffset = rm != null ? startOffset + rm - 1 : Infinity
+      const yearStart = ref.year * 12 + 1
+      const yearEnd = ref.year * 12 + 12
+      const activeMonths = Math.max(
+        0,
+        Math.min(endOffset, yearEnd) - Math.max(startOffset, yearStart) + 1
+      )
       return { applies: activeMonths > 0, period_amount: record.amount * activeMonths }
     }
     case 'daily': {
       // A monthly-recurring record contributes to a daily period only on its
       // (clamped) monthly occurrence day — once per month, not every day.
       const occurrenceDay = Math.min(rec.day, daysInMonth(ref.year, ref.month))
-      const applies = cmp(ref, rec) >= 0 && ref.day === occurrenceDay
+      const monthsDiff = (ref.year - rec.year) * 12 + (ref.month - rec.month)
+      const withinWindow = rm == null || monthsDiff < rm
+      const applies = cmp(ref, rec) >= 0 && ref.day === occurrenceDay && withinWindow
       return { applies, period_amount: applies ? record.amount : 0 }
     }
   }

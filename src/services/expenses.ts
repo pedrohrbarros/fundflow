@@ -21,9 +21,11 @@ type ExpenseWithSplits = {
   id: bigint
   name: string
   category_id: bigint | null
+  category: { name: string } | null
   amount: number
   date: Date
   is_recurring: boolean
+  recurring_months: number | null
   is_paid: boolean
   is_saved: boolean
   saving_location: string | null
@@ -47,6 +49,7 @@ const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
   amount: expense.amount,
   date: expense.date.toISOString().slice(0, 10),
   is_recurring: expense.is_recurring,
+  recurring_months: expense.recurring_months,
   is_paid: expense.is_paid,
   is_saved: expense.is_saved,
   saving_location: expense.saving_location,
@@ -97,6 +100,13 @@ export const ExpensesService = {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
       if (!user) return { ok: false, status: 404, message: 'User not found' }
 
+      if (input.recurring_months != null && !input.is_recurring)
+        return {
+          ok: false,
+          status: 400,
+          message: 'recurring_months requires is_recurring to be true',
+        }
+
       if (input.category_id != null) {
         const category = await db.category.findFirst({
           where: { id: BigInt(input.category_id), user_id: user.id, type: 'EXPENSE' },
@@ -123,6 +133,7 @@ export const ExpensesService = {
           amount: input.amount,
           date: new Date(`${input.date}T00:00:00.000Z`),
           is_recurring: input.is_recurring ?? false,
+          recurring_months: input.recurring_months ?? null,
           is_paid: input.is_paid ?? false,
           is_saved: input.is_saved ?? false,
           saving_location: input.saving_location ?? null,
@@ -140,7 +151,7 @@ export const ExpensesService = {
               }
             : {}),
         },
-        include: { payment_methods: { include: { payment_method: true } } },
+        include: { category: true, payment_methods: { include: { payment_method: true } } },
       })
 
       return { ok: true, data: toRecord(expense) }
@@ -192,14 +203,19 @@ export const ExpensesService = {
       const rows = await db.expense.findMany({
         where,
         orderBy: { id: 'desc' },
-        include: { payment_methods: { include: { payment_method: true } } },
+        include: { category: true, payment_methods: { include: { payment_method: true } } },
       })
 
       const applicable = rows
         .map((r) => ({
           r,
           c: periodContribution(
-            { date: r.date, is_recurring: r.is_recurring, amount: r.amount },
+            {
+              date: r.date,
+              is_recurring: r.is_recurring,
+              amount: r.amount,
+              recurring_months: r.recurring_months,
+            },
             period
           ),
         }))
@@ -226,6 +242,12 @@ export const ExpensesService = {
               return x.r.created_at.getTime()
             case 'updated_at':
               return x.r.updated_at.getTime()
+            case 'category_name':
+              return x.r.category?.name ?? ''
+            case 'payment_method_name': {
+              const names = x.r.payment_methods.map((s) => s.payment_method.name).sort()
+              return names[0] ?? ''
+            }
             default:
               return Number(x.r.id)
           }
@@ -271,6 +293,22 @@ export const ExpensesService = {
       if (!existing)
         return { ok: false, status: 404, message: 'Expense not found', meta: { id: id.toString() } }
 
+      // Determine the resulting is_recurring and recurring_months after the update.
+      const nextIsRecurring =
+        input.is_recurring !== undefined ? input.is_recurring : existing.is_recurring
+      // Auto-clear recurring_months when is_recurring is flipped to false.
+      const nextRecurringMonths = !nextIsRecurring
+        ? null
+        : input.recurring_months !== undefined
+          ? input.recurring_months
+          : existing.recurring_months
+      if (nextRecurringMonths != null && !nextIsRecurring)
+        return {
+          ok: false,
+          status: 400,
+          message: 'recurring_months requires is_recurring to be true',
+        }
+
       if (input.category_id != null) {
         const category = await db.category.findFirst({
           where: { id: BigInt(input.category_id), user_id: user.id, type: 'EXPENSE' },
@@ -315,13 +353,14 @@ export const ExpensesService = {
           ...(input.amount !== undefined ? { amount: input.amount } : {}),
           ...(input.date !== undefined ? { date: new Date(`${input.date}T00:00:00.000Z`) } : {}),
           ...(input.is_recurring !== undefined ? { is_recurring: input.is_recurring } : {}),
+          recurring_months: nextRecurringMonths,
           ...(input.is_paid !== undefined ? { is_paid: input.is_paid } : {}),
           ...(input.is_saved !== undefined ? { is_saved: input.is_saved } : {}),
           ...(input.saving_location !== undefined
             ? { saving_location: input.saving_location }
             : {}),
         },
-        include: { payment_methods: { include: { payment_method: true } } },
+        include: { category: true, payment_methods: { include: { payment_method: true } } },
       })
 
       return { ok: true, data: toRecord(expense) }
@@ -359,13 +398,24 @@ export const ExpensesService = {
 
       const rows = await db.expense.findMany({
         where,
-        select: { category_id: true, amount: true, date: true, is_recurring: true },
+        select: {
+          category_id: true,
+          amount: true,
+          date: true,
+          is_recurring: true,
+          recurring_months: true,
+        },
       })
 
       const acc = new Map<bigint | null, { total: number; count: number }>()
       for (const r of rows) {
         const c = periodContribution(
-          { date: r.date, is_recurring: r.is_recurring, amount: r.amount },
+          {
+            date: r.date,
+            is_recurring: r.is_recurring,
+            amount: r.amount,
+            recurring_months: r.recurring_months,
+          },
           period
         )
         if (!c.applies) continue

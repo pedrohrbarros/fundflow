@@ -18,6 +18,8 @@ const EXPENSE_SORT_FIELDS = [
   'is_saved',
   'created_at',
   'updated_at',
+  'category_name',
+  'payment_method_name',
 ] as const
 
 export const EXPENSE_ALLOWED_FIELDS: FieldAllowlist = {

@@ -454,6 +454,140 @@ describe('Expenses API', () => {
     expect(res.status).toBe(400)
   }, 20000)
 
+  it('search sorts by payment_method_name asc (first method alphabetically)', async () => {
+    const pmA = await (
+      await req('POST', '/api/v1/payment_methods', { name: `aaa-pm-${TS}`, origin: 'bank' })
+    ).json()
+    const pmZ = await (
+      await req('POST', '/api/v1/payment_methods', { name: `zzz-pm-${TS}`, origin: 'bank' })
+    ).json()
+    await req('POST', '/api/v1/expenses', {
+      name: `sort-pm-z-${TS}`,
+      amount: 50,
+      date: '2026-06-10',
+      payment_methods: [{ payment_method_id: Number(pmZ.id), partial_amount: 50 }],
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `sort-pm-a-${TS}`,
+      amount: 50,
+      date: '2026-06-10',
+      payment_methods: [{ payment_method_id: Number(pmA.id), partial_amount: 50 }],
+    })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'monthly',
+      date: '2026-06-01',
+      sort: { field: 'payment_method_name', direction: 'asc' },
+      filters: {
+        logic: 'OR',
+        conditions: [
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `sort-pm-z-${TS}` },
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `sort-pm-a-${TS}` },
+        ],
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses[0].name).toBe(`sort-pm-a-${TS}`)
+    expect(json.expenses[1].name).toBe(`sort-pm-z-${TS}`)
+  }, 20000)
+
+  it('search sorts by category_name asc', async () => {
+    const catA = await (
+      await req('POST', '/api/v1/categories', { name: `aaa-cat-${TS}`, type: 'EXPENSE' })
+    ).json()
+    const catZ = await (
+      await req('POST', '/api/v1/categories', { name: `zzz-cat-${TS}`, type: 'EXPENSE' })
+    ).json()
+    await req('POST', '/api/v1/expenses', {
+      name: `sort-cat-z-${TS}`,
+      category_id: Number(catZ.id),
+      amount: 50,
+      date: '2026-06-10',
+    })
+    await req('POST', '/api/v1/expenses', {
+      name: `sort-cat-a-${TS}`,
+      category_id: Number(catA.id),
+      amount: 50,
+      date: '2026-06-10',
+    })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'monthly',
+      date: '2026-06-01',
+      sort: { field: 'category_name', direction: 'asc' },
+      filters: {
+        logic: 'OR',
+        conditions: [
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `sort-cat-z-${TS}` },
+          { field: 'name', fieldType: 'string', op: 'is_equal', value: `sort-cat-a-${TS}` },
+        ],
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses[0].name).toBe(`sort-cat-a-${TS}`)
+    expect(json.expenses[1].name).toBe(`sort-cat-z-${TS}`)
+  }, 20000)
+
+  it('create rejects recurring_months on non-recurring expense', async () => {
+    const res = await req('POST', '/api/v1/expenses', {
+      name: `rm-invalid-${TS}`,
+      amount: 50,
+      date: '2026-06-10',
+      is_recurring: false,
+      recurring_months: 3,
+    })
+    expect(res.status).toBe(400)
+  }, 20000)
+
+  it('create accepts recurring_months on recurring expense', async () => {
+    const res = await req('POST', '/api/v1/expenses', {
+      name: `rm-ok-${TS}`,
+      amount: 100,
+      date: '2026-06-01',
+      is_recurring: true,
+      recurring_months: 2,
+    })
+    expect(res.status).toBe(201)
+    const json = await res.json()
+    expect(json.recurring_months).toBe(2)
+  }, 20000)
+
+  it('search excludes recurring expense after its recurring_months window', async () => {
+    await req('POST', '/api/v1/expenses', {
+      name: `rm-expired-${TS}`,
+      amount: 50,
+      date: '2026-06-01',
+      is_recurring: true,
+      recurring_months: 1,
+    })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'monthly',
+      date: '2026-07-01',
+      filters: { field: 'name', fieldType: 'string', op: 'is_equal', value: `rm-expired-${TS}` },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses).toHaveLength(0)
+  }, 20000)
+
+  it('annually sums only active months within recurring_months window', async () => {
+    await req('POST', '/api/v1/expenses', {
+      name: `rm-annual-${TS}`,
+      amount: 100,
+      date: '2026-01-01',
+      is_recurring: true,
+      recurring_months: 3,
+    })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'annually',
+      date: '2026-06-01',
+      filters: { field: 'name', fieldType: 'string', op: 'is_equal', value: `rm-annual-${TS}` },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses[0].period_amount).toBe(300)
+  }, 20000)
+
   it('by-category totals period_amount per category', async () => {
     const cat1 = await (
       await req('POST', '/api/v1/categories', { name: `bc1-${TS}`, type: 'EXPENSE' })

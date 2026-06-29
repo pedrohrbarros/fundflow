@@ -92,11 +92,12 @@ model Expense {
   category        Category?              @relation(fields: [category_id], references: [id])
   amount          Float
   date            DateTime               @db.Date
-  is_recurring    Boolean                @default(false)
-  is_paid         Boolean                @default(false)
-  is_saved        Boolean                @default(false)
-  saving_location String?
-  user_id         BigInt
+  is_recurring     Boolean                @default(false)
+  recurring_months Int?
+  is_paid          Boolean                @default(false)
+  is_saved         Boolean                @default(false)
+  saving_location  String?
+  user_id          BigInt
   user            User                   @relation(fields: [user_id], references: [id], onDelete: Cascade)
   payment_methods ExpensePaymentMethod[]
   created_at      DateTime               @default(now())
