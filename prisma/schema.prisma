@@ -95,6 +95,7 @@ model Expense {
   is_recurring     Boolean                @default(false)
   recurring_months Int?
   is_paid          Boolean                @default(false)
+  paid_period      String?
   is_saved         Boolean                @default(false)
   saving_location  String?
   user_id          BigInt

@@ -270,6 +270,8 @@ describe('Expenses API', () => {
       date: '2026-06-15',
     })
     const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'monthly',
+      date: '2026-06-15',
       filters: { field: 'name', op: 'is_equal', value: name },
     })
     expect(res.status).toBe(200)
@@ -618,5 +620,61 @@ describe('Expenses API', () => {
     )
     expect(row.total).toBe(7030)
     expect(row.count).toBe(2)
+  }, 20000)
+
+  it('search returns is_paid=true for recurring expense paid in the current period', async () => {
+    const exp = await (
+      await req('POST', '/api/v1/expenses', {
+        name: `paid-period-match-${TS}`,
+        amount: 100,
+        date: '2026-06-01',
+        is_recurring: true,
+      })
+    ).json()
+    await req('PATCH', `/api/v1/expenses/${exp.id}`, {
+      is_paid: true,
+      paid_period: '2026-06',
+    })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'monthly',
+      date: '2026-06-15',
+      filters: {
+        field: 'name',
+        fieldType: 'string',
+        op: 'is_equal',
+        value: `paid-period-match-${TS}`,
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses[0].is_paid).toBe(true)
+  }, 20000)
+
+  it('search returns is_paid=false for recurring expense paid in a different period', async () => {
+    const exp = await (
+      await req('POST', '/api/v1/expenses', {
+        name: `paid-period-mismatch-${TS}`,
+        amount: 100,
+        date: '2026-06-01',
+        is_recurring: true,
+      })
+    ).json()
+    await req('PATCH', `/api/v1/expenses/${exp.id}`, {
+      is_paid: true,
+      paid_period: '2026-06',
+    })
+    const res = await req('POST', '/api/v1/expenses/search', {
+      granularity: 'monthly',
+      date: '2026-07-15',
+      filters: {
+        field: 'name',
+        fieldType: 'string',
+        op: 'is_equal',
+        value: `paid-period-mismatch-${TS}`,
+      },
+    })
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.expenses[0].is_paid).toBe(false)
   }, 20000)
 })

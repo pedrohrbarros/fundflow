@@ -16,6 +16,10 @@ export const ExpenseCreateSchema = z.object({
   is_recurring: z.boolean().optional(),
   recurring_months: z.number().int().min(1).nullish(),
   is_paid: z.boolean().optional(),
+  paid_period: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/)
+    .nullish(),
   is_saved: z.boolean().optional(),
   saving_location: z.union([z.string().min(1), z.null()]).optional(),
   payment_methods: z.array(ExpensePaymentMethodInput).optional(),
@@ -29,6 +33,10 @@ export const ExpenseUpdateSchema = z.object({
   is_recurring: z.boolean().optional(),
   recurring_months: z.number().int().min(1).nullish(),
   is_paid: z.boolean().optional(),
+  paid_period: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/)
+    .nullish(),
   is_saved: z.boolean().optional(),
   saving_location: z.union([z.string().min(1), z.null()]).optional(),
   payment_methods: z.array(ExpensePaymentMethodInput).optional(),

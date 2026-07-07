@@ -27,6 +27,7 @@ type ExpenseWithSplits = {
   is_recurring: boolean
   recurring_months: number | null
   is_paid: boolean
+  paid_period: string | null
   is_saved: boolean
   saving_location: string | null
   created_at: Date
@@ -187,6 +188,8 @@ export const ExpensesService = {
       const startDate = new Date(Date.UTC(start.year, start.month - 1, start.day))
       const endDate = new Date(Date.UTC(end.year, end.month - 1, end.day))
 
+      const periodMonthStr = `${start.year}-${String(start.month).padStart(2, '0')}`
+
       // Coarse pre-filter; periodContribution refines below. Recurring rows are
       // intentionally fetched with NO start-date floor: an anchor from years ago
       // still recurs into the current period, so bounding them by startDate would
@@ -235,7 +238,7 @@ export const ExpensesService = {
             case 'is_recurring':
               return x.r.is_recurring
             case 'is_paid':
-              return x.r.is_paid
+              return x.r.is_recurring ? x.r.paid_period === periodMonthStr : x.r.is_paid
             case 'is_saved':
               return x.r.is_saved
             case 'created_at':
@@ -261,7 +264,11 @@ export const ExpensesService = {
       return {
         ok: true,
         data: {
-          expenses: paged.map((x) => ({ ...toRecord(x.r), period_amount: x.c.period_amount })),
+          expenses: paged.map((x) => ({
+            ...toRecord(x.r),
+            period_amount: x.c.period_amount,
+            is_paid: x.r.is_recurring ? x.r.paid_period === periodMonthStr : x.r.is_paid,
+          })),
           total,
           pagination: { page, limit, total: applicable.length },
         },
@@ -355,6 +362,11 @@ export const ExpensesService = {
           ...(input.is_recurring !== undefined ? { is_recurring: input.is_recurring } : {}),
           recurring_months: nextRecurringMonths,
           ...(input.is_paid !== undefined ? { is_paid: input.is_paid } : {}),
+          paid_period: (() => {
+            if (input.is_paid === false) return null
+            if (input.paid_period !== undefined) return input.paid_period ?? null
+            return undefined
+          })(),
           ...(input.is_saved !== undefined ? { is_saved: input.is_saved } : {}),
           ...(input.saving_location !== undefined
             ? { saving_location: input.saving_location }

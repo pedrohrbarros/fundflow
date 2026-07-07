@@ -1,0 +1,1 @@
+ALTER TABLE "expenses" ADD COLUMN IF NOT EXISTS "paid_period" VARCHAR(7);
