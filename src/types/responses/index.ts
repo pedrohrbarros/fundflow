@@ -92,7 +92,6 @@ const payment_method = {
     id: { type: 'number' },
     name: { type: 'string' },
     origin: { type: 'string' },
-    receiver: { type: 'string', nullable: true },
     user_id: { type: 'number' },
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
@@ -111,12 +110,11 @@ export const PaymentMethodSearchResponse = {
 
 const expense_payment_method = {
   type: 'object',
+  nullable: true,
   properties: {
-    payment_method_id: { type: 'number' },
-    partial_amount: { type: 'number' },
+    id: { type: 'number' },
     name: { type: 'string' },
     origin: { type: 'string' },
-    receiver: { type: 'string', nullable: true },
   },
 }
 
@@ -132,7 +130,8 @@ const expense = {
     is_paid: { type: 'boolean' },
     is_saved: { type: 'boolean' },
     saving_location: { type: 'string', nullable: true },
-    payment_methods: { type: 'array', items: expense_payment_method },
+    payment_method_id: { type: 'number', nullable: true },
+    payment_method: expense_payment_method,
     created_at: { type: 'string', format: 'date-time' },
     updated_at: { type: 'string', format: 'date-time' },
   },

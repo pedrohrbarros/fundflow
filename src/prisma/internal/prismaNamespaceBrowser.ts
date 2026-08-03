@@ -54,7 +54,6 @@ export const ModelName = {
   SourceOfIncome: 'SourceOfIncome',
   PaymentMethod: 'PaymentMethod',
   Expense: 'Expense',
-  ExpensePaymentMethod: 'ExpensePaymentMethod',
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -128,7 +127,6 @@ export const PaymentMethodScalarFieldEnum = {
   id: 'id',
   name: 'name',
   origin: 'origin',
-  receiver: 'receiver',
   user_id: 'user_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
@@ -149,6 +147,7 @@ export const ExpenseScalarFieldEnum = {
   paid_period: 'paid_period',
   is_saved: 'is_saved',
   saving_location: 'saving_location',
+  payment_method_id: 'payment_method_id',
   user_id: 'user_id',
   created_at: 'created_at',
   updated_at: 'updated_at',
@@ -156,16 +155,6 @@ export const ExpenseScalarFieldEnum = {
 
 export type ExpenseScalarFieldEnum =
   (typeof ExpenseScalarFieldEnum)[keyof typeof ExpenseScalarFieldEnum]
-
-export const ExpensePaymentMethodScalarFieldEnum = {
-  expense_id: 'expense_id',
-  payment_method_id: 'payment_method_id',
-  partial_amount: 'partial_amount',
-  created_at: 'created_at',
-} as const
-
-export type ExpensePaymentMethodScalarFieldEnum =
-  (typeof ExpensePaymentMethodScalarFieldEnum)[keyof typeof ExpensePaymentMethodScalarFieldEnum]
 
 export const SortOrder = {
   asc: 'asc',

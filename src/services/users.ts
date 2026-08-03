@@ -74,7 +74,6 @@ export const UserService = {
       // categories. Children are deleted before their parents throughout.
       await db.$transaction([
         db.refreshToken.deleteMany({ where: { user_id: user.id } }),
-        db.expensePaymentMethod.deleteMany({ where: { expense: { user_id: user.id } } }),
         db.expense.deleteMany({ where: { user_id: user.id } }),
         db.paymentMethod.deleteMany({ where: { user_id: user.id } }),
         db.sourceOfIncome.deleteMany({ where: { user_id: user.id } }),

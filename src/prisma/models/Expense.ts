@@ -30,6 +30,7 @@ export type ExpenseAvgAggregateOutputType = {
   category_id: number | null
   amount: number | null
   recurring_months: number | null
+  payment_method_id: number | null
   user_id: number | null
 }
 
@@ -38,6 +39,7 @@ export type ExpenseSumAggregateOutputType = {
   category_id: bigint | null
   amount: number | null
   recurring_months: number | null
+  payment_method_id: bigint | null
   user_id: bigint | null
 }
 
@@ -53,6 +55,7 @@ export type ExpenseMinAggregateOutputType = {
   paid_period: string | null
   is_saved: boolean | null
   saving_location: string | null
+  payment_method_id: bigint | null
   user_id: bigint | null
   created_at: Date | null
   updated_at: Date | null
@@ -70,6 +73,7 @@ export type ExpenseMaxAggregateOutputType = {
   paid_period: string | null
   is_saved: boolean | null
   saving_location: string | null
+  payment_method_id: bigint | null
   user_id: bigint | null
   created_at: Date | null
   updated_at: Date | null
@@ -87,6 +91,7 @@ export type ExpenseCountAggregateOutputType = {
   paid_period: number
   is_saved: number
   saving_location: number
+  payment_method_id: number
   user_id: number
   created_at: number
   updated_at: number
@@ -98,6 +103,7 @@ export type ExpenseAvgAggregateInputType = {
   category_id?: true
   amount?: true
   recurring_months?: true
+  payment_method_id?: true
   user_id?: true
 }
 
@@ -106,6 +112,7 @@ export type ExpenseSumAggregateInputType = {
   category_id?: true
   amount?: true
   recurring_months?: true
+  payment_method_id?: true
   user_id?: true
 }
 
@@ -121,6 +128,7 @@ export type ExpenseMinAggregateInputType = {
   paid_period?: true
   is_saved?: true
   saving_location?: true
+  payment_method_id?: true
   user_id?: true
   created_at?: true
   updated_at?: true
@@ -138,6 +146,7 @@ export type ExpenseMaxAggregateInputType = {
   paid_period?: true
   is_saved?: true
   saving_location?: true
+  payment_method_id?: true
   user_id?: true
   created_at?: true
   updated_at?: true
@@ -155,6 +164,7 @@ export type ExpenseCountAggregateInputType = {
   paid_period?: true
   is_saved?: true
   saving_location?: true
+  payment_method_id?: true
   user_id?: true
   created_at?: true
   updated_at?: true
@@ -260,6 +270,7 @@ export type ExpenseGroupByOutputType = {
   paid_period: string | null
   is_saved: boolean
   saving_location: string | null
+  payment_method_id: bigint | null
   user_id: bigint
   created_at: Date
   updated_at: Date
@@ -297,6 +308,7 @@ export type ExpenseWhereInput = {
   paid_period?: Prisma.StringNullableFilter<'Expense'> | string | null
   is_saved?: Prisma.BoolFilter<'Expense'> | boolean
   saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
+  payment_method_id?: Prisma.BigIntNullableFilter<'Expense'> | bigint | number | null
   user_id?: Prisma.BigIntFilter<'Expense'> | bigint | number
   created_at?: Prisma.DateTimeFilter<'Expense'> | Date | string
   updated_at?: Prisma.DateTimeFilter<'Expense'> | Date | string
@@ -304,8 +316,11 @@ export type ExpenseWhereInput = {
     Prisma.CategoryNullableScalarRelationFilter,
     Prisma.CategoryWhereInput
   > | null
+  payment_method?: Prisma.XOR<
+    Prisma.PaymentMethodNullableScalarRelationFilter,
+    Prisma.PaymentMethodWhereInput
+  > | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-  payment_methods?: Prisma.ExpensePaymentMethodListRelationFilter
 }
 
 export type ExpenseOrderByWithRelationInput = {
@@ -320,12 +335,13 @@ export type ExpenseOrderByWithRelationInput = {
   paid_period?: Prisma.SortOrderInput | Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrderInput | Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrderInput | Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
   category?: Prisma.CategoryOrderByWithRelationInput
+  payment_method?: Prisma.PaymentMethodOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
-  payment_methods?: Prisma.ExpensePaymentMethodOrderByRelationAggregateInput
 }
 
 export type ExpenseWhereUniqueInput = Prisma.AtLeast<
@@ -344,6 +360,7 @@ export type ExpenseWhereUniqueInput = Prisma.AtLeast<
     paid_period?: Prisma.StringNullableFilter<'Expense'> | string | null
     is_saved?: Prisma.BoolFilter<'Expense'> | boolean
     saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
+    payment_method_id?: Prisma.BigIntNullableFilter<'Expense'> | bigint | number | null
     user_id?: Prisma.BigIntFilter<'Expense'> | bigint | number
     created_at?: Prisma.DateTimeFilter<'Expense'> | Date | string
     updated_at?: Prisma.DateTimeFilter<'Expense'> | Date | string
@@ -351,8 +368,11 @@ export type ExpenseWhereUniqueInput = Prisma.AtLeast<
       Prisma.CategoryNullableScalarRelationFilter,
       Prisma.CategoryWhereInput
     > | null
+    payment_method?: Prisma.XOR<
+      Prisma.PaymentMethodNullableScalarRelationFilter,
+      Prisma.PaymentMethodWhereInput
+    > | null
     user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
-    payment_methods?: Prisma.ExpensePaymentMethodListRelationFilter
   },
   'id'
 >
@@ -369,6 +389,7 @@ export type ExpenseOrderByWithAggregationInput = {
   paid_period?: Prisma.SortOrderInput | Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrderInput | Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrderInput | Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -398,6 +419,7 @@ export type ExpenseScalarWhereWithAggregatesInput = {
   paid_period?: Prisma.StringNullableWithAggregatesFilter<'Expense'> | string | null
   is_saved?: Prisma.BoolWithAggregatesFilter<'Expense'> | boolean
   saving_location?: Prisma.StringNullableWithAggregatesFilter<'Expense'> | string | null
+  payment_method_id?: Prisma.BigIntNullableWithAggregatesFilter<'Expense'> | bigint | number | null
   user_id?: Prisma.BigIntWithAggregatesFilter<'Expense'> | bigint | number
   created_at?: Prisma.DateTimeWithAggregatesFilter<'Expense'> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<'Expense'> | Date | string
@@ -417,8 +439,8 @@ export type ExpenseCreateInput = {
   created_at?: Date | string
   updated_at?: Date | string
   category?: Prisma.CategoryCreateNestedOneWithoutExpensesInput
+  payment_method?: Prisma.PaymentMethodCreateNestedOneWithoutExpensesInput
   user: Prisma.UserCreateNestedOneWithoutExpensesInput
-  payment_methods?: Prisma.ExpensePaymentMethodCreateNestedManyWithoutExpenseInput
 }
 
 export type ExpenseUncheckedCreateInput = {
@@ -433,10 +455,10 @@ export type ExpenseUncheckedCreateInput = {
   paid_period?: string | null
   is_saved?: boolean
   saving_location?: string | null
+  payment_method_id?: bigint | number | null
   user_id: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
-  payment_methods?: Prisma.ExpensePaymentMethodUncheckedCreateNestedManyWithoutExpenseInput
 }
 
 export type ExpenseUpdateInput = {
@@ -453,8 +475,8 @@ export type ExpenseUpdateInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneWithoutExpensesNestedInput
+  payment_method?: Prisma.PaymentMethodUpdateOneWithoutExpensesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutExpensesNestedInput
-  payment_methods?: Prisma.ExpensePaymentMethodUpdateManyWithoutExpenseNestedInput
 }
 
 export type ExpenseUncheckedUpdateInput = {
@@ -469,10 +491,10 @@ export type ExpenseUncheckedUpdateInput = {
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payment_methods?: Prisma.ExpensePaymentMethodUncheckedUpdateManyWithoutExpenseNestedInput
 }
 
 export type ExpenseCreateManyInput = {
@@ -487,6 +509,7 @@ export type ExpenseCreateManyInput = {
   paid_period?: string | null
   is_saved?: boolean
   saving_location?: string | null
+  payment_method_id?: bigint | number | null
   user_id: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
@@ -519,6 +542,7 @@ export type ExpenseUncheckedUpdateManyInput = {
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -546,6 +570,7 @@ export type ExpenseCountOrderByAggregateInput = {
   paid_period?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -556,6 +581,7 @@ export type ExpenseAvgOrderByAggregateInput = {
   category_id?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   recurring_months?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
 }
 
@@ -571,6 +597,7 @@ export type ExpenseMaxOrderByAggregateInput = {
   paid_period?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -588,6 +615,7 @@ export type ExpenseMinOrderByAggregateInput = {
   paid_period?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
@@ -598,12 +626,8 @@ export type ExpenseSumOrderByAggregateInput = {
   category_id?: Prisma.SortOrder
   amount?: Prisma.SortOrder
   recurring_months?: Prisma.SortOrder
+  payment_method_id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
-}
-
-export type ExpenseScalarRelationFilter = {
-  is?: Prisma.ExpenseWhereInput
-  isNot?: Prisma.ExpenseWhereInput
 }
 
 export type ExpenseCreateNestedManyWithoutUserInput = {
@@ -778,6 +802,92 @@ export type ExpenseUncheckedUpdateManyWithoutCategoryNestedInput = {
   deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
 }
 
+export type ExpenseCreateNestedManyWithoutPayment_methodInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ExpenseCreateWithoutPayment_methodInput,
+        Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput
+      >
+    | Prisma.ExpenseCreateWithoutPayment_methodInput[]
+    | Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput[]
+  connectOrCreate?:
+    | Prisma.ExpenseCreateOrConnectWithoutPayment_methodInput
+    | Prisma.ExpenseCreateOrConnectWithoutPayment_methodInput[]
+  createMany?: Prisma.ExpenseCreateManyPayment_methodInputEnvelope
+  connect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+}
+
+export type ExpenseUncheckedCreateNestedManyWithoutPayment_methodInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ExpenseCreateWithoutPayment_methodInput,
+        Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput
+      >
+    | Prisma.ExpenseCreateWithoutPayment_methodInput[]
+    | Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput[]
+  connectOrCreate?:
+    | Prisma.ExpenseCreateOrConnectWithoutPayment_methodInput
+    | Prisma.ExpenseCreateOrConnectWithoutPayment_methodInput[]
+  createMany?: Prisma.ExpenseCreateManyPayment_methodInputEnvelope
+  connect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+}
+
+export type ExpenseUpdateManyWithoutPayment_methodNestedInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ExpenseCreateWithoutPayment_methodInput,
+        Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput
+      >
+    | Prisma.ExpenseCreateWithoutPayment_methodInput[]
+    | Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput[]
+  connectOrCreate?:
+    | Prisma.ExpenseCreateOrConnectWithoutPayment_methodInput
+    | Prisma.ExpenseCreateOrConnectWithoutPayment_methodInput[]
+  upsert?:
+    | Prisma.ExpenseUpsertWithWhereUniqueWithoutPayment_methodInput
+    | Prisma.ExpenseUpsertWithWhereUniqueWithoutPayment_methodInput[]
+  createMany?: Prisma.ExpenseCreateManyPayment_methodInputEnvelope
+  set?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  disconnect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  delete?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  connect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  update?:
+    | Prisma.ExpenseUpdateWithWhereUniqueWithoutPayment_methodInput
+    | Prisma.ExpenseUpdateWithWhereUniqueWithoutPayment_methodInput[]
+  updateMany?:
+    | Prisma.ExpenseUpdateManyWithWhereWithoutPayment_methodInput
+    | Prisma.ExpenseUpdateManyWithWhereWithoutPayment_methodInput[]
+  deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
+}
+
+export type ExpenseUncheckedUpdateManyWithoutPayment_methodNestedInput = {
+  create?:
+    | Prisma.XOR<
+        Prisma.ExpenseCreateWithoutPayment_methodInput,
+        Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput
+      >
+    | Prisma.ExpenseCreateWithoutPayment_methodInput[]
+    | Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput[]
+  connectOrCreate?:
+    | Prisma.ExpenseCreateOrConnectWithoutPayment_methodInput
+    | Prisma.ExpenseCreateOrConnectWithoutPayment_methodInput[]
+  upsert?:
+    | Prisma.ExpenseUpsertWithWhereUniqueWithoutPayment_methodInput
+    | Prisma.ExpenseUpsertWithWhereUniqueWithoutPayment_methodInput[]
+  createMany?: Prisma.ExpenseCreateManyPayment_methodInputEnvelope
+  set?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  disconnect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  delete?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  connect?: Prisma.ExpenseWhereUniqueInput | Prisma.ExpenseWhereUniqueInput[]
+  update?:
+    | Prisma.ExpenseUpdateWithWhereUniqueWithoutPayment_methodInput
+    | Prisma.ExpenseUpdateWithWhereUniqueWithoutPayment_methodInput[]
+  updateMany?:
+    | Prisma.ExpenseUpdateManyWithWhereWithoutPayment_methodInput
+    | Prisma.ExpenseUpdateManyWithWhereWithoutPayment_methodInput[]
+  deleteMany?: Prisma.ExpenseScalarWhereInput | Prisma.ExpenseScalarWhereInput[]
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -786,30 +896,8 @@ export type NullableIntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type ExpenseCreateNestedOneWithoutPayment_methodsInput = {
-  create?: Prisma.XOR<
-    Prisma.ExpenseCreateWithoutPayment_methodsInput,
-    Prisma.ExpenseUncheckedCreateWithoutPayment_methodsInput
-  >
-  connectOrCreate?: Prisma.ExpenseCreateOrConnectWithoutPayment_methodsInput
-  connect?: Prisma.ExpenseWhereUniqueInput
-}
-
-export type ExpenseUpdateOneRequiredWithoutPayment_methodsNestedInput = {
-  create?: Prisma.XOR<
-    Prisma.ExpenseCreateWithoutPayment_methodsInput,
-    Prisma.ExpenseUncheckedCreateWithoutPayment_methodsInput
-  >
-  connectOrCreate?: Prisma.ExpenseCreateOrConnectWithoutPayment_methodsInput
-  upsert?: Prisma.ExpenseUpsertWithoutPayment_methodsInput
-  connect?: Prisma.ExpenseWhereUniqueInput
-  update?: Prisma.XOR<
-    Prisma.XOR<
-      Prisma.ExpenseUpdateToOneWithWhereWithoutPayment_methodsInput,
-      Prisma.ExpenseUpdateWithoutPayment_methodsInput
-    >,
-    Prisma.ExpenseUncheckedUpdateWithoutPayment_methodsInput
-  >
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
 export type ExpenseCreateWithoutUserInput = {
@@ -826,7 +914,7 @@ export type ExpenseCreateWithoutUserInput = {
   created_at?: Date | string
   updated_at?: Date | string
   category?: Prisma.CategoryCreateNestedOneWithoutExpensesInput
-  payment_methods?: Prisma.ExpensePaymentMethodCreateNestedManyWithoutExpenseInput
+  payment_method?: Prisma.PaymentMethodCreateNestedOneWithoutExpensesInput
 }
 
 export type ExpenseUncheckedCreateWithoutUserInput = {
@@ -841,9 +929,9 @@ export type ExpenseUncheckedCreateWithoutUserInput = {
   paid_period?: string | null
   is_saved?: boolean
   saving_location?: string | null
+  payment_method_id?: bigint | number | null
   created_at?: Date | string
   updated_at?: Date | string
-  payment_methods?: Prisma.ExpensePaymentMethodUncheckedCreateNestedManyWithoutExpenseInput
 }
 
 export type ExpenseCreateOrConnectWithoutUserInput = {
@@ -902,6 +990,7 @@ export type ExpenseScalarWhereInput = {
   paid_period?: Prisma.StringNullableFilter<'Expense'> | string | null
   is_saved?: Prisma.BoolFilter<'Expense'> | boolean
   saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
+  payment_method_id?: Prisma.BigIntNullableFilter<'Expense'> | bigint | number | null
   user_id?: Prisma.BigIntFilter<'Expense'> | bigint | number
   created_at?: Prisma.DateTimeFilter<'Expense'> | Date | string
   updated_at?: Prisma.DateTimeFilter<'Expense'> | Date | string
@@ -920,8 +1009,8 @@ export type ExpenseCreateWithoutCategoryInput = {
   saving_location?: string | null
   created_at?: Date | string
   updated_at?: Date | string
+  payment_method?: Prisma.PaymentMethodCreateNestedOneWithoutExpensesInput
   user: Prisma.UserCreateNestedOneWithoutExpensesInput
-  payment_methods?: Prisma.ExpensePaymentMethodCreateNestedManyWithoutExpenseInput
 }
 
 export type ExpenseUncheckedCreateWithoutCategoryInput = {
@@ -935,10 +1024,10 @@ export type ExpenseUncheckedCreateWithoutCategoryInput = {
   paid_period?: string | null
   is_saved?: boolean
   saving_location?: string | null
+  payment_method_id?: bigint | number | null
   user_id: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
-  payment_methods?: Prisma.ExpensePaymentMethodUncheckedCreateNestedManyWithoutExpenseInput
 }
 
 export type ExpenseCreateOrConnectWithoutCategoryInput = {
@@ -982,7 +1071,7 @@ export type ExpenseUpdateManyWithWhereWithoutCategoryInput = {
   >
 }
 
-export type ExpenseCreateWithoutPayment_methodsInput = {
+export type ExpenseCreateWithoutPayment_methodInput = {
   id?: bigint | number
   name: string
   amount: number
@@ -999,7 +1088,7 @@ export type ExpenseCreateWithoutPayment_methodsInput = {
   user: Prisma.UserCreateNestedOneWithoutExpensesInput
 }
 
-export type ExpenseUncheckedCreateWithoutPayment_methodsInput = {
+export type ExpenseUncheckedCreateWithoutPayment_methodInput = {
   id?: bigint | number
   name: string
   category_id?: bigint | number | null
@@ -1016,66 +1105,45 @@ export type ExpenseUncheckedCreateWithoutPayment_methodsInput = {
   updated_at?: Date | string
 }
 
-export type ExpenseCreateOrConnectWithoutPayment_methodsInput = {
+export type ExpenseCreateOrConnectWithoutPayment_methodInput = {
   where: Prisma.ExpenseWhereUniqueInput
   create: Prisma.XOR<
-    Prisma.ExpenseCreateWithoutPayment_methodsInput,
-    Prisma.ExpenseUncheckedCreateWithoutPayment_methodsInput
+    Prisma.ExpenseCreateWithoutPayment_methodInput,
+    Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput
   >
 }
 
-export type ExpenseUpsertWithoutPayment_methodsInput = {
+export type ExpenseCreateManyPayment_methodInputEnvelope = {
+  data: Prisma.ExpenseCreateManyPayment_methodInput | Prisma.ExpenseCreateManyPayment_methodInput[]
+  skipDuplicates?: boolean
+}
+
+export type ExpenseUpsertWithWhereUniqueWithoutPayment_methodInput = {
+  where: Prisma.ExpenseWhereUniqueInput
   update: Prisma.XOR<
-    Prisma.ExpenseUpdateWithoutPayment_methodsInput,
-    Prisma.ExpenseUncheckedUpdateWithoutPayment_methodsInput
+    Prisma.ExpenseUpdateWithoutPayment_methodInput,
+    Prisma.ExpenseUncheckedUpdateWithoutPayment_methodInput
   >
   create: Prisma.XOR<
-    Prisma.ExpenseCreateWithoutPayment_methodsInput,
-    Prisma.ExpenseUncheckedCreateWithoutPayment_methodsInput
+    Prisma.ExpenseCreateWithoutPayment_methodInput,
+    Prisma.ExpenseUncheckedCreateWithoutPayment_methodInput
   >
-  where?: Prisma.ExpenseWhereInput
 }
 
-export type ExpenseUpdateToOneWithWhereWithoutPayment_methodsInput = {
-  where?: Prisma.ExpenseWhereInput
+export type ExpenseUpdateWithWhereUniqueWithoutPayment_methodInput = {
+  where: Prisma.ExpenseWhereUniqueInput
   data: Prisma.XOR<
-    Prisma.ExpenseUpdateWithoutPayment_methodsInput,
-    Prisma.ExpenseUncheckedUpdateWithoutPayment_methodsInput
+    Prisma.ExpenseUpdateWithoutPayment_methodInput,
+    Prisma.ExpenseUncheckedUpdateWithoutPayment_methodInput
   >
 }
 
-export type ExpenseUpdateWithoutPayment_methodsInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  category?: Prisma.CategoryUpdateOneWithoutExpensesNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutExpensesNestedInput
-}
-
-export type ExpenseUncheckedUpdateWithoutPayment_methodsInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  category_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
-  amount?: Prisma.FloatFieldUpdateOperationsInput | number
-  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+export type ExpenseUpdateManyWithWhereWithoutPayment_methodInput = {
+  where: Prisma.ExpenseScalarWhereInput
+  data: Prisma.XOR<
+    Prisma.ExpenseUpdateManyMutationInput,
+    Prisma.ExpenseUncheckedUpdateManyWithoutPayment_methodInput
+  >
 }
 
 export type ExpenseCreateManyUserInput = {
@@ -1090,6 +1158,7 @@ export type ExpenseCreateManyUserInput = {
   paid_period?: string | null
   is_saved?: boolean
   saving_location?: string | null
+  payment_method_id?: bigint | number | null
   created_at?: Date | string
   updated_at?: Date | string
 }
@@ -1108,7 +1177,7 @@ export type ExpenseUpdateWithoutUserInput = {
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.CategoryUpdateOneWithoutExpensesNestedInput
-  payment_methods?: Prisma.ExpensePaymentMethodUpdateManyWithoutExpenseNestedInput
+  payment_method?: Prisma.PaymentMethodUpdateOneWithoutExpensesNestedInput
 }
 
 export type ExpenseUncheckedUpdateWithoutUserInput = {
@@ -1123,9 +1192,9 @@ export type ExpenseUncheckedUpdateWithoutUserInput = {
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payment_methods?: Prisma.ExpensePaymentMethodUncheckedUpdateManyWithoutExpenseNestedInput
 }
 
 export type ExpenseUncheckedUpdateManyWithoutUserInput = {
@@ -1140,6 +1209,7 @@ export type ExpenseUncheckedUpdateManyWithoutUserInput = {
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1155,6 +1225,7 @@ export type ExpenseCreateManyCategoryInput = {
   paid_period?: string | null
   is_saved?: boolean
   saving_location?: string | null
+  payment_method_id?: bigint | number | null
   user_id: bigint | number
   created_at?: Date | string
   updated_at?: Date | string
@@ -1173,8 +1244,8 @@ export type ExpenseUpdateWithoutCategoryInput = {
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  payment_method?: Prisma.PaymentMethodUpdateOneWithoutExpensesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutExpensesNestedInput
-  payment_methods?: Prisma.ExpensePaymentMethodUpdateManyWithoutExpenseNestedInput
 }
 
 export type ExpenseUncheckedUpdateWithoutCategoryInput = {
@@ -1188,10 +1259,10 @@ export type ExpenseUncheckedUpdateWithoutCategoryInput = {
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  payment_methods?: Prisma.ExpensePaymentMethodUncheckedUpdateManyWithoutExpenseNestedInput
 }
 
 export type ExpenseUncheckedUpdateManyWithoutCategoryInput = {
@@ -1205,44 +1276,78 @@ export type ExpenseUncheckedUpdateManyWithoutCategoryInput = {
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-/**
- * Count Type ExpenseCountOutputType
- */
-
-export type ExpenseCountOutputType = {
-  payment_methods: number
+export type ExpenseCreateManyPayment_methodInput = {
+  id?: bigint | number
+  name: string
+  category_id?: bigint | number | null
+  amount: number
+  date: Date | string
+  is_recurring?: boolean
+  recurring_months?: number | null
+  is_paid?: boolean
+  paid_period?: string | null
+  is_saved?: boolean
+  saving_location?: string | null
+  user_id: bigint | number
+  created_at?: Date | string
+  updated_at?: Date | string
 }
 
-export type ExpenseCountOutputTypeSelect<
-  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-  payment_methods?: boolean | ExpenseCountOutputTypeCountPayment_methodsArgs
+export type ExpenseUpdateWithoutPayment_methodInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  category?: Prisma.CategoryUpdateOneWithoutExpensesNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutExpensesNestedInput
 }
 
-/**
- * ExpenseCountOutputType without action
- */
-export type ExpenseCountOutputTypeDefaultArgs<
-  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-  /**
-   * Select specific fields to fetch from the ExpenseCountOutputType
-   */
-  select?: Prisma.ExpenseCountOutputTypeSelect<ExtArgs> | null
+export type ExpenseUncheckedUpdateWithoutPayment_methodInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-/**
- * ExpenseCountOutputType without action
- */
-export type ExpenseCountOutputTypeCountPayment_methodsArgs<
-  ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
-> = {
-  where?: Prisma.ExpensePaymentMethodWhereInput
+export type ExpenseUncheckedUpdateManyWithoutPayment_methodInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  category_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  is_recurring?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  recurring_months?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ExpenseSelect<
@@ -1260,13 +1365,13 @@ export type ExpenseSelect<
     paid_period?: boolean
     is_saved?: boolean
     saving_location?: boolean
+    payment_method_id?: boolean
     user_id?: boolean
     created_at?: boolean
     updated_at?: boolean
     category?: boolean | Prisma.Expense$categoryArgs<ExtArgs>
+    payment_method?: boolean | Prisma.Expense$payment_methodArgs<ExtArgs>
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-    payment_methods?: boolean | Prisma.Expense$payment_methodsArgs<ExtArgs>
-    _count?: boolean | Prisma.ExpenseCountOutputTypeDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['expense']
 >
@@ -1286,10 +1391,12 @@ export type ExpenseSelectCreateManyAndReturn<
     paid_period?: boolean
     is_saved?: boolean
     saving_location?: boolean
+    payment_method_id?: boolean
     user_id?: boolean
     created_at?: boolean
     updated_at?: boolean
     category?: boolean | Prisma.Expense$categoryArgs<ExtArgs>
+    payment_method?: boolean | Prisma.Expense$payment_methodArgs<ExtArgs>
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['expense']
@@ -1310,10 +1417,12 @@ export type ExpenseSelectUpdateManyAndReturn<
     paid_period?: boolean
     is_saved?: boolean
     saving_location?: boolean
+    payment_method_id?: boolean
     user_id?: boolean
     created_at?: boolean
     updated_at?: boolean
     category?: boolean | Prisma.Expense$categoryArgs<ExtArgs>
+    payment_method?: boolean | Prisma.Expense$payment_methodArgs<ExtArgs>
     user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   },
   ExtArgs['result']['expense']
@@ -1331,6 +1440,7 @@ export type ExpenseSelectScalar = {
   paid_period?: boolean
   is_saved?: boolean
   saving_location?: boolean
+  payment_method_id?: boolean
   user_id?: boolean
   created_at?: boolean
   updated_at?: boolean
@@ -1350,6 +1460,7 @@ export type ExpenseOmit<
   | 'paid_period'
   | 'is_saved'
   | 'saving_location'
+  | 'payment_method_id'
   | 'user_id'
   | 'created_at'
   | 'updated_at',
@@ -1359,20 +1470,21 @@ export type ExpenseInclude<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   category?: boolean | Prisma.Expense$categoryArgs<ExtArgs>
+  payment_method?: boolean | Prisma.Expense$payment_methodArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
-  payment_methods?: boolean | Prisma.Expense$payment_methodsArgs<ExtArgs>
-  _count?: boolean | Prisma.ExpenseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ExpenseIncludeCreateManyAndReturn<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   category?: boolean | Prisma.Expense$categoryArgs<ExtArgs>
+  payment_method?: boolean | Prisma.Expense$payment_methodArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type ExpenseIncludeUpdateManyAndReturn<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   category?: boolean | Prisma.Expense$categoryArgs<ExtArgs>
+  payment_method?: boolean | Prisma.Expense$payment_methodArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
@@ -1382,8 +1494,8 @@ export type $ExpensePayload<
   name: 'Expense'
   objects: {
     category: Prisma.$CategoryPayload<ExtArgs> | null
+    payment_method: Prisma.$PaymentMethodPayload<ExtArgs> | null
     user: Prisma.$UserPayload<ExtArgs>
-    payment_methods: Prisma.$ExpensePaymentMethodPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<
     {
@@ -1398,6 +1510,7 @@ export type $ExpensePayload<
       paid_period: string | null
       is_saved: boolean
       saving_location: string | null
+      payment_method_id: bigint | null
       user_id: bigint
       created_at: Date
       updated_at: Date
@@ -1929,6 +2042,19 @@ export interface Prisma__ExpenseClient<
     ExtArgs,
     GlobalOmitOptions
   >
+  payment_method<T extends Prisma.Expense$payment_methodArgs<ExtArgs> = {}>(
+    args?: Prisma.Subset<T, Prisma.Expense$payment_methodArgs<ExtArgs>>
+  ): Prisma.Prisma__PaymentMethodClient<
+    runtime.Types.Result.GetResult<
+      Prisma.$PaymentMethodPayload<ExtArgs>,
+      T,
+      'findUniqueOrThrow',
+      GlobalOmitOptions
+    > | null,
+    null,
+    ExtArgs,
+    GlobalOmitOptions
+  >
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(
     args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>
   ): Prisma.Prisma__UserClient<
@@ -1942,17 +2068,6 @@ export interface Prisma__ExpenseClient<
     Null,
     ExtArgs,
     GlobalOmitOptions
-  >
-  payment_methods<T extends Prisma.Expense$payment_methodsArgs<ExtArgs> = {}>(
-    args?: Prisma.Subset<T, Prisma.Expense$payment_methodsArgs<ExtArgs>>
-  ): Prisma.PrismaPromise<
-    | runtime.Types.Result.GetResult<
-        Prisma.$ExpensePaymentMethodPayload<ExtArgs>,
-        T,
-        'findMany',
-        GlobalOmitOptions
-      >
-    | Null
   >
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1996,6 +2111,7 @@ export interface ExpenseFieldRefs {
   readonly paid_period: Prisma.FieldRef<'Expense', 'String'>
   readonly is_saved: Prisma.FieldRef<'Expense', 'Boolean'>
   readonly saving_location: Prisma.FieldRef<'Expense', 'String'>
+  readonly payment_method_id: Prisma.FieldRef<'Expense', 'BigInt'>
   readonly user_id: Prisma.FieldRef<'Expense', 'BigInt'>
   readonly created_at: Prisma.FieldRef<'Expense', 'DateTime'>
   readonly updated_at: Prisma.FieldRef<'Expense', 'DateTime'>
@@ -2448,33 +2564,24 @@ export type Expense$categoryArgs<
 }
 
 /**
- * Expense.payment_methods
+ * Expense.payment_method
  */
-export type Expense$payment_methodsArgs<
+export type Expense$payment_methodArgs<
   ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs,
 > = {
   /**
-   * Select specific fields to fetch from the ExpensePaymentMethod
+   * Select specific fields to fetch from the PaymentMethod
    */
-  select?: Prisma.ExpensePaymentMethodSelect<ExtArgs> | null
+  select?: Prisma.PaymentMethodSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the ExpensePaymentMethod
+   * Omit specific fields from the PaymentMethod
    */
-  omit?: Prisma.ExpensePaymentMethodOmit<ExtArgs> | null
+  omit?: Prisma.PaymentMethodOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ExpensePaymentMethodInclude<ExtArgs> | null
-  where?: Prisma.ExpensePaymentMethodWhereInput
-  orderBy?:
-    | Prisma.ExpensePaymentMethodOrderByWithRelationInput
-    | Prisma.ExpensePaymentMethodOrderByWithRelationInput[]
-  cursor?: Prisma.ExpensePaymentMethodWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?:
-    | Prisma.ExpensePaymentMethodScalarFieldEnum
-    | Prisma.ExpensePaymentMethodScalarFieldEnum[]
+  include?: Prisma.PaymentMethodInclude<ExtArgs> | null
+  where?: Prisma.PaymentMethodWhereInput
 }
 
 /**

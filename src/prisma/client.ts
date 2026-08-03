@@ -74,8 +74,3 @@ export type PaymentMethod = Prisma.PaymentMethodModel
  *
  */
 export type Expense = Prisma.ExpenseModel
-/**
- * Model ExpensePaymentMethod
- *
- */
-export type ExpensePaymentMethod = Prisma.ExpensePaymentMethodModel

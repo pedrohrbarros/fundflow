@@ -19,10 +19,9 @@ export const updatePaymentMethod = async ({
     return { error: parsed.error.flatten().fieldErrors }
   }
   const id = BigInt(params.id)
-  const data: { name?: string; origin?: string; receiver?: string | null } = {}
+  const data: { name?: string; origin?: string } = {}
   if (parsed.data.name !== undefined) data.name = parsed.data.name
   if (parsed.data.origin !== undefined) data.origin = parsed.data.origin
-  if (parsed.data.receiver !== undefined) data.receiver = parsed.data.receiver
   const result = await PaymentMethodsService.update(id, user_external_id, data)
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   return result.data

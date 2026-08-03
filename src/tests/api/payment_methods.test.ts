@@ -52,14 +52,13 @@ describe('Payment Methods API', () => {
     const res = await req('POST', '/api/v1/payment_methods', {
       name: 'My Card',
       origin: 'Inter Bank',
-      receiver: 'Pedro',
     })
     expect(res.status).toBe(201)
     const json = await res.json()
     expect(json.id).toBeDefined()
     expect(json.name).toBe('My Card')
     expect(json.origin).toBe('Inter Bank')
-    expect(json.receiver).toBe('Pedro')
+    expect(json.receiver).toBeUndefined()
   })
 
   it('POST /api/v1/payment_methods/search returns the list for the authenticated user', async () => {

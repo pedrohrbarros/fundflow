@@ -28,17 +28,16 @@ Pass an optional `sort` object to control result order. Omitting it keeps the de
 | `field`     | String (required) | —       | Field to sort by |
 | `direction` | `asc` \| `desc`   | `asc`   | Sort direction   |
 
-Sortable fields: `id`, `name`, `origin`, `receiver`, `created_at`, `updated_at`.
+Sortable fields: `id`, `name`, `origin`, `created_at`, `updated_at`.
 
 **Filterable fields:**
 
-| Field        | Type              | Valid operators                                                                                       |
-| ------------ | ----------------- | ----------------------------------------------------------------------------------------------------- |
-| `name`       | String            | `is_equal`, `is_not_equal`, `is_contains`, `is_starts_with`, `is_ends_with`                           |
-| `origin`     | String            | `is_equal`, `is_not_equal`, `is_contains`, `is_starts_with`, `is_ends_with`                           |
-| `receiver`   | String (nullable) | `is_equal`, `is_not_equal`, `is_contains`, `is_starts_with`, `is_ends_with`, `is_null`, `is_not_null` |
-| `created_at` | DateTime          | `is_equal`, `is_before`, `is_after`, `is_between`                                                     |
-| `updated_at` | DateTime          | `is_equal`, `is_before`, `is_after`, `is_between`                                                     |
+| Field        | Type     | Valid operators                                                             |
+| ------------ | -------- | --------------------------------------------------------------------------- |
+| `name`       | String   | `is_equal`, `is_not_equal`, `is_contains`, `is_starts_with`, `is_ends_with` |
+| `origin`     | String   | `is_equal`, `is_not_equal`, `is_contains`, `is_starts_with`, `is_ends_with` |
+| `created_at` | DateTime | `is_equal`, `is_before`, `is_after`, `is_between`                           |
+| `updated_at` | DateTime | `is_equal`, `is_before`, `is_after`, `is_between`                           |
 
 ## Handler contract
 

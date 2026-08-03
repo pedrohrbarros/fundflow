@@ -9,19 +9,11 @@ import type { FieldAllowlist } from '../../../helpers/filters'
 const PAYMENT_METHOD_ALLOWED_FIELDS: FieldAllowlist = {
   name: 'string',
   origin: 'string',
-  receiver: 'string_nullable',
   created_at: 'datetime',
   updated_at: 'datetime',
 }
 
-const PAYMENT_METHOD_SORT_FIELDS = [
-  'id',
-  'name',
-  'origin',
-  'receiver',
-  'created_at',
-  'updated_at',
-] as const
+const PAYMENT_METHOD_SORT_FIELDS = ['id', 'name', 'origin', 'created_at', 'updated_at'] as const
 
 export const searchPaymentMethods = async ({
   user_external_id,

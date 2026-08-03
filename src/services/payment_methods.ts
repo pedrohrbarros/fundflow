@@ -15,8 +15,7 @@ export const PaymentMethodsService = {
   async create(
     user_external_id: string,
     name: string,
-    origin: string,
-    receiver?: string
+    origin: string
   ): Promise<ServiceResult<PaymentMethodRecord>> {
     try {
       const user = await db.user.findUnique({ where: { external_id: user_external_id } })
@@ -25,7 +24,7 @@ export const PaymentMethodsService = {
       if (count >= 100)
         return { ok: false, status: 400, message: 'Payment method limit reached (100 per user)' }
       const payment_method = await db.paymentMethod.create({
-        data: { name, origin, receiver: receiver ?? null, user_id: user.id },
+        data: { name, origin, user_id: user.id },
       })
       return {
         ok: true,
@@ -33,7 +32,6 @@ export const PaymentMethodsService = {
           id: Number(payment_method.id),
           name: payment_method.name,
           origin: payment_method.origin,
-          receiver: payment_method.receiver,
           user_id: Number(payment_method.user_id),
           created_at: payment_method.created_at.toISOString(),
           updated_at: payment_method.updated_at.toISOString(),
@@ -81,7 +79,6 @@ export const PaymentMethodsService = {
             id: Number(pm.id),
             name: pm.name,
             origin: pm.origin,
-            receiver: pm.receiver,
             user_id: Number(pm.user_id),
             created_at: pm.created_at.toISOString(),
             updated_at: pm.updated_at.toISOString(),
@@ -103,7 +100,7 @@ export const PaymentMethodsService = {
   async update(
     id: bigint,
     user_external_id: string,
-    data: { name?: string; origin?: string; receiver?: string | null }
+    data: { name?: string; origin?: string }
   ): Promise<ServiceResult<PaymentMethodRecord>> {
     if (Object.keys(data).length === 0)
       return { ok: false, status: 400, message: 'No fields to update' }
@@ -120,7 +117,6 @@ export const PaymentMethodsService = {
           id: Number(payment_method.id),
           name: payment_method.name,
           origin: payment_method.origin,
-          receiver: payment_method.receiver,
           user_id: Number(payment_method.user_id),
           created_at: payment_method.created_at.toISOString(),
           updated_at: payment_method.updated_at.toISOString(),

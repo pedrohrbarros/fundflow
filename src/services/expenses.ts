@@ -8,7 +8,6 @@ import type { FilterNode } from '../helpers/filters'
 import { periodRange, periodContribution, type PeriodInput } from '../helpers/period'
 import { applyInAppSort, type SortSpec, type SortableValue } from '../helpers/sort'
 
-type Split = { payment_method_id: number; partial_amount: number }
 type ExpenseCategoryTotal = {
   category_id: number | null
   name: string
@@ -17,7 +16,7 @@ type ExpenseCategoryTotal = {
 }
 type ExpensesByCategoryData = { by_category: ExpenseCategoryTotal[]; total: number }
 
-type ExpenseWithSplits = {
+type ExpenseWithRelations = {
   id: bigint
   name: string
   category_id: bigint | null
@@ -30,20 +29,13 @@ type ExpenseWithSplits = {
   paid_period: string | null
   is_saved: boolean
   saving_location: string | null
+  payment_method_id: bigint | null
+  payment_method: { id: bigint; name: string; origin: string } | null
   created_at: Date
   updated_at: Date
-  payment_methods: {
-    payment_method_id: bigint
-    partial_amount: number
-    payment_method: {
-      name: string
-      origin: string
-      receiver: string | null
-    }
-  }[]
 }
 
-const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
+const toRecord = (expense: ExpenseWithRelations): ExpenseRecord => ({
   id: Number(expense.id),
   name: expense.name,
   category_id: expense.category_id != null ? Number(expense.category_id) : null,
@@ -54,42 +46,24 @@ const toRecord = (expense: ExpenseWithSplits): ExpenseRecord => ({
   is_paid: expense.is_paid,
   is_saved: expense.is_saved,
   saving_location: expense.saving_location,
-  payment_methods: expense.payment_methods.map((split) => ({
-    payment_method_id: Number(split.payment_method_id),
-    partial_amount: split.partial_amount,
-    name: split.payment_method.name,
-    origin: split.payment_method.origin,
-    receiver: split.payment_method.receiver,
-  })),
+  payment_method_id: expense.payment_method_id != null ? Number(expense.payment_method_id) : null,
+  payment_method: expense.payment_method
+    ? {
+        id: Number(expense.payment_method.id),
+        name: expense.payment_method.name,
+        origin: expense.payment_method.origin,
+      }
+    : null,
   created_at: expense.created_at.toISOString(),
   updated_at: expense.updated_at.toISOString(),
 })
 
-async function validateSplits(
-  splits: Split[],
-  amount: number,
-  user_id: bigint
-): Promise<{ ok: true } | { ok: false; status: number; message: string }> {
-  const ids = splits.map((s) => s.payment_method_id)
-  if (new Set(ids).size !== ids.length)
-    return { ok: false, status: 400, message: 'Duplicate payment methods in splits' }
-
-  const sum = splits.reduce((acc, s) => acc + s.partial_amount, 0)
-  if (Math.abs(sum - amount) > 0.01)
-    return {
-      ok: false,
-      status: 400,
-      message: `Split amounts (${sum}) must equal the total amount (${amount})`,
-    }
-
-  const owned = await db.paymentMethod.findMany({
-    where: { id: { in: ids.map(BigInt) }, user_id },
+async function paymentMethodExists(payment_method_id: number, user_id: bigint) {
+  const owned = await db.paymentMethod.findFirst({
+    where: { id: BigInt(payment_method_id), user_id },
     select: { id: true },
   })
-  if (owned.length !== ids.length)
-    return { ok: false, status: 404, message: 'One or more payment methods not found' }
-
-  return { ok: true }
+  return owned !== null
 }
 
 export const ExpensesService = {
@@ -121,11 +95,16 @@ export const ExpensesService = {
           }
       }
 
-      const splits = input.payment_methods ?? []
-      if (splits.length > 0) {
-        const validation = await validateSplits(splits, input.amount, user.id)
-        if (!validation.ok) return validation
-      }
+      if (
+        input.payment_method_id != null &&
+        !(await paymentMethodExists(input.payment_method_id, user.id))
+      )
+        return {
+          ok: false,
+          status: 404,
+          message: 'Payment method not found',
+          meta: { payment_method_id: String(input.payment_method_id) },
+        }
 
       const expense = await db.expense.create({
         data: {
@@ -138,21 +117,11 @@ export const ExpensesService = {
           is_paid: input.is_paid ?? false,
           is_saved: input.is_saved ?? false,
           saving_location: input.saving_location ?? null,
+          payment_method_id:
+            input.payment_method_id != null ? BigInt(input.payment_method_id) : null,
           user_id: user.id,
-          ...(splits.length > 0
-            ? {
-                payment_methods: {
-                  createMany: {
-                    data: splits.map((s) => ({
-                      payment_method_id: BigInt(s.payment_method_id),
-                      partial_amount: s.partial_amount,
-                    })),
-                  },
-                },
-              }
-            : {}),
         },
-        include: { category: true, payment_methods: { include: { payment_method: true } } },
+        include: { category: true, payment_method: true },
       })
 
       return { ok: true, data: toRecord(expense) }
@@ -206,7 +175,7 @@ export const ExpensesService = {
       const rows = await db.expense.findMany({
         where,
         orderBy: { id: 'desc' },
-        include: { category: true, payment_methods: { include: { payment_method: true } } },
+        include: { category: true, payment_method: true },
       })
 
       const applicable = rows
@@ -247,10 +216,8 @@ export const ExpensesService = {
               return x.r.updated_at.getTime()
             case 'category_name':
               return x.r.category?.name ?? ''
-            case 'payment_method_name': {
-              const names = x.r.payment_methods.map((s) => s.payment_method.name).sort()
-              return names[0] ?? ''
-            }
+            case 'payment_method_name':
+              return x.r.payment_method?.name ?? ''
             default:
               return Number(x.r.id)
           }
@@ -329,26 +296,16 @@ export const ExpensesService = {
           }
       }
 
-      const splits = input.payment_methods
-      const newAmount = input.amount ?? existing.amount
-
-      if (splits !== undefined && splits.length > 0) {
-        const validation = await validateSplits(splits, newAmount, user.id)
-        if (!validation.ok) return validation
-      }
-
-      if (splits !== undefined) {
-        await db.expensePaymentMethod.deleteMany({ where: { expense_id: id } })
-        if (splits.length > 0) {
-          await db.expensePaymentMethod.createMany({
-            data: splits.map((s) => ({
-              expense_id: id,
-              payment_method_id: BigInt(s.payment_method_id),
-              partial_amount: s.partial_amount,
-            })),
-          })
+      if (
+        input.payment_method_id != null &&
+        !(await paymentMethodExists(input.payment_method_id, user.id))
+      )
+        return {
+          ok: false,
+          status: 404,
+          message: 'Payment method not found',
+          meta: { payment_method_id: String(input.payment_method_id) },
         }
-      }
 
       const expense = await db.expense.update({
         where: { id },
@@ -371,8 +328,14 @@ export const ExpensesService = {
           ...(input.saving_location !== undefined
             ? { saving_location: input.saving_location }
             : {}),
+          ...(input.payment_method_id !== undefined
+            ? {
+                payment_method_id:
+                  input.payment_method_id == null ? null : BigInt(input.payment_method_id),
+              }
+            : {}),
         },
-        include: { category: true, payment_methods: { include: { payment_method: true } } },
+        include: { category: true, payment_method: true },
       })
 
       return { ok: true, data: toRecord(expense) }

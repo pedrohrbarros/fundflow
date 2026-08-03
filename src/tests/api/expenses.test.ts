@@ -46,9 +46,9 @@ afterAll(async () => {
 })
 
 describe('Expenses API', () => {
-  it('POST /api/v1/expenses creates an expense without splits', async () => {
+  it('POST /api/v1/expenses creates an expense without a payment method', async () => {
     const res = await req('POST', '/api/v1/expenses', {
-      name: `exp-${TS}-no-split`,
+      name: `exp-${TS}-no-pm`,
       category_id: Number(exp_category_id),
       amount: 100,
       date: '2026-06-15',
@@ -56,45 +56,34 @@ describe('Expenses API', () => {
     expect(res.status).toBe(201)
     const json = await res.json()
     expect(json.id).toBeDefined()
-    expect(json.name).toBe(`exp-${TS}-no-split`)
+    expect(json.name).toBe(`exp-${TS}-no-pm`)
     expect(json.category_id).toBe(exp_category_id)
     expect(json.amount).toBe(100)
     expect(json.is_paid).toBe(false)
     expect(json.is_saved).toBe(false)
     expect(json.saving_location).toBeNull()
-    expect(json.payment_methods).toEqual([])
+    expect(json.payment_method_id).toBeNull()
+    expect(json.payment_method).toBeNull()
     expect(json.date).toBe('2026-06-15')
     expect(json.is_recurring).toBe(false)
     expect(json.created_at).toBeDefined()
     expect(json.updated_at).toBeDefined()
   })
 
-  it('POST /api/v1/expenses creates an expense with splits', async () => {
+  it('POST /api/v1/expenses creates an expense with a payment method', async () => {
     const res = await req('POST', '/api/v1/expenses', {
-      name: `exp-${TS}-split`,
+      name: `exp-${TS}-pm`,
       category_id: Number(exp_category_id),
       amount: 100,
       date: '2026-06-15',
       is_paid: true,
-      payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
+      payment_method_id: Number(pm_id),
     })
     expect(res.status).toBe(201)
     const json = await res.json()
-    expect(json.payment_methods).toHaveLength(1)
-    expect(json.payment_methods[0].payment_method_id).toBe(pm_id)
-    expect(json.payment_methods[0].partial_amount).toBe(100)
+    expect(json.payment_method_id).toBe(pm_id)
+    expect(json.payment_method.id).toBe(pm_id)
     expect(json.is_paid).toBe(true)
-  })
-
-  it('POST /api/v1/expenses returns 400 when splits do not sum to amount', async () => {
-    const res = await req('POST', '/api/v1/expenses', {
-      name: `exp-${TS}-bad-split`,
-      category_id: Number(exp_category_id),
-      amount: 100,
-      date: '2026-06-15',
-      payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 50 }],
-    })
-    expect(res.status).toBe(400)
   })
 
   it('POST /api/v1/expenses returns 404 for unknown payment method', async () => {
@@ -103,7 +92,7 @@ describe('Expenses API', () => {
       category_id: Number(exp_category_id),
       amount: 100,
       date: '2026-06-15',
-      payment_methods: [{ payment_method_id: 999999999, partial_amount: 100 }],
+      payment_method_id: 999999999,
     })
     expect(res.status).toBe(404)
   })
@@ -145,7 +134,7 @@ describe('Expenses API', () => {
       category_id: Number(exp_category_id),
       amount: 100,
       date: '2026-06-15',
-      payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
+      payment_method_id: Number(pm_id),
     })
     const res = await req('POST', '/api/v1/expenses/search', {
       page: 1,
@@ -162,14 +151,10 @@ describe('Expenses API', () => {
     // Find the expense we just created
     const expense = json.expenses.find((e: { name: string }) => e.name === `exp-${TS}-list`)
     expect(expense).toBeDefined()
-    expect(expense.payment_methods).toHaveLength(1)
-    // Each payment method entry must include full data
-    const split = expense.payment_methods[0]
-    expect(split.payment_method_id).toBe(pm_id)
-    expect(typeof split.partial_amount).toBe('number')
-    expect(typeof split.name).toBe('string')
-    expect('origin' in split).toBe(true)
-    expect('receiver' in split).toBe(true)
+    // The embedded payment method must carry its name and origin
+    expect(expense.payment_method.id).toBe(pm_id)
+    expect(typeof expense.payment_method.name).toBe('string')
+    expect(typeof expense.payment_method.origin).toBe('string')
   })
 
   it('PATCH /api/v1/expenses/:id updates expense fields', async () => {
@@ -194,35 +179,21 @@ describe('Expenses API', () => {
     expect(json.amount).toBe(50)
   })
 
-  it('PATCH /api/v1/expenses/:id replaces splits atomically', async () => {
+  it('PATCH /api/v1/expenses/:id clears the payment method with null', async () => {
     const created = await (
       await req('POST', '/api/v1/expenses', {
-        name: `exp-${TS}-split-replace`,
+        name: `exp-${TS}-pm-clear`,
         category_id: Number(exp_category_id),
         amount: 100,
         date: '2026-06-15',
-        payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 100 }],
+        payment_method_id: Number(pm_id),
       })
     ).json()
-    const res = await req('PATCH', `/api/v1/expenses/${created.id}`, { payment_methods: [] })
+    const res = await req('PATCH', `/api/v1/expenses/${created.id}`, { payment_method_id: null })
     expect(res.status).toBe(200)
     const json = await res.json()
-    expect(json.payment_methods).toEqual([])
-  })
-
-  it('PATCH /api/v1/expenses/:id returns 400 when new splits do not sum to amount', async () => {
-    const created = await (
-      await req('POST', '/api/v1/expenses', {
-        name: `exp-${TS}-bad-patch`,
-        category_id: Number(exp_category_id),
-        amount: 100,
-        date: '2026-06-15',
-      })
-    ).json()
-    const res = await req('PATCH', `/api/v1/expenses/${created.id}`, {
-      payment_methods: [{ payment_method_id: Number(pm_id), partial_amount: 50 }],
-    })
-    expect(res.status).toBe(400)
+    expect(json.payment_method_id).toBeNull()
+    expect(json.payment_method).toBeNull()
   })
 
   it('PATCH /api/v1/expenses/:id returns 404 for unknown id', async () => {
@@ -456,7 +427,7 @@ describe('Expenses API', () => {
     expect(res.status).toBe(400)
   }, 20000)
 
-  it('search sorts by payment_method_name asc (first method alphabetically)', async () => {
+  it('search sorts by payment_method_name asc', async () => {
     const pmA = await (
       await req('POST', '/api/v1/payment_methods', { name: `aaa-pm-${TS}`, origin: 'bank' })
     ).json()
@@ -467,13 +438,13 @@ describe('Expenses API', () => {
       name: `sort-pm-z-${TS}`,
       amount: 50,
       date: '2026-06-10',
-      payment_methods: [{ payment_method_id: Number(pmZ.id), partial_amount: 50 }],
+      payment_method_id: Number(pmZ.id),
     })
     await req('POST', '/api/v1/expenses', {
       name: `sort-pm-a-${TS}`,
       amount: 50,
       date: '2026-06-10',
-      payment_methods: [{ payment_method_id: Number(pmA.id), partial_amount: 50 }],
+      payment_method_id: Number(pmA.id),
     })
     const res = await req('POST', '/api/v1/expenses/search', {
       granularity: 'monthly',

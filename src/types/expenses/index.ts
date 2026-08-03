@@ -2,11 +2,9 @@ import { t } from 'elysia'
 import type { Static } from '@sinclair/typebox'
 
 export type ExpensePaymentMethodRecord = {
-  payment_method_id: number
-  partial_amount: number
+  id: number
   name: string
   origin: string
-  receiver: string | null
 }
 
 export type ExpenseRecord = {
@@ -20,17 +18,13 @@ export type ExpenseRecord = {
   is_paid: boolean
   is_saved: boolean
   saving_location: string | null
-  payment_methods: ExpensePaymentMethodRecord[]
+  payment_method_id: number | null
+  payment_method: ExpensePaymentMethodRecord | null
   created_at: string
   updated_at: string
 }
 
 export type ExpenseSearchRecord = ExpenseRecord & { period_amount: number }
-
-const ExpensePaymentMethodInput = t.Object({
-  payment_method_id: t.Integer(),
-  partial_amount: t.Number({ exclusiveMinimum: 0 }),
-})
 
 export const ExpenseCreateBody = t.Object({
   name: t.String({ minLength: 1 }),
@@ -43,7 +37,7 @@ export const ExpenseCreateBody = t.Object({
   paid_period: t.Optional(t.Union([t.String({ pattern: '^\\d{4}-\\d{2}$' }), t.Null()])),
   is_saved: t.Optional(t.Boolean()),
   saving_location: t.Optional(t.Union([t.String({ minLength: 1 }), t.Null()])),
-  payment_methods: t.Optional(t.Array(ExpensePaymentMethodInput)),
+  payment_method_id: t.Optional(t.Union([t.Integer(), t.Null()])),
 })
 
 export const ExpenseUpdateBody = t.Object({
@@ -57,7 +51,7 @@ export const ExpenseUpdateBody = t.Object({
   paid_period: t.Optional(t.Union([t.String({ pattern: '^\\d{4}-\\d{2}$' }), t.Null()])),
   is_saved: t.Optional(t.Boolean()),
   saving_location: t.Optional(t.Union([t.String({ minLength: 1 }), t.Null()])),
-  payment_methods: t.Optional(t.Array(ExpensePaymentMethodInput)),
+  payment_method_id: t.Optional(t.Union([t.Integer(), t.Null()])),
 })
 
 export type ExpenseCreateBodyType = Static<typeof ExpenseCreateBody>

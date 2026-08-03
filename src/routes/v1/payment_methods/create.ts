@@ -19,8 +19,7 @@ export const createPaymentMethod = async ({
   const result = await PaymentMethodsService.create(
     user_external_id,
     parsed.data.name,
-    parsed.data.origin,
-    parsed.data.receiver
+    parsed.data.origin
   )
   if (!result.ok) return handleError(set, result.status, result.message, result.meta)
   set.status = 201

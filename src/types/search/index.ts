@@ -134,9 +134,9 @@ export const PaymentMethodSearchBody = searchBody({
   properties: {
     field: {
       type: 'string',
-      enum: ['name', 'origin', 'receiver', 'created_at', 'updated_at'],
+      enum: ['name', 'origin', 'created_at', 'updated_at'],
       description:
-        'name/origin → is_equal, is_not_equal, is_contains, is_starts_with, is_ends_with | receiver → same + is_null, is_not_null | created_at/updated_at → is_equal, is_before, is_after, is_between',
+        'name/origin → is_equal, is_not_equal, is_contains, is_starts_with, is_ends_with | created_at/updated_at → is_equal, is_before, is_after, is_between',
     },
     op: {
       type: 'string',
@@ -155,7 +155,7 @@ export const PaymentMethodSearchBody = searchBody({
     },
     value: {
       description:
-        'string for name/origin/receiver; ISO 8601 string for datetime; [ISO, ISO] tuple for is_between; omit for is_null/is_not_null',
+        'string for name/origin; ISO 8601 string for datetime; [ISO, ISO] tuple for is_between; omit for is_null/is_not_null',
     },
   },
 })
