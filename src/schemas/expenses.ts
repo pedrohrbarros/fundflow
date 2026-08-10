@@ -16,6 +16,10 @@ export const ExpenseCreateSchema = z.object({
     .regex(/^\d{4}-\d{2}$/)
     .nullish(),
   is_saved: z.boolean().optional(),
+  saved_period: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/)
+    .nullish(),
   saving_location: z.union([z.string().min(1), z.null()]).optional(),
   payment_method_id: z.number().int().nullish(),
 })
@@ -33,6 +37,10 @@ export const ExpenseUpdateSchema = z.object({
     .regex(/^\d{4}-\d{2}$/)
     .nullish(),
   is_saved: z.boolean().optional(),
+  saved_period: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/)
+    .nullish(),
   saving_location: z.union([z.string().min(1), z.null()]).optional(),
   payment_method_id: z.number().int().nullish(),
 })

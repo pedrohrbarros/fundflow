@@ -36,6 +36,7 @@ export const ExpenseCreateBody = t.Object({
   is_paid: t.Optional(t.Boolean()),
   paid_period: t.Optional(t.Union([t.String({ pattern: '^\\d{4}-\\d{2}$' }), t.Null()])),
   is_saved: t.Optional(t.Boolean()),
+  saved_period: t.Optional(t.Union([t.String({ pattern: '^\\d{4}-\\d{2}$' }), t.Null()])),
   saving_location: t.Optional(t.Union([t.String({ minLength: 1 }), t.Null()])),
   payment_method_id: t.Optional(t.Union([t.Integer(), t.Null()])),
 })
@@ -50,6 +51,7 @@ export const ExpenseUpdateBody = t.Object({
   is_paid: t.Optional(t.Boolean()),
   paid_period: t.Optional(t.Union([t.String({ pattern: '^\\d{4}-\\d{2}$' }), t.Null()])),
   is_saved: t.Optional(t.Boolean()),
+  saved_period: t.Optional(t.Union([t.String({ pattern: '^\\d{4}-\\d{2}$' }), t.Null()])),
   saving_location: t.Optional(t.Union([t.String({ minLength: 1 }), t.Null()])),
   payment_method_id: t.Optional(t.Union([t.Integer(), t.Null()])),
 })

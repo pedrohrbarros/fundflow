@@ -28,11 +28,38 @@ type ExpenseWithRelations = {
   is_paid: boolean
   paid_period: string | null
   is_saved: boolean
+  saved_period: string | null
   saving_location: string | null
   payment_method_id: bigint | null
   payment_method: { id: bigint; name: string; origin: string } | null
   created_at: Date
   updated_at: Date
+}
+
+// A recurring expense shows up in every month it recurs into, but ticking Paid or
+// Saved only speaks for the month it was ticked in. The flag columns are therefore
+// qualified by the period they were set in, and every read derives the status for
+// the period being asked about. Non-recurring expenses live in a single month, so
+// their plain flags remain authoritative.
+const monthOf = (date: string): string => date.slice(0, 7)
+
+const statusForPeriod = (
+  expense: { is_recurring: boolean; flag: boolean; period: string | null },
+  periodMonth: string
+): boolean => (expense.is_recurring ? expense.period === periodMonth : expense.flag)
+
+// The stored period for a flag on update. Unticking the flag, or dropping recurrence
+// altogether, clears it; otherwise the caller's period wins and `undefined` leaves
+// the column untouched.
+const nextPeriod = (
+  nextIsRecurring: boolean,
+  nextFlag: boolean | undefined,
+  nextPeriodInput: string | null | undefined
+): string | null | undefined => {
+  if (!nextIsRecurring) return null
+  if (nextFlag === false) return null
+  if (nextPeriodInput !== undefined) return nextPeriodInput ?? null
+  return undefined
 }
 
 const toRecord = (expense: ExpenseWithRelations): ExpenseRecord => ({
@@ -106,16 +133,26 @@ export const ExpensesService = {
           meta: { payment_method_id: String(input.payment_method_id) },
         }
 
+      // A recurring expense created as paid/saved is only paid/saved for the month it
+      // is anchored to. Without stamping the period here it would read back as unpaid
+      // straight away, since every read derives the status from the period.
+      const is_recurring = input.is_recurring ?? false
+      const is_paid = input.is_paid ?? false
+      const is_saved = input.is_saved ?? false
+      const anchorMonth = monthOf(input.date)
+
       const expense = await db.expense.create({
         data: {
           name: input.name,
           category_id: input.category_id != null ? BigInt(input.category_id) : null,
           amount: input.amount,
           date: new Date(`${input.date}T00:00:00.000Z`),
-          is_recurring: input.is_recurring ?? false,
+          is_recurring,
           recurring_months: input.recurring_months ?? null,
-          is_paid: input.is_paid ?? false,
-          is_saved: input.is_saved ?? false,
+          is_paid,
+          paid_period: is_recurring && is_paid ? (input.paid_period ?? anchorMonth) : null,
+          is_saved,
+          saved_period: is_recurring && is_saved ? (input.saved_period ?? anchorMonth) : null,
           saving_location: input.saving_location ?? null,
           payment_method_id:
             input.payment_method_id != null ? BigInt(input.payment_method_id) : null,
@@ -207,9 +244,15 @@ export const ExpensesService = {
             case 'is_recurring':
               return x.r.is_recurring
             case 'is_paid':
-              return x.r.is_recurring ? x.r.paid_period === periodMonthStr : x.r.is_paid
+              return statusForPeriod(
+                { is_recurring: x.r.is_recurring, flag: x.r.is_paid, period: x.r.paid_period },
+                periodMonthStr
+              )
             case 'is_saved':
-              return x.r.is_saved
+              return statusForPeriod(
+                { is_recurring: x.r.is_recurring, flag: x.r.is_saved, period: x.r.saved_period },
+                periodMonthStr
+              )
             case 'created_at':
               return x.r.created_at.getTime()
             case 'updated_at':
@@ -234,7 +277,14 @@ export const ExpensesService = {
           expenses: paged.map((x) => ({
             ...toRecord(x.r),
             period_amount: x.c.period_amount,
-            is_paid: x.r.is_recurring ? x.r.paid_period === periodMonthStr : x.r.is_paid,
+            is_paid: statusForPeriod(
+              { is_recurring: x.r.is_recurring, flag: x.r.is_paid, period: x.r.paid_period },
+              periodMonthStr
+            ),
+            is_saved: statusForPeriod(
+              { is_recurring: x.r.is_recurring, flag: x.r.is_saved, period: x.r.saved_period },
+              periodMonthStr
+            ),
           })),
           total,
           pagination: { page, limit, total: applicable.length },
@@ -319,12 +369,9 @@ export const ExpensesService = {
           ...(input.is_recurring !== undefined ? { is_recurring: input.is_recurring } : {}),
           recurring_months: nextRecurringMonths,
           ...(input.is_paid !== undefined ? { is_paid: input.is_paid } : {}),
-          paid_period: (() => {
-            if (input.is_paid === false) return null
-            if (input.paid_period !== undefined) return input.paid_period ?? null
-            return undefined
-          })(),
+          paid_period: nextPeriod(nextIsRecurring, input.is_paid, input.paid_period),
           ...(input.is_saved !== undefined ? { is_saved: input.is_saved } : {}),
+          saved_period: nextPeriod(nextIsRecurring, input.is_saved, input.saved_period),
           ...(input.saving_location !== undefined
             ? { saving_location: input.saving_location }
             : {}),

@@ -96,6 +96,7 @@ model Expense {
   is_paid           Boolean        @default(false)
   paid_period       String?
   is_saved          Boolean        @default(false)
+  saved_period      String?
   saving_location   String?
   payment_method_id BigInt?
   payment_method    PaymentMethod? @relation(fields: [payment_method_id], references: [id], onDelete: SetNull)

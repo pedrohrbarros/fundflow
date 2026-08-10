@@ -971,6 +971,7 @@ export const ExpenseScalarFieldEnum = {
   is_paid: 'is_paid',
   paid_period: 'paid_period',
   is_saved: 'is_saved',
+  saved_period: 'saved_period',
   saving_location: 'saving_location',
   payment_method_id: 'payment_method_id',
   user_id: 'user_id',

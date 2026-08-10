@@ -1,0 +1,1 @@
+ALTER TABLE "expenses" ADD COLUMN IF NOT EXISTS "saved_period" VARCHAR(7);

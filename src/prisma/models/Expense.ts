@@ -54,6 +54,7 @@ export type ExpenseMinAggregateOutputType = {
   is_paid: boolean | null
   paid_period: string | null
   is_saved: boolean | null
+  saved_period: string | null
   saving_location: string | null
   payment_method_id: bigint | null
   user_id: bigint | null
@@ -72,6 +73,7 @@ export type ExpenseMaxAggregateOutputType = {
   is_paid: boolean | null
   paid_period: string | null
   is_saved: boolean | null
+  saved_period: string | null
   saving_location: string | null
   payment_method_id: bigint | null
   user_id: bigint | null
@@ -90,6 +92,7 @@ export type ExpenseCountAggregateOutputType = {
   is_paid: number
   paid_period: number
   is_saved: number
+  saved_period: number
   saving_location: number
   payment_method_id: number
   user_id: number
@@ -127,6 +130,7 @@ export type ExpenseMinAggregateInputType = {
   is_paid?: true
   paid_period?: true
   is_saved?: true
+  saved_period?: true
   saving_location?: true
   payment_method_id?: true
   user_id?: true
@@ -145,6 +149,7 @@ export type ExpenseMaxAggregateInputType = {
   is_paid?: true
   paid_period?: true
   is_saved?: true
+  saved_period?: true
   saving_location?: true
   payment_method_id?: true
   user_id?: true
@@ -163,6 +168,7 @@ export type ExpenseCountAggregateInputType = {
   is_paid?: true
   paid_period?: true
   is_saved?: true
+  saved_period?: true
   saving_location?: true
   payment_method_id?: true
   user_id?: true
@@ -269,6 +275,7 @@ export type ExpenseGroupByOutputType = {
   is_paid: boolean
   paid_period: string | null
   is_saved: boolean
+  saved_period: string | null
   saving_location: string | null
   payment_method_id: bigint | null
   user_id: bigint
@@ -307,6 +314,7 @@ export type ExpenseWhereInput = {
   is_paid?: Prisma.BoolFilter<'Expense'> | boolean
   paid_period?: Prisma.StringNullableFilter<'Expense'> | string | null
   is_saved?: Prisma.BoolFilter<'Expense'> | boolean
+  saved_period?: Prisma.StringNullableFilter<'Expense'> | string | null
   saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
   payment_method_id?: Prisma.BigIntNullableFilter<'Expense'> | bigint | number | null
   user_id?: Prisma.BigIntFilter<'Expense'> | bigint | number
@@ -334,6 +342,7 @@ export type ExpenseOrderByWithRelationInput = {
   is_paid?: Prisma.SortOrder
   paid_period?: Prisma.SortOrderInput | Prisma.SortOrder
   is_saved?: Prisma.SortOrder
+  saved_period?: Prisma.SortOrderInput | Prisma.SortOrder
   saving_location?: Prisma.SortOrderInput | Prisma.SortOrder
   payment_method_id?: Prisma.SortOrderInput | Prisma.SortOrder
   user_id?: Prisma.SortOrder
@@ -359,6 +368,7 @@ export type ExpenseWhereUniqueInput = Prisma.AtLeast<
     is_paid?: Prisma.BoolFilter<'Expense'> | boolean
     paid_period?: Prisma.StringNullableFilter<'Expense'> | string | null
     is_saved?: Prisma.BoolFilter<'Expense'> | boolean
+    saved_period?: Prisma.StringNullableFilter<'Expense'> | string | null
     saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
     payment_method_id?: Prisma.BigIntNullableFilter<'Expense'> | bigint | number | null
     user_id?: Prisma.BigIntFilter<'Expense'> | bigint | number
@@ -388,6 +398,7 @@ export type ExpenseOrderByWithAggregationInput = {
   is_paid?: Prisma.SortOrder
   paid_period?: Prisma.SortOrderInput | Prisma.SortOrder
   is_saved?: Prisma.SortOrder
+  saved_period?: Prisma.SortOrderInput | Prisma.SortOrder
   saving_location?: Prisma.SortOrderInput | Prisma.SortOrder
   payment_method_id?: Prisma.SortOrderInput | Prisma.SortOrder
   user_id?: Prisma.SortOrder
@@ -418,6 +429,7 @@ export type ExpenseScalarWhereWithAggregatesInput = {
   is_paid?: Prisma.BoolWithAggregatesFilter<'Expense'> | boolean
   paid_period?: Prisma.StringNullableWithAggregatesFilter<'Expense'> | string | null
   is_saved?: Prisma.BoolWithAggregatesFilter<'Expense'> | boolean
+  saved_period?: Prisma.StringNullableWithAggregatesFilter<'Expense'> | string | null
   saving_location?: Prisma.StringNullableWithAggregatesFilter<'Expense'> | string | null
   payment_method_id?: Prisma.BigIntNullableWithAggregatesFilter<'Expense'> | bigint | number | null
   user_id?: Prisma.BigIntWithAggregatesFilter<'Expense'> | bigint | number
@@ -435,6 +447,7 @@ export type ExpenseCreateInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -454,6 +467,7 @@ export type ExpenseUncheckedCreateInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   payment_method_id?: bigint | number | null
   user_id: bigint | number
@@ -471,6 +485,7 @@ export type ExpenseUpdateInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -490,6 +505,7 @@ export type ExpenseUncheckedUpdateInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -508,6 +524,7 @@ export type ExpenseCreateManyInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   payment_method_id?: bigint | number | null
   user_id: bigint | number
@@ -525,6 +542,7 @@ export type ExpenseUpdateManyMutationInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -541,6 +559,7 @@ export type ExpenseUncheckedUpdateManyInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -569,6 +588,7 @@ export type ExpenseCountOrderByAggregateInput = {
   is_paid?: Prisma.SortOrder
   paid_period?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
+  saved_period?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
   payment_method_id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
@@ -596,6 +616,7 @@ export type ExpenseMaxOrderByAggregateInput = {
   is_paid?: Prisma.SortOrder
   paid_period?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
+  saved_period?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
   payment_method_id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
@@ -614,6 +635,7 @@ export type ExpenseMinOrderByAggregateInput = {
   is_paid?: Prisma.SortOrder
   paid_period?: Prisma.SortOrder
   is_saved?: Prisma.SortOrder
+  saved_period?: Prisma.SortOrder
   saving_location?: Prisma.SortOrder
   payment_method_id?: Prisma.SortOrder
   user_id?: Prisma.SortOrder
@@ -910,6 +932,7 @@ export type ExpenseCreateWithoutUserInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -928,6 +951,7 @@ export type ExpenseUncheckedCreateWithoutUserInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   payment_method_id?: bigint | number | null
   created_at?: Date | string
@@ -989,6 +1013,7 @@ export type ExpenseScalarWhereInput = {
   is_paid?: Prisma.BoolFilter<'Expense'> | boolean
   paid_period?: Prisma.StringNullableFilter<'Expense'> | string | null
   is_saved?: Prisma.BoolFilter<'Expense'> | boolean
+  saved_period?: Prisma.StringNullableFilter<'Expense'> | string | null
   saving_location?: Prisma.StringNullableFilter<'Expense'> | string | null
   payment_method_id?: Prisma.BigIntNullableFilter<'Expense'> | bigint | number | null
   user_id?: Prisma.BigIntFilter<'Expense'> | bigint | number
@@ -1006,6 +1031,7 @@ export type ExpenseCreateWithoutCategoryInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -1023,6 +1049,7 @@ export type ExpenseUncheckedCreateWithoutCategoryInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   payment_method_id?: bigint | number | null
   user_id: bigint | number
@@ -1081,6 +1108,7 @@ export type ExpenseCreateWithoutPayment_methodInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   created_at?: Date | string
   updated_at?: Date | string
@@ -1099,6 +1127,7 @@ export type ExpenseUncheckedCreateWithoutPayment_methodInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   user_id: bigint | number
   created_at?: Date | string
@@ -1157,6 +1186,7 @@ export type ExpenseCreateManyUserInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   payment_method_id?: bigint | number | null
   created_at?: Date | string
@@ -1173,6 +1203,7 @@ export type ExpenseUpdateWithoutUserInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1191,6 +1222,7 @@ export type ExpenseUncheckedUpdateWithoutUserInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1208,6 +1240,7 @@ export type ExpenseUncheckedUpdateManyWithoutUserInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1224,6 +1257,7 @@ export type ExpenseCreateManyCategoryInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   payment_method_id?: bigint | number | null
   user_id: bigint | number
@@ -1241,6 +1275,7 @@ export type ExpenseUpdateWithoutCategoryInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1258,6 +1293,7 @@ export type ExpenseUncheckedUpdateWithoutCategoryInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1275,6 +1311,7 @@ export type ExpenseUncheckedUpdateManyWithoutCategoryInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payment_method_id?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -1293,6 +1330,7 @@ export type ExpenseCreateManyPayment_methodInput = {
   is_paid?: boolean
   paid_period?: string | null
   is_saved?: boolean
+  saved_period?: string | null
   saving_location?: string | null
   user_id: bigint | number
   created_at?: Date | string
@@ -1309,6 +1347,7 @@ export type ExpenseUpdateWithoutPayment_methodInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1327,6 +1366,7 @@ export type ExpenseUncheckedUpdateWithoutPayment_methodInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1344,6 +1384,7 @@ export type ExpenseUncheckedUpdateManyWithoutPayment_methodInput = {
   is_paid?: Prisma.BoolFieldUpdateOperationsInput | boolean
   paid_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   is_saved?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  saved_period?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   saving_location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user_id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1364,6 +1405,7 @@ export type ExpenseSelect<
     is_paid?: boolean
     paid_period?: boolean
     is_saved?: boolean
+    saved_period?: boolean
     saving_location?: boolean
     payment_method_id?: boolean
     user_id?: boolean
@@ -1390,6 +1432,7 @@ export type ExpenseSelectCreateManyAndReturn<
     is_paid?: boolean
     paid_period?: boolean
     is_saved?: boolean
+    saved_period?: boolean
     saving_location?: boolean
     payment_method_id?: boolean
     user_id?: boolean
@@ -1416,6 +1459,7 @@ export type ExpenseSelectUpdateManyAndReturn<
     is_paid?: boolean
     paid_period?: boolean
     is_saved?: boolean
+    saved_period?: boolean
     saving_location?: boolean
     payment_method_id?: boolean
     user_id?: boolean
@@ -1439,6 +1483,7 @@ export type ExpenseSelectScalar = {
   is_paid?: boolean
   paid_period?: boolean
   is_saved?: boolean
+  saved_period?: boolean
   saving_location?: boolean
   payment_method_id?: boolean
   user_id?: boolean
@@ -1459,6 +1504,7 @@ export type ExpenseOmit<
   | 'is_paid'
   | 'paid_period'
   | 'is_saved'
+  | 'saved_period'
   | 'saving_location'
   | 'payment_method_id'
   | 'user_id'
@@ -1509,6 +1555,7 @@ export type $ExpensePayload<
       is_paid: boolean
       paid_period: string | null
       is_saved: boolean
+      saved_period: string | null
       saving_location: string | null
       payment_method_id: bigint | null
       user_id: bigint
@@ -2110,6 +2157,7 @@ export interface ExpenseFieldRefs {
   readonly is_paid: Prisma.FieldRef<'Expense', 'Boolean'>
   readonly paid_period: Prisma.FieldRef<'Expense', 'String'>
   readonly is_saved: Prisma.FieldRef<'Expense', 'Boolean'>
+  readonly saved_period: Prisma.FieldRef<'Expense', 'String'>
   readonly saving_location: Prisma.FieldRef<'Expense', 'String'>
   readonly payment_method_id: Prisma.FieldRef<'Expense', 'BigInt'>
   readonly user_id: Prisma.FieldRef<'Expense', 'BigInt'>

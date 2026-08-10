@@ -648,4 +648,37 @@ describe('Expenses API', () => {
     const json = await res.json()
     expect(json.expenses[0].is_paid).toBe(false)
   }, 20000)
+
+  it('search drops is_paid and is_saved once a recurring expense rolls into the next period', async () => {
+    const name = `paid-saved-rollover-${TS}`
+    await req('POST', '/api/v1/expenses', {
+      name,
+      amount: 100,
+      date: '2026-06-01',
+      is_recurring: true,
+      is_paid: true,
+      is_saved: true,
+    })
+    const filters = { field: 'name', fieldType: 'string', op: 'is_equal', value: name }
+
+    const june = await (
+      await req('POST', '/api/v1/expenses/search', {
+        granularity: 'monthly',
+        date: '2026-06-15',
+        filters,
+      })
+    ).json()
+    expect(june.expenses[0].is_paid).toBe(true)
+    expect(june.expenses[0].is_saved).toBe(true)
+
+    const july = await (
+      await req('POST', '/api/v1/expenses/search', {
+        granularity: 'monthly',
+        date: '2026-07-15',
+        filters,
+      })
+    ).json()
+    expect(july.expenses[0].is_paid).toBe(false)
+    expect(july.expenses[0].is_saved).toBe(false)
+  }, 20000)
 })
