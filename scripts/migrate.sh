@@ -26,6 +26,12 @@ sed 's/CREATE TABLE /CREATE TABLE IF NOT EXISTS /g
 echo "Pushing to Supabase..."
 bunx supabase db push
 
+# The push above can be declined at its confirmation prompt, or stop early on an
+# earlier migration that is applied but unregistered, without failing loudly here.
+# Confirm the migration actually landed rather than trusting that the file was written.
+echo "Verifying the migration was deployed..."
+bash scripts/check-migrations.sh
+
 echo "Done. Files to commit:"
 echo "  $PRISMA_SQL"
 echo "  $SUPABASE_SQL"

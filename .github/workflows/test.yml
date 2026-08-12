@@ -59,8 +59,14 @@ jobs:
       - name: Generate Prisma client
         run: bunx prisma generate
 
-      - name: Sync schema to the test database
-        run: bunx prisma db push
+      # Build the test database from the committed migration history instead of
+      # pushing schema.prisma straight in. `db push` invents whatever schema the
+      # models describe, so it passes even when the migration that a real database
+      # depends on is missing or incomplete — the failure then only shows up in
+      # production. Replaying the history proves the migrations produce the schema
+      # the tests (and the app) expect.
+      - name: Apply migration history to the test database
+        run: bunx prisma migrate deploy
 
       - name: Run tests
         run: bun test

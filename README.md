@@ -235,6 +235,29 @@ supabase db push                   # register the migration in Supabase
 prisma generate                    # regenerate the Prisma client
 ```
 
+#### Verifying a migration was deployed
+
+```bash
+bun run migrate:check    # fails unless every committed migration is applied to the database
+```
+
+`bun run migrate` ends with this check, so a migration that never reached the database fails
+the command instead of passing silently. Run it on its own whenever the API returns a 500 on a
+table you have just changed.
+
+A committed migration file is not a deployed migration. If the push is skipped or declined at
+its prompt, nothing fails at that moment — the break appears later, when code expects a column
+the database does not have and every query on that table fails with Prisma `P2022`
+(`column does not exist`). CI cannot catch it, because it builds a throwaway database from the
+committed history and never connects to the real one.
+
+If the check reports a pending migration that is in fact already applied, register it rather
+than re-running it — re-running is only safe for a strictly idempotent migration:
+
+```bash
+bunx supabase migration repair --status applied <version>
+```
+
 See `prisma/docs/README.md` for the full migration workflow.
 
 ### Project Structure

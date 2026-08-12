@@ -5,6 +5,7 @@
     "test": "bun test --timeout 20000",
     "dev": "bun run --watch src/index.ts",
     "migrate": "bash scripts/migrate.sh",
+    "migrate:check": "bash scripts/check-migrations.sh",
     "prepare": "husky",
     "format": "prettier --write ."
   },
