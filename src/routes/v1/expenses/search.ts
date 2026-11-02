@@ -28,6 +28,8 @@ export const EXPENSE_ALLOWED_FIELDS: FieldAllowlist = {
   is_paid: 'boolean',
   is_saved: 'boolean',
   saving_location: 'string_nullable',
+  'payment_method.name': 'string',
+  'payment_method.origin': 'string',
   created_at: 'datetime',
   updated_at: 'datetime',
 }

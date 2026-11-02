@@ -210,6 +210,18 @@ describe('parseFilterBody', () => {
 // ---------------------------------------------------------------------------
 
 describe('buildWhereClause', () => {
+  it('dotted field filters through a relation', () => {
+    const condition: FilterCondition = {
+      field: 'payment_method.origin',
+      fieldType: 'string',
+      op: 'is_contains',
+      value: 'nubank',
+    }
+    expect(buildWhereClause(condition)).toEqual({
+      payment_method: { origin: { contains: 'nubank', mode: 'insensitive' } },
+    })
+  })
+
   it('string is_equal', () => {
     const condition: FilterCondition = {
       field: 'name',

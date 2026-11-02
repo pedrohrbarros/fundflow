@@ -204,49 +204,54 @@ export const buildWhereClause = (node: FilterNode): Record<string, unknown> => {
   }
 
   const condition = node as FilterCondition
-  const { field, fieldType, op, value } = condition
+  const { field } = condition
+  return nestField(field, conditionFilter(condition))
+}
 
+const conditionFilter = ({ fieldType, op, value }: FilterCondition): unknown => {
   const toDate = (dateValue: unknown) => new Date(dateValue as string)
 
   switch (op) {
     case 'is_equal':
-      return {
-        [field]: { equals: fieldType === 'datetime' ? toDate(value) : value },
-      }
+      return { equals: fieldType === 'datetime' ? toDate(value) : value }
     case 'is_not_equal':
-      return {
-        [field]: { not: fieldType === 'datetime' ? toDate(value) : value },
-      }
+      return { not: fieldType === 'datetime' ? toDate(value) : value }
     case 'is_contains':
-      return { [field]: { contains: value, mode: 'insensitive' } }
+      return { contains: value, mode: 'insensitive' }
     case 'is_starts_with':
-      return { [field]: { startsWith: value, mode: 'insensitive' } }
+      return { startsWith: value, mode: 'insensitive' }
     case 'is_ends_with':
-      return { [field]: { endsWith: value, mode: 'insensitive' } }
+      return { endsWith: value, mode: 'insensitive' }
     case 'is_null':
-      return { [field]: null }
+      return null
     case 'is_not_null':
-      return { [field]: { not: null } }
+      return { not: null }
     case 'is_greater':
-      return { [field]: { gt: value } }
+      return { gt: value }
     case 'is_greater_or_equal':
-      return { [field]: { gte: value } }
+      return { gte: value }
     case 'is_lower':
-      return { [field]: { lt: value } }
+      return { lt: value }
     case 'is_lower_or_equal':
-      return { [field]: { lte: value } }
+      return { lte: value }
     case 'is_between': {
       const [valueA, valueB] = value as [number, number] | [string, string]
       return {
-        [field]: {
-          gte: fieldType === 'datetime' ? toDate(valueA) : valueA,
-          lte: fieldType === 'datetime' ? toDate(valueB) : valueB,
-        },
+        gte: fieldType === 'datetime' ? toDate(valueA) : valueA,
+        lte: fieldType === 'datetime' ? toDate(valueB) : valueB,
       }
     }
     case 'is_before':
-      return { [field]: { lt: toDate(value) } }
+      return { lt: toDate(value) }
     case 'is_after':
-      return { [field]: { gt: toDate(value) } }
+      return { gt: toDate(value) }
   }
 }
+
+// A dotted field filters through a relation:
+// 'payment_method.name' → { payment_method: { name: <filter> } }
+const nestField = (field: string, filter: unknown): Record<string, unknown> =>
+  field.split('.').reduceRight<unknown>((inner, key) => ({ [key]: inner }), filter) as Record<
+    string,
+    unknown
+  >
